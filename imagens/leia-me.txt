@@ -1,0 +1,7 @@
+Se preferir hospedar as fotos aqui em vez de usar ImgBB/Postimages,
+coloque os arquivos de imagem dentro desta pasta.
+
+Depois, na planilha, o link da foto fica assim:
+https://nossoprojeto3d.github.io/NOME-DO-REPOSITORIO/imagens/nome-da-foto.jpg
+
+Troque NOME-DO-REPOSITORIO pelo nome real do repositório.
