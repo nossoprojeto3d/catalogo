@@ -290,6 +290,22 @@
     margin: 0;
     color: var(--text);
     line-height: 1.3;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .cartao-categoria h2 span, .produto h3 span{
+    display: inline-block;
+  }
+  .rolar span{
+    animation: rolarTexto var(--duracao, 6s) ease-in-out infinite;
+  }
+  @keyframes rolarTexto{
+    0%, 12%{ transform: translateX(0); }
+    45%, 55%{ transform: translateX(var(--deslocamento, 0)); }
+    88%, 100%{ transform: translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .rolar span{ animation: none; }
   }
   .contagem{ font-size: 12.5px; color: var(--text-tertiary); margin:0; }
 
@@ -689,7 +705,7 @@
       <div class="foto">${fotoHtml}</div>
       <div class="info">
         ${mostrarCategoria ? `<p class="contagem">${nomeCategoria}</p>` : ''}
-        <h3>${produto.nome}</h3>
+        <h3><span>${produto.nome}</span></h3>
         ${produto.codigo ? `<p class="codigo">Cód. ${produto.codigo}</p>` : ''}
         ${produto.descricao ? `<p class="descricao">${produto.descricao}</p>` : ''}
         <p class="preco">R$ ${produto.preco}</p>
@@ -728,6 +744,23 @@
     if(evento.key === 'Escape') fecharLightbox();
   });
 
+  function aplicarRolagemNosTitulos(){
+    document.querySelectorAll('.cartao-categoria h2, .produto h3').forEach(titulo => {
+      const span = titulo.querySelector('span');
+      if(!span) return;
+      const excesso = span.scrollWidth - titulo.clientWidth;
+      if(excesso > 4){
+        const distancia = excesso + 14; // pequena folga no final
+        const duracao = Math.max(4, distancia / 28); // velocidade constante de leitura
+        titulo.style.setProperty('--deslocamento', `-${distancia}px`);
+        titulo.style.setProperty('--duracao', `${duracao}s`);
+        titulo.classList.add('rolar');
+      }else{
+        titulo.classList.remove('rolar');
+      }
+    });
+  }
+
   function trocarTela(construir){
     conteudo.style.opacity = '0';
     conteudo.style.transform = 'translateY(6px)';
@@ -736,6 +769,7 @@
       conteudo.style.opacity = '1';
       conteudo.style.transform = 'translateY(0)';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      requestAnimationFrame(aplicarRolagemNosTitulos);
     }, 180);
   }
 
@@ -755,7 +789,7 @@
         cartao.innerHTML = `
           <div class="capa">${capaHtml}</div>
           <div class="legenda">
-            <h2>${categoria.nome}</h2>
+            <h2><span>${categoria.nome}</span></h2>
             <p class="contagem">${categoria.produtos.length} ${categoria.produtos.length === 1 ? 'produto' : 'produtos'}</p>
           </div>
         `;
@@ -860,6 +894,12 @@
     const limite = cabecalhoEl.offsetHeight - 60;
     if(window.scrollY > limite){ barraFixa.classList.add('visivel'); }
     else{ barraFixa.classList.remove('visivel'); }
+  });
+
+  let tempoRedimensionar = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(tempoRedimensionar);
+    tempoRedimensionar = setTimeout(aplicarRolagemNosTitulos, 200);
   });
 
   function renderManutencao(){
