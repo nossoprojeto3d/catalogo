@@ -744,9 +744,10 @@
   }
 
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
+    const candidatosPorCodigo = produto.codigo ? candidatosFotoPorCodigo(produto.codigo, nomeCategoria) : [];
     const candidatosFoto = produto.foto
-      ? [produto.foto]
-      : (produto.codigo ? candidatosFotoPorCodigo(produto.codigo, nomeCategoria) : []);
+      ? [produto.foto, ...candidatosPorCodigo]
+      : candidatosPorCodigo;
 
     const fotoHtml = candidatosFoto.length
       ? `<img alt="${produto.nome}">`
