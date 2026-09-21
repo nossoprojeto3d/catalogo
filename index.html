@@ -783,14 +783,16 @@
     });
   }
 
-  function trocarTela(construir){
+  function trocarTela(construir, rolarTopo = true){
     conteudo.style.opacity = '0';
     conteudo.style.transform = 'translateY(6px)';
     setTimeout(() => {
       construir();
       conteudo.style.opacity = '1';
       conteudo.style.transform = 'translateY(0)';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if(rolarTopo){
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       requestAnimationFrame(aplicarRolagemNosTitulos);
     }, 180);
   }
@@ -894,7 +896,7 @@
         grade.appendChild(criarCardProduto(resultado.produto, resultado.categoria, indice, true));
       });
       conteudo.appendChild(grade);
-    });
+    }, false);
   }
 
   // Brilho segue o mouse no cabeçalho (apenas em telas com ponteiro preciso)
