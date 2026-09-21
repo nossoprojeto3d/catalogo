@@ -652,6 +652,12 @@
         });
       }
     }
+
+    categorias.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+    categorias.forEach(categoria => {
+      categoria.produtos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+    });
+
     return categorias;
   }
 
