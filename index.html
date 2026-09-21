@@ -98,7 +98,6 @@
     background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 38%), rgba(231,200,115,0.16), transparent 70%);
     transition: opacity 0.4s var(--easing);
   }
-  header:hover .brilho-cursor{ opacity: 1; }
 
   @keyframes derivar{
     0%, 100%{ transform: translate(0, 0) scale(1); }
@@ -237,7 +236,6 @@
     cursor: pointer;
     transition: border-color 0.2s var(--easing), color 0.2s var(--easing), background 0.2s var(--easing);
   }
-  .voltar:hover{ border-color: var(--gold); color: var(--gold-light); background: var(--card-hover); }
   .trilha .categoria-atual{ color: var(--gold-light); font-weight: 500; }
 
   .grade{
@@ -263,12 +261,6 @@
     animation: surgir 0.5s var(--easing) both;
   }
   .cartao-categoria{ cursor: pointer; text-align: left; padding: 0; }
-  .cartao-categoria:hover, .produto:hover{
-    border-color: var(--border-hover);
-    background: var(--card-hover);
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px -12px rgba(0,0,0,0.55);
-  }
 
   .capa, .foto{
     width: 100%;
@@ -280,7 +272,6 @@
   }
   .foto{ cursor: zoom-in; }
   .capa img, .foto img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.5s var(--easing); }
-  .cartao-categoria:hover .capa img, .produto:hover .foto img{ transform: scale(1.05); }
 
   .legenda, .info{ padding: 14px 14px 16px; display:flex; flex-direction: column; gap: 5px; flex: 1; }
   .cartao-categoria h2, .produto h3{
@@ -326,7 +317,6 @@
     border-radius: 100px;
     transition: background 0.2s var(--easing), color 0.2s var(--easing), transform 0.15s var(--easing);
   }
-  .btn-whats:hover{ background: var(--gold); color: var(--bg); }
   .btn-whats:active{ transform: scale(0.97); }
   .btn-whats svg{ width: 14px; height: 14px; flex-shrink:0; }
 
@@ -423,7 +413,6 @@
     z-index: 30;
     transition: transform 0.2s var(--easing);
   }
-  .flutuante:hover{ transform: scale(1.06); }
   .flutuante svg{ width: 24px; height: 24px; }
 
   /* ---------- Rodapé ---------- */
@@ -474,7 +463,6 @@
     transition: color 0.2s var(--easing);
   }
   @media (min-width: 640px){ .rodape-links a{ justify-content: flex-start; } }
-  .rodape-links a:hover{ color: var(--gold-light); }
   .rodape-links svg{ width: 15px; height: 15px; flex-shrink: 0; }
 
   .rodape-base{
@@ -491,6 +479,25 @@
     header{ padding: 76px 24px 56px; }
     .logo-marca{ width: 88px; }
     main{ padding: 44px 24px 88px; }
+  }
+
+  /* ---------- Efeitos de hover — só em telas com mouse de verdade ----------
+     Em toque (celular/tablet), :hover "gruda" no item tocado até o usuário
+     tocar em outro lugar, o que parece um bug. Por isso, esses efeitos só
+     entram em telas que realmente têm um ponteiro preciso (mouse). ---------- */
+  @media (hover: hover) and (pointer: fine){
+    header:hover .brilho-cursor{ opacity: 1; }
+    .voltar:hover{ border-color: var(--gold); color: var(--gold-light); background: var(--card-hover); }
+    .cartao-categoria:hover, .produto:hover{
+      border-color: var(--border-hover);
+      background: var(--card-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px -12px rgba(0,0,0,0.55);
+    }
+    .cartao-categoria:hover .capa img, .produto:hover .foto img{ transform: scale(1.05); }
+    .btn-whats:hover{ background: var(--gold); color: var(--bg); }
+    .flutuante:hover{ transform: scale(1.06); }
+    .rodape-links a:hover{ color: var(--gold-light); }
   }
 </style>
 </head>
