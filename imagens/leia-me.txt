@@ -1,7 +1,8 @@
-Se preferir hospedar as fotos aqui em vez de usar ImgBB/Postimages,
-coloque os arquivos de imagem dentro desta pasta.
+Coloque aqui as fotos dos produtos.
 
-Depois, na planilha, o link da foto fica assim:
-https://nossoprojeto3d.github.io/NOME-DO-REPOSITORIO/imagens/nome-da-foto.jpg
+Nomeie cada arquivo exatamente igual ao "Codigo" do produto na planilha
+(maiúsculo ou minúsculo, tanto faz). Exemplo: produto com código SEN-01
+-> arquivo SEN-01.jpg (ou .jpeg / .png / .webp).
 
-Troque NOME-DO-REPOSITORIO pelo nome real do repositório.
+Com o arquivo aqui e a coluna "Foto" da planilha vazia, a página encontra
+a imagem sozinha pelo código — não precisa colar link nenhum.

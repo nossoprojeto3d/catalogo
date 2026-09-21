@@ -35,13 +35,25 @@ Colunas, exatamente nessa grafia (linha 1):
 
 ## Fotos
 
-O catálogo não hospeda imagem nenhuma — só usa o link. Duas formas de
-conseguir esse link:
+Forma recomendada — automática pelo código do produto:
 
-1. Subir a foto no [imgbb.com](https://imgbb.com) ou
-   [postimages.org](https://postimages.org) e copiar o link direto.
-2. Colocar o arquivo na pasta `imagens/` deste repositório e usar o link
-   do GitHub Pages (veja `imagens/leia-me.txt`).
+1. Nomeie o arquivo de imagem exatamente igual ao `Codigo` do produto
+   (ex.: produto com código `SEN-01` → arquivo `SEN-01.jpg`). Maiúsculo
+   ou minúsculo tanto faz, a página tenta as duas formas.
+2. Coloque o arquivo dentro da pasta `imagens/` deste repositório e suba
+   (commit + push) pro GitHub.
+3. **Deixe a coluna `Foto` da planilha vazia** para esse produto — a
+   página encontra a imagem sozinha pelo código.
+
+Extensões aceitas: `.jpg`, `.jpeg`, `.png`, `.webp`. Se nenhum arquivo
+correspondente for encontrado, o card mostra o placeholder "Foto do
+produto" em vez de imagem quebrada.
+
+Forma alternativa — link direto: se preferir, ainda dá pra preencher a
+coluna `Foto` da planilha com um link direto de imagem (ex.: subindo a
+foto no [imgbb.com](https://imgbb.com) ou [postimages.org](https://postimages.org)).
+Quando a coluna `Foto` está preenchida, ela tem prioridade sobre a busca
+automática pelo código.
 
 Proporção recomendada: retrato (3:4), até 1200px no lado maior, e o
 arquivo abaixo de ~400KB pra carregar rápido no celular.

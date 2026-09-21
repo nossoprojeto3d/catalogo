@@ -722,9 +722,28 @@
       .toLowerCase().trim();
   }
 
+  // ---------- Foto automática pelo código do produto (pasta imagens/) ----------
+  const PASTA_IMAGENS = 'imagens/';
+  const EXTENSOES_FOTO = ['jpg', 'jpeg', 'png', 'webp'];
+
+  function candidatosFotoPorCodigo(codigo){
+    const variantes = [...new Set([codigo, codigo.toUpperCase(), codigo.toLowerCase()])];
+    const candidatos = [];
+    variantes.forEach(variante => {
+      EXTENSOES_FOTO.forEach(extensao => {
+        candidatos.push(`${PASTA_IMAGENS}${encodeURIComponent(variante)}.${extensao}`);
+      });
+    });
+    return candidatos;
+  }
+
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
-    const fotoHtml = produto.foto
-      ? `<img src="${produto.foto}" alt="${produto.nome}">`
+    const candidatosFoto = produto.foto
+      ? [produto.foto]
+      : (produto.codigo ? candidatosFotoPorCodigo(produto.codigo) : []);
+
+    const fotoHtml = candidatosFoto.length
+      ? `<img alt="${produto.nome}">`
       : `<div class="foto-vazia">Foto do produto</div>`;
 
     const card = document.createElement('div');
@@ -744,8 +763,27 @@
       </div>
     `;
 
-    if(produto.foto){
-      card.querySelector('.foto').addEventListener('click', () => abrirLightbox(produto.foto, produto.nome));
+    if(candidatosFoto.length){
+      const areaFoto = card.querySelector('.foto');
+      const imagem = areaFoto.querySelector('img');
+      let tentativa = 0;
+
+      const tentarProximaFoto = () => {
+        if(tentativa >= candidatosFoto.length){
+          areaFoto.innerHTML = `<div class="foto-vazia">Foto do produto</div>`;
+          return;
+        }
+        imagem.src = candidatosFoto[tentativa];
+        tentativa++;
+      };
+      imagem.addEventListener('error', tentarProximaFoto);
+      tentarProximaFoto();
+
+      areaFoto.addEventListener('click', () => {
+        if(imagem.isConnected && imagem.complete && imagem.naturalWidth > 0){
+          abrirLightbox(imagem.src, produto.nome);
+        }
+      });
     }
 
     return card;
