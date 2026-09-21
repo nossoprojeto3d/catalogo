@@ -4,5 +4,11 @@ Nomeie cada arquivo exatamente igual ao "Codigo" do produto na planilha
 (maiúsculo ou minúsculo, tanto faz). Exemplo: produto com código SEN-01
 -> arquivo SEN-01.jpg (ou .jpeg / .png / .webp).
 
+Pode jogar direto aqui na raiz ou organizar em subpastas com o nome
+exato da categoria, ex.:
+  imagens/Sensoriais - Articulados/SEN-01.jpg
+  imagens/Harry Potter/HP-03.png
+A página procura primeiro na subpasta da categoria e depois aqui na raiz.
+
 Com o arquivo aqui e a coluna "Foto" da planilha vazia, a página encontra
 a imagem sozinha pelo código — não precisa colar link nenhum.

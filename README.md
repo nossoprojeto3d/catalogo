@@ -40,9 +40,12 @@ Forma recomendada — automática pelo código do produto:
 1. Nomeie o arquivo de imagem exatamente igual ao `Codigo` do produto
    (ex.: produto com código `SEN-01` → arquivo `SEN-01.jpg`). Maiúsculo
    ou minúsculo tanto faz, a página tenta as duas formas.
-2. Coloque o arquivo dentro da pasta `imagens/` deste repositório e suba
-   (commit + push) pro GitHub.
-3. **Deixe a coluna `Foto` da planilha vazia** para esse produto — a
+2. Coloque o arquivo dentro da pasta `imagens/` deste repositório — pode
+   ser direto na raiz dela ou dentro de uma subpasta com o nome exato da
+   categoria (ex.: `imagens/Sensoriais - Articulados/SEN-01.jpg`), pra
+   manter organizado. A página procura nos dois lugares.
+3. Suba (commit + push) o arquivo pro GitHub.
+4. **Deixe a coluna `Foto` da planilha vazia** para esse produto — a
    página encontra a imagem sozinha pelo código.
 
 Extensões aceitas: `.jpg`, `.jpeg`, `.png`, `.webp`. Se nenhum arquivo

@@ -726,12 +726,18 @@
   const PASTA_IMAGENS = 'imagens/';
   const EXTENSOES_FOTO = ['jpg', 'jpeg', 'png', 'webp'];
 
-  function candidatosFotoPorCodigo(codigo){
-    const variantes = [...new Set([codigo, codigo.toUpperCase(), codigo.toLowerCase()])];
+  function candidatosFotoPorCodigo(codigo, nomeCategoria){
+    const variantesCodigo = [...new Set([codigo, codigo.toUpperCase(), codigo.toLowerCase()])];
+    const pastas = [
+      `${PASTA_IMAGENS}${encodeURIComponent(nomeCategoria)}/`,
+      PASTA_IMAGENS
+    ];
     const candidatos = [];
-    variantes.forEach(variante => {
-      EXTENSOES_FOTO.forEach(extensao => {
-        candidatos.push(`${PASTA_IMAGENS}${encodeURIComponent(variante)}.${extensao}`);
+    pastas.forEach(pasta => {
+      variantesCodigo.forEach(variante => {
+        EXTENSOES_FOTO.forEach(extensao => {
+          candidatos.push(`${pasta}${encodeURIComponent(variante)}.${extensao}`);
+        });
       });
     });
     return candidatos;
@@ -740,7 +746,7 @@
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
     const candidatosFoto = produto.foto
       ? [produto.foto]
-      : (produto.codigo ? candidatosFotoPorCodigo(produto.codigo) : []);
+      : (produto.codigo ? candidatosFotoPorCodigo(produto.codigo, nomeCategoria) : []);
 
     const fotoHtml = candidatosFoto.length
       ? `<img alt="${produto.nome}">`
