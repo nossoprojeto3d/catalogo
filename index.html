@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#120E09">
 <title>Catálogo — Nosso Projeto 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,7 +25,7 @@
     --easing: cubic-bezier(0.22, 1, 0.36, 1);
   }
   *{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
+  html{ scroll-behavior: smooth; background: #120E09; }
   html,body{ margin:0; padding:0; }
   body{
     background: var(--bg);
@@ -32,29 +33,43 @@
     font-family: 'Work Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
   ::selection{ background: var(--gold-dark); color: var(--text); }
 
   /* ---------- Barra fixa (aparece ao rolar) ---------- */
   .barra-fixa{
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 20;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     padding: 14px 20px;
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
     background: rgba(18,14,9,0.82);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 1px solid transparent;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-100%);
+    transition: opacity 0.3s var(--easing), transform 0.3s var(--easing), visibility 0.3s;
+    pointer-events: none;
+  }
+  .barra-fixa.visivel{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--border);
-    opacity: 0;
-    transform: translateY(-100%);
-    transition: opacity 0.3s var(--easing), transform 0.3s var(--easing);
-    pointer-events: none;
   }
-  .barra-fixa.visivel{ opacity: 1; transform: translateY(0); pointer-events: auto; }
   .barra-fixa img{ width: 22px; height: 22px; object-fit: contain; }
   .barra-fixa span{
     font-family: 'Fraunces', serif;
