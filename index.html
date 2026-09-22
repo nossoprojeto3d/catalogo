@@ -263,8 +263,8 @@
 
   .grade{
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   @media (min-width: 540px){
     .grade{ grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -276,16 +276,15 @@
   .produto{
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 14px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 10px 30px -20px rgba(0,0,0,0.6);
     transition: border-color 0.25s var(--easing), background 0.25s var(--easing), transform 0.25s var(--easing), box-shadow 0.25s var(--easing);
     animation: surgir 0.5s var(--easing) both;
   }
   .produto-promocao{
-    border-color: var(--gold);
-    box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25);
     /* mantém a entrada normal do card (surgir) e soma o tremor logo
        depois que ela termina, pra não brigar com o próprio translateY
        da entrada */
@@ -408,16 +407,31 @@
     .selo-tag{ animation: none; opacity: 1; transform: scale(1); }
   }
 
-  .info{ padding: 14px 14px 16px; display:flex; flex-direction: column; gap: 5px; flex: 1; }
+  /* Nome e preço ficam sobre a própria foto, com um gradiente escuro
+     por baixo garantindo leitura em qualquer imagem — dá mais presença
+     pro produto num card de largura cheia (1 coluna no mobile). */
+  .legenda-foto{
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 2;
+    padding: 34px 16px 14px;
+    background: linear-gradient(to top, rgba(9,7,4,0.95) 0%, rgba(9,7,4,0.72) 40%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    pointer-events: none;
+  }
+  .legenda-foto .contagem{ color: var(--text-tertiary); text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
   .produto h3{
     font-family:'Fraunces', serif;
     font-weight:500;
-    font-size: clamp(15px, 3.6vw, 18px);
+    font-size: clamp(18px, 4.6vw, 22px);
     margin: 0;
     color: var(--text);
-    line-height: 1.3;
+    line-height: 1.28;
     overflow: hidden;
     white-space: nowrap;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.55);
   }
   .produto h3 span{
     display: inline-block;
@@ -435,12 +449,14 @@
   }
   .contagem{ font-size: 12.5px; color: var(--text-tertiary); margin:0; }
 
-  .descricao{ font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 0 0 2px; }
-  .codigo{ font-size: 11px; color: var(--text-footer); letter-spacing: 0.5px; margin: -2px 0 4px; }
-  .preco{ font-size: clamp(16px, 4vw, 18px); font-weight: 700; color: var(--gold-light); margin: auto 0 10px; }
-  .preco-linha{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 8px; margin: auto 0 10px; }
+  .info{ padding: 14px 16px 16px; display:flex; flex-direction: column; gap: 8px; flex: 1; }
+  .descricao{ font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 0; }
+  .codigo{ font-size: 11px; color: var(--text-footer); letter-spacing: 0.5px; margin: 0; }
+  .preco{ font-size: clamp(18px, 4.8vw, 21px); font-weight: 700; color: var(--gold-light); margin: 0; text-shadow: 0 1px 10px rgba(0,0,0,0.55); }
+  .preco-linha{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 8px; margin: 0; }
   .preco-linha .preco{ margin: 0; }
-  .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; }
+  .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; text-shadow: none; }
+  .info .btn-whats{ margin-top: auto; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
 
   /* ---------- Carrossel de mais vendidos ---------- */
@@ -483,8 +499,6 @@
     animation: surgir 0.5s var(--easing) both;
   }
   .card-vendido-promocao{
-    border-color: var(--gold);
-    box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25);
     animation: surgir 0.5s var(--easing) both, tremerCard 0.6s 0.5s ease-in-out both;
   }
   @media (prefers-reduced-motion: reduce){
@@ -1282,15 +1296,17 @@
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
         ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
+        <div class="legenda-foto">
+          ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
+          <h3><span>${escaparHTML(produto.nome)}</span></h3>
+          ${produto.precoPromocional
+            ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
+            : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
+        </div>
       </div>
       <div class="info">
-        ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
-        <h3><span>${escaparHTML(produto.nome)}</span></h3>
         ${produto.codigo ? `<p class="codigo">Cód. ${escaparHTML(produto.codigo)}</p>` : ''}
         ${produto.descricao ? `<p class="descricao">${escaparHTML(produto.descricao)}</p>` : ''}
-        ${produto.precoPromocional
-          ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
-          : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
         <a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
           ${iconeWhats} Escolher no WhatsApp
         </a>
