@@ -1637,7 +1637,7 @@
       const pills = document.createElement('div');
       pills.className = 'pills-categorias';
       pills.id = 'pillsCategorias';
-      pills.appendChild(criarBotaoPill('Todos', null, categorias));
+      pills.appendChild(criarBotaoPill('Tudo por Aqui', null, categorias));
       categorias.forEach(categoria => {
         pills.appendChild(criarBotaoPill(formatarNomeCategoria(categoria.nome), categoria.nome, categorias));
       });
