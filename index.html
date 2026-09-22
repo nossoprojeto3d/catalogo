@@ -1156,6 +1156,15 @@
     }
 
     categorias.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+    // "Lançamentos" sempre pula pra frente de todo mundo (exceto o pill
+    // "Tudo por Aqui", que já é fixo antes disso) — o resto continua em
+    // ordem alfabética. Funciona sozinho pra categoria nova que aparecer
+    // na planilha, sem precisar reordenar nada aqui.
+    const indiceLancamentos = categorias.findIndex(categoria => normalizarTexto(categoria.nome) === 'lancamentos');
+    if(indiceLancamentos > 0){
+      const [lancamentos] = categorias.splice(indiceLancamentos, 1);
+      categorias.unshift(lancamentos);
+    }
     categorias.forEach(categoria => {
       // Ordena por nome primeiro, depois traz quem tem Tag pra frente
       // (sort é estável, então dentro de "tem tag" e "não tem tag" a
