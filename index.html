@@ -43,6 +43,9 @@
     overflow-x: hidden;
     min-height: 100vh;
     min-height: 100dvh;
+    /* Evita o zoom de "duplo toque" do Safari/iOS ao tocar rápido em
+       cards e botões — continua permitindo pinça pra zoom manual. */
+    touch-action: manipulation;
   }
   ::selection{ background: var(--gold-dark); color: var(--text); }
 
@@ -227,7 +230,9 @@
     border: 1px solid var(--border);
     color: var(--text);
     font-family: 'Work Sans', sans-serif;
-    font-size: 14.5px;
+    /* 16px é o mínimo pro Safari/iOS não dar zoom automático ao focar
+       o campo (abaixo disso, ele "ajuda" ampliando a tela sozinho). */
+    font-size: 16px;
     padding: 13px 16px 13px 44px;
     border-radius: 100px;
     outline: none;
