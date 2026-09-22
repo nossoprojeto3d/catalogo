@@ -789,6 +789,13 @@
       .toLowerCase().trim();
   }
 
+  // Troca "-" (separando palavras) ou "/" por um ponto tipográfico, só
+  // na exibição — o nome original da categoria (planilha, agrupamento,
+  // pasta de fotos) continua intacto.
+  function formatarNomeCategoria(nome){
+    return String(nome).replace(/\s+-\s+|\//g, ' · ');
+  }
+
   // ---------- Foto automática pelo código do produto (pasta imagens/) ----------
   const PASTA_IMAGENS = 'imagens/';
   const EXTENSOES_FOTO = ['jpg', 'jpeg', 'png', 'webp'];
@@ -826,7 +833,7 @@
     card.innerHTML = `
       <div class="foto">${fotoHtml}</div>
       <div class="info">
-        ${mostrarCategoria ? `<p class="contagem">${nomeCategoria}</p>` : ''}
+        ${mostrarCategoria ? `<p class="contagem">${formatarNomeCategoria(nomeCategoria)}</p>` : ''}
         <h3><span>${produto.nome}</span></h3>
         ${produto.codigo ? `<p class="codigo">Cód. ${produto.codigo}</p>` : ''}
         ${produto.descricao ? `<p class="descricao">${produto.descricao}</p>` : ''}
@@ -927,7 +934,7 @@
         card.style.animationDelay = `${indice * 0.05}s`;
         card.innerHTML = `
           <span class="estrela">✦</span>
-          <h2>${categoria.nome}</h2>
+          <h2>${formatarNomeCategoria(categoria.nome)}</h2>
           <p class="contagem-cat">${categoria.produtos.length} ${categoria.produtos.length === 1 ? 'produto' : 'produtos'}</p>
         `;
         card.addEventListener('click', () => renderProdutos(categorias, indice));
@@ -964,7 +971,7 @@
       trilha.innerHTML = `
         <button class="voltar">‹ Categorias</button>
         <span>/</span>
-        <span class="categoria-atual">${categoria.nome}</span>
+        <span class="categoria-atual">${formatarNomeCategoria(categoria.nome)}</span>
       `;
       trilha.querySelector('.voltar').addEventListener('click', () => renderCategorias(categorias));
 
