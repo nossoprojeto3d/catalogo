@@ -562,8 +562,19 @@
     -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
   }
   .pills-categorias::-webkit-scrollbar{ display: none; }
-  @media (min-width: 900px){
-    .pills-categorias{ margin: 0 -24px 22px; padding: 2px 24px 4px; }
+  /* A rolagem horizontal é só pra telas de celular — a partir daqui tem
+     espaço de sobra, então volta a quebrar linha normalmente, sem
+     esconder nenhuma categoria atrás de scroll. */
+  @media (min-width: 540px){
+    .pills-categorias{
+      flex-wrap: wrap;
+      overflow-x: visible;
+      scroll-snap-type: none;
+      margin: 0 0 22px;
+      padding: 0;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
   }
   .pill{
     display: inline-flex;
@@ -584,8 +595,8 @@
     transition: border-color 0.2s var(--easing), background 0.2s var(--easing), color 0.2s var(--easing);
   }
   .pill.ativo{
-    background: var(--gold);
-    border-color: var(--gold);
+    background: var(--gold-mid);
+    border-color: var(--gold-mid);
     color: var(--bg);
     font-weight: 700;
   }
@@ -593,15 +604,15 @@
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
-    background: var(--gold);
-    border: 1px solid var(--gold);
+    background: var(--gold-mid);
+    border: 1px solid var(--gold-mid);
     color: var(--bg);
     text-decoration: none;
     font-weight: 700;
     font-size: 13.5px;
     padding: 12px 14px;
     border-radius: 100px;
-    box-shadow: 0 8px 20px -10px rgba(201, 162, 39, 0.6);
+    box-shadow: 0 8px 20px -10px rgba(176, 141, 43, 0.6);
     transition: background 0.2s var(--easing), border-color 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
   }
   .btn-whats:active{ transform: scale(0.97); }
