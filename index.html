@@ -962,7 +962,7 @@
     <button class="modal-info-fechar" id="modalInfoFechar" aria-label="Fechar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
-    <h2>Informações importantes</h2>
+    <h2>Antes de pedir, um papo rápido</h2>
     <div class="modal-info-item">
       <h3>Garantia</h3>
       <p>A garantia é válida exclusivamente para defeitos de fabricação. Não cobre danos decorrentes de quedas, mau uso, alterações, exposição ao calor ou uso inadequado do produto.</p>
@@ -987,7 +987,7 @@
 </a>
 
 <div class="toast-info" id="toastInfo">
-  <p>Antes de pedir, vale conferir nossas <button class="link-toast-info" id="toastInfoLink">informações importantes</button> (garantia, cores e cuidados).</p>
+  <p>Antes de pedir, vale bater um <button class="link-toast-info" id="toastInfoLink">papo rápido</button> com a gente (garantia, cores e cuidados).</p>
   <button class="toast-info-fechar" id="toastInfoFechar" aria-label="Fechar aviso">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
   </button>
@@ -1001,7 +1001,7 @@
       <p class="frase">Transformamos ideias em peças 3D personalizadas.</p>
     </div>
     <div class="rodape-coluna">
-      <h4>Onde estamos</h4>
+      <h4>Cadê a gente</h4>
       <p>Atendemos Goiânia e região</p>
       <p>Enviamos para todo o Brasil</p>
     </div>
@@ -1021,7 +1021,7 @@
   </div>
   <div class="rodape-base">
     Catálogo digital Nosso Projeto 3D · Pedidos feitos diretamente pelo WhatsApp ·
-    <button class="link-rodape-base" id="botaoInfoImportante">Informações importantes</button>
+    <button class="link-rodape-base" id="botaoInfoImportante">Papo rápido antes de pedir</button>
   </div>
 </footer>
 
@@ -1045,7 +1045,7 @@
   const iconeWhats = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>`;
 
   const conteudo = document.getElementById('conteudo');
-  conteudo.innerHTML = '<p class="estado">Carregando catálogo...</p>';
+  conteudo.innerHTML = '<p class="estado">Só um segundo, preparando tudo...</p>';
 
   function urlDaPlanilha(){
     return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(NOME_DA_ABA)}`;
@@ -1154,14 +1154,14 @@
   }
 
   function linkWhatsappGeral(){
-    const mensagem = "Olá! Vi o catálogo da Nosso Projeto 3D e gostaria de tirar uma dúvida.";
+    const mensagem = "Oi! Vi o catálogo de vocês e fiquei com uma dúvida.";
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
   }
   document.getElementById('botaoFlutuante').href = linkWhatsappGeral();
   document.getElementById('linkRodapeWhats').href = linkWhatsappGeral();
 
   function linkWhatsapp(produto, categoria){
-    let mensagem = `Olá! Vim pelo catálogo e tenho interesse neste produto:\n\n`;
+    let mensagem = `Oi! Vi esse no catálogo de vocês e quero saber mais:\n\n`;
     mensagem += `Categoria: ${categoria}\n`;
     mensagem += `Produto: ${produto.nome}\n`;
     mensagem += produto.precoPromocional
@@ -1293,7 +1293,7 @@
         ${produto.codigo ? `<p class="codigo">Cód. ${escaparHTML(produto.codigo)}</p>` : ''}
         ${produto.descricao ? `<p class="descricao">${escaparHTML(produto.descricao)}</p>` : ''}
         <a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
-          ${iconeWhats} Escolher no WhatsApp
+          ${iconeWhats} Quero esse!
         </a>
       </div>
     `;
@@ -1453,7 +1453,7 @@
 
   // Abre a categoria do produto clicado no carrossel, rola até o card
   // dele na listagem e destaca a borda por um instante — o pedido em
-  // si é feito pelo botão "Escolher no WhatsApp" que já existe no card.
+  // si é feito pelo botão "Quero esse!" que já existe no card.
   function irParaProdutoNaListagem(categorias, categoriaNome, produto){
     const indiceCategoria = categorias.findIndex(categoria => categoria.nome === categoriaNome);
     if(indiceCategoria === -1) return;
@@ -1568,7 +1568,7 @@
       conteudo.appendChild(trilha);
 
       if(resultados.length === 0){
-        conteudo.innerHTML += '<p class="estado">Nenhum produto encontrado com esse termo.</p>';
+        conteudo.innerHTML += '<p class="estado">Não achamos nada com esse termo. Tenta escrever diferente?</p>';
         return;
       }
 
@@ -1627,10 +1627,10 @@
         <svg class="manutencao-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M14.7 6.3a4 4 0 0 1-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 0 1 5.4-5.4l-2.4 2.4-2-2 2.4-2.4z"></path>
         </svg>
-        <h2>Catálogo em manutenção</h2>
+        <h2>Voltamos já, já!</h2>
         <p>Estamos ajustando algo por aqui. Enquanto isso, fale direto com a gente pelo WhatsApp que te ajudamos na hora.</p>
         <a class="btn-whats btn-whats-grande" href="${linkWhatsappGeral()}" target="_blank" rel="noopener">
-          ${iconeWhats} Falar no WhatsApp
+          ${iconeWhats} Chama a gente no Zap
         </a>
       </div>
     `;
