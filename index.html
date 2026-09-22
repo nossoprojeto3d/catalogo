@@ -320,63 +320,67 @@
   .preco{ font-size: clamp(16px, 4vw, 18px); font-weight: 700; color: var(--gold-light); margin: auto 0 10px; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
 
-  /* ---------- Lista editorial de categorias ---------- */
-  .lista-categorias{
+  /* ---------- Cards de vidro para seleção de categoria ---------- */
+  .grade-categorias{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (min-width: 540px){
+    .grade-categorias{ grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  }
+  @media (min-width: 860px){
+    .grade-categorias{ grid-template-columns: repeat(4, 1fr); }
+  }
+  .card-categoria{
+    position: relative;
+    aspect-ratio: 3 / 4;
     display: flex;
     flex-direction: column;
-    max-width: 760px;
-    border-top: 1px solid var(--border);
-  }
-  .item-categoria{
-    display: flex;
     align-items: center;
-    gap: 18px;
-    width: 100%;
-    padding: 24px 8px;
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--border);
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background:
+      linear-gradient(160deg, rgba(231, 200, 115, 0.08), rgba(255, 255, 255, 0.02) 45%, transparent),
+      var(--frame);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    overflow: hidden;
     color: inherit;
     font-family: inherit;
-    text-align: left;
-    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     animation: surgir 0.5s var(--easing) both;
-    transition: background 0.3s var(--easing);
+    transition: border-color 0.3s var(--easing), box-shadow 0.3s var(--easing);
+    will-change: transform;
   }
-  .item-categoria .numero{
-    flex-shrink: 0;
-    width: 26px;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-    color: var(--text-footer);
-    font-variant-numeric: tabular-nums;
+  .card-categoria .estrela{
+    font-size: 18px;
+    color: var(--gold);
+    opacity: 0.65;
+    transition: opacity 0.3s var(--easing);
   }
-  .item-categoria .texto{
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .item-categoria h2{
+  .card-categoria h2{
+    width: 100%;
     font-family: 'Fraunces', serif;
     font-weight: 500;
-    font-size: clamp(21px, 5vw, 29px);
+    font-size: clamp(16px, 4vw, 20px);
     margin: 0;
     color: var(--text);
-    line-height: 1.25;
-    transition: color 0.3s var(--easing), transform 0.3s var(--easing);
+    line-height: 1.28;
+    overflow-wrap: break-word;
   }
-  .item-categoria .seta{
-    flex-shrink: 0;
-    font-size: 20px;
-    color: var(--gold-light);
-    opacity: 0;
-    transform: translateX(-8px);
-    transition: opacity 0.3s var(--easing), transform 0.3s var(--easing);
+  .card-categoria .contagem-cat{
+    width: 100%;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin: 0;
   }
-  .item-categoria:active{ background: var(--card-hover); }
+  .card-categoria:active{ border-color: var(--gold); }
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
@@ -568,9 +572,11 @@
       box-shadow: 0 14px 30px -12px rgba(0,0,0,0.55);
     }
     .produto:hover .foto img{ transform: scale(1.05); }
-    .item-categoria:hover{ background: var(--card-hover); }
-    .item-categoria:hover h2{ color: var(--gold-light); transform: translateX(4px); }
-    .item-categoria:hover .seta{ opacity: 1; transform: translateX(0); }
+    .card-categoria:hover{
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.3), 0 22px 45px -18px rgba(201, 162, 39, 0.4);
+    }
+    .card-categoria:hover .estrela{ opacity: 1; }
     .btn-whats:hover{ background: var(--gold); color: var(--bg); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
@@ -650,6 +656,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
 <script>
   /* =====================================================================
      CONFIGURAÇÃO — só precisa mexer aqui UMA vez
@@ -911,24 +918,20 @@
 
   function renderCategorias(categorias){
     trocarTela(() => {
-      const lista = document.createElement('div');
-      lista.className = 'lista-categorias';
+      const grade = document.createElement('div');
+      grade.className = 'grade-categorias';
 
       categorias.forEach((categoria, indice) => {
-        const numero = String(indice + 1).padStart(2, '0');
-        const item = document.createElement('button');
-        item.className = 'item-categoria';
-        item.style.animationDelay = `${indice * 0.04}s`;
-        item.innerHTML = `
-          <span class="numero">${numero}</span>
-          <span class="texto">
-            <h2>${categoria.nome}</h2>
-            <p class="contagem">${categoria.produtos.length} ${categoria.produtos.length === 1 ? 'produto' : 'produtos'}</p>
-          </span>
-          <span class="seta">→</span>
+        const card = document.createElement('button');
+        card.className = 'card-categoria';
+        card.style.animationDelay = `${indice * 0.05}s`;
+        card.innerHTML = `
+          <span class="estrela">✦</span>
+          <h2>${categoria.nome}</h2>
+          <p class="contagem-cat">${categoria.produtos.length} ${categoria.produtos.length === 1 ? 'produto' : 'produtos'}</p>
         `;
-        item.addEventListener('click', () => renderProdutos(categorias, indice));
-        lista.appendChild(item);
+        card.addEventListener('click', () => renderProdutos(categorias, indice));
+        grade.appendChild(card);
       });
 
       conteudo.innerHTML = '';
@@ -936,7 +939,19 @@
         conteudo.innerHTML = '<p class="estado">Nenhum produto encontrado ainda.</p>';
         return;
       }
-      conteudo.appendChild(lista);
+      conteudo.appendChild(grade);
+
+      const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(window.VanillaTilt && !semMovimento){
+        window.VanillaTilt.init(grade.querySelectorAll('.card-categoria'), {
+          max: 8,
+          speed: 400,
+          scale: 1.02,
+          glare: true,
+          'max-glare': 0.35,
+          gyroscope: false
+        });
+      }
     });
   }
 
