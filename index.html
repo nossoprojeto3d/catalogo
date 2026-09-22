@@ -286,6 +286,20 @@
   .produto-promocao{
     border-color: var(--gold);
     box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25);
+    /* mantém a entrada normal do card (surgir) e soma o tremor logo
+       depois que ela termina, pra não brigar com o próprio translateY
+       da entrada */
+    animation: surgir 0.5s var(--easing) both, tremerCard 0.6s 0.5s ease-in-out both;
+  }
+  @keyframes tremerCard{
+    0%, 100%{ transform: translateX(0); }
+    20%{ transform: translateX(-7px); }
+    40%{ transform: translateX(6px); }
+    60%{ transform: translateX(-4px); }
+    80%{ transform: translateX(2px); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .produto-promocao{ animation: surgir 0.5s var(--easing) both; }
   }
 
   @keyframes pulsarDestaque{
@@ -322,30 +336,76 @@
     padding: 4px 9px;
     border-radius: 100px;
     pointer-events: none;
-    animation: chamativoSelo 0.9s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
-  .selo-tag{
-    left: 10px;
-    transform-origin: top left;
-    background: rgba(18,14,9,0.8);
-    border: 1px solid var(--gold);
-    color: var(--gold-light);
   }
   .selo-promocao{
     right: 10px;
-    transform-origin: top right;
     background: var(--gold);
     border: 1px solid var(--gold);
     color: var(--bg);
   }
-  @keyframes chamativoSelo{
-    0%{ transform: scale(0.4); opacity: 0; box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
-    35%{ transform: scale(1.9); opacity: 1; box-shadow: 0 0 20px 4px rgba(201, 162, 39, 0.55); }
-    62%{ transform: scale(1.9); opacity: 1; box-shadow: 0 0 20px 4px rgba(201, 162, 39, 0.55); }
-    100%{ transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
+
+  /* Selo de tag: antes da foto carregar, o texto da tag "explode"
+     grande e centralizado no card; depois some enquanto o seloziho
+     pequeno (no canto, igual aos outros selos) aparece no lugar dele.
+     Só anima transform/opacity (leve, não força recálculo de layout a
+     cada quadro — importante pra rodar bem em celular mais simples). */
+  .capa-selo-tag{
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: var(--frame);
+    pointer-events: none;
+    animation: sumirCapaSelo 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes sumirCapaSelo{
+    0%, 72%{ opacity: 1; }
+    100%{ opacity: 0; }
+  }
+  .explosao-tag{
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    text-align: center;
+    pointer-events: none;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    text-shadow: 0 0 22px rgba(201, 162, 39, 0.7);
+    font-size: clamp(19px, 7.5vw, 27px);
+    opacity: 0;
+    transform: scale(0.4);
+    animation: explodirTag 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes explodirTag{
+    0%{ opacity: 0; transform: scale(0.4); }
+    18%{ opacity: 1; transform: scale(1.12); }
+    30%, 66%{ opacity: 1; transform: scale(1); }
+    78%, 100%{ opacity: 0; transform: scale(1); }
+  }
+  .selo-tag{
+    left: 10px;
+    background: rgba(18,14,9,0.8);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    transform-origin: top left;
+    opacity: 0;
+    transform: scale(0.5);
+    animation: aparecerSeloTag 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes aparecerSeloTag{
+    0%, 74%{ opacity: 0; transform: scale(0.5); }
+    100%{ opacity: 1; transform: scale(1); }
   }
   @media (prefers-reduced-motion: reduce){
-    .selo-produto{ animation: none; }
+    .capa-selo-tag{ animation: none; opacity: 0; }
+    .explosao-tag{ animation: none; opacity: 0; }
+    .selo-tag{ animation: none; opacity: 1; transform: scale(1); }
   }
 
   .info{ padding: 14px 14px 16px; display:flex; flex-direction: column; gap: 5px; flex: 1; }
@@ -421,6 +481,14 @@
     cursor: pointer;
     transition: border-color 0.25s var(--easing), transform 0.25s var(--easing);
     animation: surgir 0.5s var(--easing) both;
+  }
+  .card-vendido-promocao{
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25);
+    animation: surgir 0.5s var(--easing) both, tremerCard 0.6s 0.5s ease-in-out both;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card-vendido-promocao{ animation: surgir 0.5s var(--easing) both; }
   }
   .card-vendido .foto{ cursor: pointer; }
   .info-vendido{ padding: 10px 12px 12px; display:flex; flex-direction:column; gap:4px; }
@@ -1076,7 +1144,11 @@
 
     categorias.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
     categorias.forEach(categoria => {
+      // Ordena por nome primeiro, depois traz quem tem Tag pra frente
+      // (sort é estável, então dentro de "tem tag" e "não tem tag" a
+      // ordem alfabética continua igual).
       categoria.produtos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+      categoria.produtos.sort((a, b) => (a.tag ? 0 : 1) - (b.tag ? 0 : 1));
     });
 
     return categorias;
@@ -1192,32 +1264,6 @@
     return 'Oferta';
   }
 
-  // Selos (tag + promoção) entram com uma animação chamativa (estoura
-  // grande e recolhe rápido pro tamanho final) e depois ficam quietos —
-  // chama atenção na hora sem poluir a tela depois.
-  // Numa listagem, a maioria dos cards nasce fora da tela (abaixo da
-  // dobra) — se o selo animasse na hora que o card é criado, quem tem
-  // muito produto nunca chegaria a ver o efeito, porque ele já teria
-  // acontecido e sumido antes da rolagem chegar ali. Por isso o selo
-  // nasce pausado, e só toca quando o card realmente aparece na tela.
-  const observadorSelos = ('IntersectionObserver' in window)
-    ? new IntersectionObserver((entradas, observador) => {
-        entradas.forEach(entrada => {
-          if(!entrada.isIntersecting) return;
-          entrada.target.querySelectorAll('.selo-produto').forEach(selo => {
-            selo.style.animationPlayState = 'running';
-          });
-          observador.unobserve(entrada.target);
-        });
-      }, { threshold: 0.35 })
-    : null;
-
-  function prepararSelosParaEntrada(card){
-    const selos = card.querySelectorAll('.selo-produto');
-    if(!selos.length || !observadorSelos) return;
-    selos.forEach(selo => { selo.style.animationPlayState = 'paused'; });
-    observadorSelos.observe(card);
-  }
 
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
     const card = document.createElement('div');
@@ -1225,11 +1271,16 @@
     card.dataset.nome = produto.nome;
     if(produto.codigo) card.dataset.codigo = produto.codigo;
     const atraso = (indice || 0) * 0.05;
-    card.style.animationDelay = `${atraso}s`;
+    // Card com promoção tem 2 animações (entrada + tremor); o tremor
+    // precisa do seu próprio atraso (0.5s a mais) pra só começar depois
+    // que a entrada terminar, senão os dois "transform" brigam entre si.
+    card.style.animationDelay = produto.precoPromocional
+      ? `${atraso}s, ${atraso + 0.5}s`
+      : `${atraso}s`;
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
-        ${produto.tag ? `<span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
       </div>
       <div class="info">
@@ -1247,7 +1298,6 @@
     `;
 
     anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, true);
-    prepararSelosParaEntrada(card);
 
     return card;
   }
@@ -1384,11 +1434,11 @@
 
   function criarCardVendido(produto, categoriaNome, categorias){
     const card = document.createElement('button');
-    card.className = 'card-vendido';
+    card.className = 'card-vendido' + (produto.precoPromocional ? ' card-vendido-promocao' : '');
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
-        ${produto.tag ? `<span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
       </div>
       <div class="info-vendido">
@@ -1401,7 +1451,6 @@
       </div>
     `;
     anexarFotoProduto(card.querySelector('.foto'), produto, categoriaNome, false);
-    prepararSelosParaEntrada(card);
     card.addEventListener('click', () => irParaProdutoNaListagem(categorias, categoriaNome, produto));
     return card;
   }
