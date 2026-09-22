@@ -313,11 +313,8 @@
   .foto img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.5s var(--easing); }
   .selo-produto{
     position: absolute;
-    top: 10px; left: 10px;
+    top: 10px;
     z-index: 2;
-    background: rgba(18,14,9,0.8);
-    border: 1px solid var(--gold);
-    color: var(--gold-light);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.8px;
@@ -325,6 +322,30 @@
     padding: 4px 9px;
     border-radius: 100px;
     pointer-events: none;
+    animation: chamativoSelo 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .selo-tag{
+    left: 10px;
+    transform-origin: top left;
+    background: rgba(18,14,9,0.8);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+  }
+  .selo-promocao{
+    right: 10px;
+    transform-origin: top right;
+    background: var(--gold);
+    border: 1px solid var(--gold);
+    color: var(--bg);
+  }
+  @keyframes chamativoSelo{
+    0%{ transform: scale(0.4); opacity: 0; box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
+    35%{ transform: scale(1.9); opacity: 1; box-shadow: 0 0 20px 4px rgba(201, 162, 39, 0.55); }
+    62%{ transform: scale(1.9); opacity: 1; box-shadow: 0 0 20px 4px rgba(201, 162, 39, 0.55); }
+    100%{ transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .selo-produto{ animation: none; }
   }
 
   .info{ padding: 14px 14px 16px; display:flex; flex-direction: column; gap: 5px; flex: 1; }
@@ -1159,16 +1180,40 @@
     }
   }
 
+  // Texto do selo de promoção: usa o desconto em % quando dá pra
+  // calcular a partir de Preco/PrecoPromocional, senão cai pra "Oferta".
+  function calcularSeloPromocao(produto){
+    const original = Number(String(produto.preco).replace(',', '.').replace(/[^\d.]/g, ''));
+    const promocional = Number(String(produto.precoPromocional).replace(',', '.').replace(/[^\d.]/g, ''));
+    if(original > 0 && promocional > 0 && promocional < original){
+      const percentual = Math.round((1 - promocional / original) * 100);
+      if(percentual > 0) return `-${percentual}%`;
+    }
+    return 'Oferta';
+  }
+
+  // Selos (tag + promoção) entram com uma animação chamativa (estoura
+  // grande e recolhe rápido pro tamanho final) e depois ficam quietos —
+  // chama atenção na hora sem poluir a tela depois.
+  function aplicarAtrasoNosSelos(card, atrasoBase){
+    const seloTag = card.querySelector('.selo-tag');
+    if(seloTag) seloTag.style.animationDelay = `${atrasoBase + 0.35}s`;
+    const seloPromocao = card.querySelector('.selo-promocao');
+    if(seloPromocao) seloPromocao.style.animationDelay = `${atrasoBase + 0.35}s`;
+  }
+
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
     const card = document.createElement('div');
     card.className = 'produto' + (produto.precoPromocional ? ' produto-promocao' : '');
     card.dataset.nome = produto.nome;
     if(produto.codigo) card.dataset.codigo = produto.codigo;
-    card.style.animationDelay = `${(indice || 0) * 0.05}s`;
+    const atraso = (indice || 0) * 0.05;
+    card.style.animationDelay = `${atraso}s`;
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
-        ${produto.tag ? `<span class="selo-produto">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.tag ? `<span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
       </div>
       <div class="info">
         ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
@@ -1185,6 +1230,7 @@
     `;
 
     anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, true);
+    aplicarAtrasoNosSelos(card, atraso);
 
     return card;
   }
@@ -1325,7 +1371,8 @@
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
-        ${produto.tag ? `<span class="selo-produto">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.tag ? `<span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
       </div>
       <div class="info-vendido">
         <h3>${escaparHTML(produto.nome)}</h3>
@@ -1337,6 +1384,7 @@
       </div>
     `;
     anexarFotoProduto(card.querySelector('.foto'), produto, categoriaNome, false);
+    aplicarAtrasoNosSelos(card, 0.15);
     card.addEventListener('click', () => irParaProdutoNaListagem(categorias, categoriaNome, produto));
     return card;
   }
