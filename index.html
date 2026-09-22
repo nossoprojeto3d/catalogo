@@ -549,13 +549,27 @@
   /* ---------- Pills de categoria (filtro rápido) ---------- */
   .pills-categorias{
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
-    margin: 0 0 22px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-left: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -20px 22px;
+    padding: 2px 20px 4px;
+    mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
+  }
+  .pills-categorias::-webkit-scrollbar{ display: none; }
+  @media (min-width: 900px){
+    .pills-categorias{ margin: 0 -24px 22px; padding: 2px 24px 4px; }
   }
   .pill{
     display: inline-flex;
     align-items: center;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
     background: var(--frame);
     border: 1px solid var(--border);
     color: var(--text-secondary);
