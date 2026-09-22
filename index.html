@@ -512,67 +512,36 @@
     .carrossel-vendidos{ margin: 0 -24px; padding: 2px 24px 10px; }
   }
 
-  /* ---------- Cards de vidro para seleção de categoria ---------- */
-  .grade-categorias{
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-  @media (min-width: 540px){
-    .grade-categorias{ grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  }
-  @media (min-width: 860px){
-    .grade-categorias{ grid-template-columns: repeat(4, 1fr); }
-  }
-  .card-categoria{
-    position: relative;
-    aspect-ratio: 1 / 1;
+  /* ---------- Pills de categoria (filtro rápido) ---------- */
+  .pills-categorias{
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    flex-wrap: wrap;
     gap: 8px;
-    padding: 16px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 16px;
+    margin: 0 0 22px;
+  }
+  .pill{
+    display: inline-flex;
+    align-items: center;
+    background: var(--frame);
     border: 1px solid var(--border);
-    background:
-      linear-gradient(160deg, rgba(231, 200, 115, 0.08), rgba(255, 255, 255, 0.02) 45%, transparent),
-      var(--frame);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    overflow: hidden;
-    color: inherit;
+    color: var(--text-secondary);
     font-family: inherit;
-    -webkit-tap-highlight-color: transparent;
-    animation: surgir 0.5s var(--easing) both;
-    transition: border-color 0.3s var(--easing), box-shadow 0.3s var(--easing);
-    will-change: transform;
-  }
-  .card-categoria .estrela{
-    font-size: 18px;
-    color: var(--gold);
-    opacity: 0.65;
-    transition: opacity 0.3s var(--easing);
-  }
-  .card-categoria h2{
-    width: 100%;
-    font-family: 'Fraunces', serif;
+    font-size: 13.5px;
     font-weight: 500;
-    font-size: clamp(16px, 4vw, 20px);
-    margin: 0;
-    color: var(--text);
-    line-height: 1.28;
-    overflow-wrap: break-word;
+    white-space: nowrap;
+    padding: 9px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s var(--easing), background 0.2s var(--easing), color 0.2s var(--easing);
   }
-  .card-categoria .contagem-cat{
-    width: 100%;
-    font-size: 12px;
-    color: var(--text-tertiary);
-    margin: 0;
+  .pill.ativo{
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
+    font-weight: 700;
   }
-  .card-categoria:active{ border-color: var(--gold); }
+  .sentinela-scroll{ height: 1px; }
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
@@ -906,13 +875,10 @@
       box-shadow: 0 14px 30px -12px rgba(0,0,0,0.55);
     }
     .produto:hover .foto img{ transform: scale(1.05); }
-    .card-categoria:hover{
-      border-color: var(--gold);
-      box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.3), 0 22px 45px -18px rgba(201, 162, 39, 0.4);
-    }
-    .card-categoria:hover .estrela{ opacity: 1; }
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
+    .pill:hover{ border-color: var(--gold); color: var(--gold-light); }
+    .pill.ativo:hover{ color: var(--bg); }
     .btn-whats:hover{ background: var(--gold-light); border-color: var(--gold-light); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
@@ -1026,7 +992,6 @@
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js" integrity="sha384-0k1dj5tm+KUH/4vkNk/i90XsjDA8Ltmt+ybcrFoH4t0dgv/WZsPpVBnkhcroX8UL" crossorigin="anonymous"></script>
 <script>
   /* =====================================================================
      CONFIGURAÇÃO — só precisa mexer aqui UMA vez
@@ -1450,28 +1415,120 @@
     return card;
   }
 
-  // Abre a categoria do produto clicado no carrossel, rola até o card
-  // dele na listagem e destaca a borda por um instante — o pedido em
-  // si é feito pelo botão "Quero esse!" que já existe no card.
-  function irParaProdutoNaListagem(categorias, categoriaNome, produto){
-    const indiceCategoria = categorias.findIndex(categoria => categoria.nome === categoriaNome);
-    if(indiceCategoria === -1) return;
+  // ---------- Catálogo: carrossel + pills de categoria + grade com
+  // "rolagem infinita" (carrega de TAMANHO_LOTE em TAMANHO_LOTE conforme
+  // o usuário desce a página, em vez de tudo de uma vez — poupa dados
+  // pra quem tá com internet fraca, já que cada produto é uma foto). ----------
+  const TAMANHO_LOTE = 6;
+  let filtroAtivo = null; // null = "Todos"; caso contrário, nome da categoria
+  let listaFiltrada = [];
+  let quantidadeExibida = 0;
+  let observadorScroll = null;
 
-    renderProdutos(categorias, indiceCategoria, false, () => {
-      const seletor = produto.codigo
-        ? `.produto[data-codigo="${CSS.escape(produto.codigo)}"]`
-        : `.produto[data-nome="${CSS.escape(produto.nome)}"]`;
-      const alvo = document.querySelector(seletor);
-      if(!alvo) return;
-      alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      alvo.classList.add('produto-destacado');
-      setTimeout(() => alvo.classList.remove('produto-destacado'), 1800);
+  function desconectarObservadorScroll(){
+    if(observadorScroll){ observadorScroll.disconnect(); observadorScroll = null; }
+  }
+
+  function configurarObservadorScroll(){
+    if(observadorScroll) return;
+    const sentinela = document.getElementById('sentinelaScroll');
+    if(!sentinela) return;
+    observadorScroll = new IntersectionObserver((entradas) => {
+      if(entradas[0].isIntersecting) exibirMaisProdutos();
+    }, { rootMargin: '600px 0px' });
+    observadorScroll.observe(sentinela);
+  }
+
+  function exibirMaisProdutos(){
+    const grade = document.getElementById('gradeProdutos');
+    if(!grade) return;
+
+    if(listaFiltrada.length === 0){
+      grade.innerHTML = '<p class="estado">Nenhum produto nessa categoria ainda.</p>';
+      desconectarObservadorScroll();
+      return;
+    }
+
+    const mostrarCategoria = filtroAtivo === null;
+    const proximos = listaFiltrada.slice(quantidadeExibida, quantidadeExibida + TAMANHO_LOTE);
+    proximos.forEach((item, i) => {
+      grade.appendChild(criarCardProduto(item.produto, item.categoriaNome, quantidadeExibida + i, mostrarCategoria));
+    });
+    quantidadeExibida += proximos.length;
+    requestAnimationFrame(aplicarRolagemNosTitulos);
+
+    if(quantidadeExibida >= listaFiltrada.length){
+      desconectarObservadorScroll();
+    }else{
+      configurarObservadorScroll();
+    }
+  }
+
+  function montarListaFiltrada(categorias){
+    listaFiltrada = [];
+    categorias.forEach(categoria => {
+      if(filtroAtivo && categoria.nome !== filtroAtivo) return;
+      categoria.produtos.forEach(produto => listaFiltrada.push({ produto, categoriaNome: categoria.nome }));
     });
   }
 
-  function renderCategorias(categorias){
+  function aplicarFiltro(categorias, nomeCategoria){
+    filtroAtivo = nomeCategoria;
+    document.querySelectorAll('#pillsCategorias .pill').forEach(botao => {
+      botao.classList.toggle('ativo', (botao.dataset.categoria || null) === nomeCategoria);
+    });
+
+    desconectarObservadorScroll();
+    const grade = document.getElementById('gradeProdutos');
+    if(grade) grade.innerHTML = '';
+    quantidadeExibida = 0;
+    montarListaFiltrada(categorias);
+    exibirMaisProdutos();
+  }
+
+  // Abre a categoria do produto clicado no carrossel, rola até o card
+  // dele na listagem e destaca a borda por um instante — o pedido em
+  // si é feito pelo botão "Quero esse!" que já existe no card. Se o
+  // produto ainda não estiver no lote carregado, puxa mais lotes até
+  // achar (categorias são pequenas, então isso é rápido).
+  function irParaProdutoNaListagem(categorias, categoriaNome, produto){
+    aplicarFiltro(categorias, categoriaNome);
+
+    const seletor = produto.codigo
+      ? `.produto[data-codigo="${CSS.escape(produto.codigo)}"]`
+      : `.produto[data-nome="${CSS.escape(produto.nome)}"]`;
+
+    function tentarDestacar(){
+      const alvo = document.querySelector(seletor);
+      if(!alvo){
+        if(quantidadeExibida < listaFiltrada.length){
+          exibirMaisProdutos();
+          requestAnimationFrame(tentarDestacar);
+        }
+        return;
+      }
+      alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      alvo.classList.add('produto-destacado');
+      setTimeout(() => alvo.classList.remove('produto-destacado'), 1800);
+    }
+    tentarDestacar();
+  }
+
+  function criarBotaoPill(rotulo, nomeCategoria, categorias){
+    const botao = document.createElement('button');
+    botao.className = 'pill' + (filtroAtivo === nomeCategoria ? ' ativo' : '');
+    botao.textContent = rotulo;
+    botao.dataset.categoria = nomeCategoria || '';
+    botao.addEventListener('click', () => aplicarFiltro(categorias, nomeCategoria));
+    return botao;
+  }
+
+  function renderCatalogo(categorias){
     trocarTela(() => {
+      desconectarObservadorScroll();
       conteudo.innerHTML = '';
+      filtroAtivo = null;
+
       if(categorias.length === 0){
         conteudo.innerHTML = '<p class="estado">Nenhum produto encontrado ainda.</p>';
         return;
@@ -1480,65 +1537,34 @@
       const carrossel = construirCarrosselVendidos(categorias);
       if(carrossel) conteudo.appendChild(carrossel);
 
-      const grade = document.createElement('div');
-      grade.className = 'grade-categorias';
-
-      categorias.forEach((categoria, indice) => {
-        const card = document.createElement('button');
-        card.className = 'card-categoria';
-        card.style.animationDelay = `${indice * 0.05}s`;
-        card.innerHTML = `
-          <span class="estrela">✦</span>
-          <h2>${escaparHTML(formatarNomeCategoria(categoria.nome))}</h2>
-          <p class="contagem-cat">${categoria.produtos.length} ${categoria.produtos.length === 1 ? 'produto' : 'produtos'}</p>
-        `;
-        card.addEventListener('click', () => renderProdutos(categorias, indice));
-        grade.appendChild(card);
+      const pills = document.createElement('div');
+      pills.className = 'pills-categorias';
+      pills.id = 'pillsCategorias';
+      pills.appendChild(criarBotaoPill('Todos', null, categorias));
+      categorias.forEach(categoria => {
+        pills.appendChild(criarBotaoPill(formatarNomeCategoria(categoria.nome), categoria.nome, categorias));
       });
-      conteudo.appendChild(grade);
-
-      const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(window.VanillaTilt && !semMovimento){
-        window.VanillaTilt.init(grade.querySelectorAll('.card-categoria'), {
-          max: 8,
-          speed: 400,
-          scale: 1.02,
-          glare: true,
-          'max-glare': 0.35,
-          gyroscope: false
-        });
-      }
-    });
-  }
-
-  function renderProdutos(categorias, indiceCategoria, rolarTopo = true, aposConstruir){
-    trocarTela(() => {
-      const categoria = categorias[indiceCategoria];
-
-      const trilha = document.createElement('div');
-      trilha.className = 'trilha';
-      trilha.innerHTML = `
-        <button class="voltar">‹ Categorias</button>
-        <span>/</span>
-        <span class="categoria-atual">${escaparHTML(formatarNomeCategoria(categoria.nome))}</span>
-      `;
-      trilha.querySelector('.voltar').addEventListener('click', () => renderCategorias(categorias));
+      conteudo.appendChild(pills);
 
       const grade = document.createElement('div');
       grade.className = 'grade';
-
-      categoria.produtos.forEach((produto, indice) => {
-        grade.appendChild(criarCardProduto(produto, categoria.nome, indice));
-      });
-
-      conteudo.innerHTML = '';
-      conteudo.appendChild(trilha);
+      grade.id = 'gradeProdutos';
       conteudo.appendChild(grade);
-    }, rolarTopo, aposConstruir);
+
+      const sentinela = document.createElement('div');
+      sentinela.id = 'sentinelaScroll';
+      sentinela.className = 'sentinela-scroll';
+      conteudo.appendChild(sentinela);
+
+      quantidadeExibida = 0;
+      montarListaFiltrada(categorias);
+      exibirMaisProdutos();
+    });
   }
 
   function renderBusca(categorias, termo){
     trocarTela(() => {
+      desconectarObservadorScroll();
       const termoNormalizado = normalizarTexto(termo);
       const resultados = [];
 
@@ -1554,13 +1580,13 @@
       const trilha = document.createElement('div');
       trilha.className = 'trilha';
       trilha.innerHTML = `
-        <button class="voltar">‹ Categorias</button>
+        <button class="voltar">× Limpar busca</button>
         <span>/</span>
         <span class="categoria-atual">${resultados.length} ${resultados.length === 1 ? 'resultado' : 'resultados'} para "${escaparHTML(termo)}"</span>
       `;
       trilha.querySelector('.voltar').addEventListener('click', () => {
         campoBusca.value = '';
-        renderCategorias(categorias);
+        renderCatalogo(categorias);
       });
 
       conteudo.innerHTML = '';
@@ -1644,7 +1670,7 @@
     clearTimeout(tempoBusca);
     tempoBusca = setTimeout(() => {
       const termo = campoBusca.value.trim();
-      if(termo.length === 0){ renderCategorias(categoriasCarregadas); }
+      if(termo.length === 0){ renderCatalogo(categoriasCarregadas); }
       else{ renderBusca(categoriasCarregadas, termo); }
     }, 250);
   });
@@ -1657,7 +1683,7 @@
     .then(texto => {
       const linhasCsv = interpretarCSV(texto);
       categoriasCarregadas = montarCategorias(linhasCsv);
-      renderCategorias(categoriasCarregadas);
+      renderCatalogo(categoriasCarregadas);
     })
     .catch(() => {
       renderManutencao();

@@ -88,11 +88,13 @@ imagens/         → fotos dos produtos (veja a seção Fotos acima)
 ## Como funciona por dentro
 
 Tudo em um arquivo HTML principal (+ CSS e JS inline), sem build e sem
-dependência de servidor — só uma libzinha via CDN (Vanilla-Tilt) pro efeito
-de inclinação nos cards de categoria, carregada com verificação de
-integridade (SRI). A página busca a planilha publicada em CSV, sempre sem
-cache (pra nunca mostrar preço/produto desatualizado), monta as categorias
-e produtos em memória, e desenha os cards. Se a planilha não responder
+dependência de servidor — nenhuma lib externa. A página busca a planilha
+publicada em CSV, sempre sem cache (pra nunca mostrar preço/produto
+desatualizado), monta as categorias e produtos em memória, e desenha os
+cards. As categorias aparecem como pills de filtro acima da listagem, e os
+produtos carregam aos poucos (6 em 6) conforme o usuário rola a página —
+poupa dados de quem tá com internet mais fraca, já que cada produto é uma
+foto. Se a planilha não responder
 (link errado, sem internet, compartilhamento desligado), aparece uma tela
 de manutenção com um botão direto pro WhatsApp, em vez de dar erro na cara
 do cliente.
