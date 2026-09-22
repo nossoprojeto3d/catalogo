@@ -72,8 +72,10 @@ foto no [imgbb.com](https://imgbb.com) ou [postimages.org](https://postimages.or
 Quando a coluna `Foto` está preenchida, ela tem prioridade sobre a busca
 automática pelo código.
 
-Proporção recomendada: retrato (3:4), até 1200px no lado maior, e o
-arquivo abaixo de ~400KB pra carregar rápido no celular.
+Proporção recomendada: paisagem (4:3), com o produto centralizado e com
+uma margem ao redor — isso também ajuda quando a mesma foto aparece
+recortada no carrossel "Os queridinhos" (3:4). Até 1200px no lado maior,
+e o arquivo abaixo de ~400KB pra carregar rápido no celular.
 
 ## Estrutura
 
