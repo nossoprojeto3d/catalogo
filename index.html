@@ -527,8 +527,17 @@
     color: inherit;
     font-family: inherit;
     cursor: pointer;
-    transition: border-color 0.25s var(--easing), transform 0.25s var(--easing);
+    --foco-escala: 1;
+    transform: scale(var(--foco-escala));
+    transition: border-color 0.2s var(--easing), transform 0.2s var(--easing), box-shadow 0.2s var(--easing), opacity 0.2s var(--easing);
     animation: surgir 0.5s var(--easing) both;
+  }
+  /* Card mais perto do centro visível do carrossel ganha destaque —
+     escala/opacidade vêm de --foco-escala e .style.opacity, calculados
+     no scroll (só transform/opacity, leve o bastante pra rodar liso). */
+  .card-vendido-foco{
+    border-color: var(--gold);
+    box-shadow: 0 14px 32px -14px rgba(201, 162, 39, 0.55);
   }
   /* Card do carrossel é só vitrine — foto mais vertical (tipo pôster)
      já que não tem mais preço/descrição ocupando espaço embaixo. */
@@ -900,7 +909,7 @@
       box-shadow: 0 14px 30px -12px rgba(0,0,0,0.55);
     }
     .produto:hover .foto img{ transform: scale(1.05); }
-    .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
+    .card-vendido:hover{ border-color: var(--gold); transform: scale(var(--foco-escala)) translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
     .pill:hover{ border-color: var(--gold); color: var(--gold-light); }
     .pill.ativo:hover{ color: var(--bg); }
@@ -1420,8 +1429,56 @@
       trilha.appendChild(criarCardVendido(produto, categoriaNome, categorias));
     });
     secao.appendChild(trilha);
+    configurarFocoCarrossel(trilha);
 
     return secao;
+  }
+
+  // Dá destaque (maior, mais opaco, com brilho) pro card do carrossel
+  // que tá mais perto do centro visível — o resto encolhe e apaga um
+  // pouco, criando sensação de profundidade conforme o usuário rola.
+  // Só transform/opacity/box-shadow, então roda liso mesmo em celular
+  // simples; respeita quem prefere menos movimento.
+  // Guarda como tirar o listener de resize da versão anterior do
+  // carrossel — ele é reconstruído do zero sempre que renderCatalogo
+  // roda de novo (ex.: ao limpar uma busca), senão ia empilhando um
+  // listener novo no window a cada vez.
+  let removerListenerResizeCarrossel = () => {};
+
+  function configurarFocoCarrossel(trilha){
+    removerListenerResizeCarrossel();
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cartoes = Array.from(trilha.querySelectorAll('.card-vendido'));
+    if(cartoes.length === 0) return;
+
+    let agendado = false;
+    function atualizarFoco(){
+      agendado = false;
+      const areaCarrossel = trilha.getBoundingClientRect();
+      const centro = areaCarrossel.left + areaCarrossel.width / 2;
+      const metade = areaCarrossel.width / 2 || 1;
+      cartoes.forEach(cartao => {
+        const retangulo = cartao.getBoundingClientRect();
+        const centroCartao = retangulo.left + retangulo.width / 2;
+        const normalizada = Math.min(Math.abs(centroCartao - centro) / metade, 1);
+        cartao.style.setProperty('--foco-escala', (1 - normalizada * 0.16).toFixed(3));
+        cartao.style.opacity = (1 - normalizada * 0.45).toFixed(3);
+        cartao.classList.toggle('card-vendido-foco', normalizada < 0.18);
+      });
+    }
+    function agendarAtualizacao(){
+      if(agendado) return;
+      agendado = true;
+      requestAnimationFrame(atualizarFoco);
+    }
+
+    trilha.addEventListener('scroll', agendarAtualizacao, { passive: true });
+    window.addEventListener('resize', agendarAtualizacao);
+    removerListenerResizeCarrossel = () => window.removeEventListener('resize', agendarAtualizacao);
+    // A trilha ainda não tá anexada ao documento nesse ponto (isso só
+    // acontece depois, em renderCatalogo) — adia pro próximo frame pra
+    // já pegar as medidas certas assim que ela entrar na tela.
+    requestAnimationFrame(atualizarFoco);
   }
 
   function criarCardVendido(produto, categoriaNome, categorias){
