@@ -427,10 +427,10 @@
     pointer-events: none;
   }
   .legenda-foto .contagem{ color: var(--text-tertiary); text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
-  .produto h3{
+  .card-vendido .legenda-foto{ padding: 18px 10px 10px; }
+  .produto h3, .card-vendido h3{
     font-family:'Fraunces', serif;
     font-weight:500;
-    font-size: clamp(18px, 4.6vw, 22px);
     margin: 0;
     color: var(--text);
     line-height: 1.28;
@@ -438,7 +438,9 @@
     white-space: nowrap;
     text-shadow: 0 1px 10px rgba(0,0,0,0.55);
   }
-  .produto h3 span{
+  .produto h3{ font-size: clamp(18px, 4.6vw, 22px); }
+  .card-vendido h3{ font-size: 14px; }
+  .produto h3 span, .card-vendido h3 span{
     display: inline-block;
   }
   .rolar span{
@@ -503,31 +505,9 @@
     transition: border-color 0.25s var(--easing), transform 0.25s var(--easing);
     animation: surgir 0.5s var(--easing) both;
   }
-  .card-vendido-promocao{
-    animation: surgir 0.5s var(--easing) both, tremerCard 0.6s 0.5s ease-in-out both;
-  }
-  @media (prefers-reduced-motion: reduce){
-    .card-vendido-promocao{ animation: surgir 0.5s var(--easing) both; }
-  }
-  .card-vendido .foto{ cursor: pointer; }
-  .info-vendido{ padding: 10px 12px 12px; display:flex; flex-direction:column; gap:4px; }
-  .card-vendido h3{
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 13.5px;
-    margin: 0;
-    color: var(--text);
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .preco-vendido{
-    display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
-    font-size: 13px; font-weight: 700; color: var(--gold-light); margin: 0;
-  }
-  .preco-vendido .preco-riscado{ font-size: 11px; }
+  /* Card do carrossel é só vitrine — foto mais vertical (tipo pôster)
+     já que não tem mais preço/descrição ocupando espaço embaixo. */
+  .card-vendido .foto{ cursor: pointer; aspect-ratio: 3 / 4; }
   @media (min-width: 900px){
     .carrossel-vendidos{ margin: 0 -24px; padding: 2px 24px 10px; }
   }
@@ -1389,7 +1369,7 @@
   function aplicarRolagemNosTitulos(){
     // Duas passadas (mede tudo, só depois altera o DOM) pra não forçar
     // o navegador a recalcular o layout a cada item do loop.
-    const medidas = Array.from(document.querySelectorAll('.produto h3'), titulo => {
+    const medidas = Array.from(document.querySelectorAll('.produto h3, .card-vendido h3'), titulo => {
       const span = titulo.querySelector('span');
       return span ? { titulo, excesso: span.scrollWidth - titulo.clientWidth } : null;
     });
@@ -1454,21 +1434,16 @@
   }
 
   function criarCardVendido(produto, categoriaNome, categorias){
+    // Carrossel é só vitrine: foto + nome, sem preço, descrição ou tag —
+    // isso fica só na listagem completa, pra incentivar o clique.
     const card = document.createElement('button');
-    card.className = 'card-vendido' + (produto.precoPromocional ? ' card-vendido-promocao' : '');
+    card.className = 'card-vendido';
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
-        ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
-        ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
-      </div>
-      <div class="info-vendido">
-        <h3>${escaparHTML(produto.nome)}</h3>
-        <p class="preco-vendido">
-          ${produto.precoPromocional
-            ? `<span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span>R$ ${escaparHTML(produto.precoPromocional)}</span>`
-            : `<span>R$ ${escaparHTML(produto.preco)}</span>`}
-        </p>
+        <div class="legenda-foto">
+          <h3><span>${escaparHTML(produto.nome)}</span></h3>
+        </div>
       </div>
     `;
     anexarFotoProduto(card.querySelector('.foto'), produto, categoriaNome, false);
