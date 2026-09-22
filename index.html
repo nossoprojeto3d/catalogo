@@ -266,7 +266,7 @@
     .grade{ grid-template-columns: repeat(4, 1fr); }
   }
 
-  .cartao-categoria, .produto{
+  .produto{
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -276,21 +276,20 @@
     transition: border-color 0.25s var(--easing), background 0.25s var(--easing), transform 0.25s var(--easing), box-shadow 0.25s var(--easing);
     animation: surgir 0.5s var(--easing) both;
   }
-  .cartao-categoria{ cursor: pointer; text-align: left; padding: 0; }
 
-  .capa, .foto{
+  .foto{
     width: 100%;
     aspect-ratio: 3 / 4;
     background: var(--frame);
     display:flex; align-items:center; justify-content:center;
     overflow:hidden;
     position: relative;
+    cursor: zoom-in;
   }
-  .foto{ cursor: zoom-in; }
-  .capa img, .foto img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.5s var(--easing); }
+  .foto img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.5s var(--easing); }
 
-  .legenda, .info{ padding: 14px 14px 16px; display:flex; flex-direction: column; gap: 5px; flex: 1; }
-  .cartao-categoria h2, .produto h3{
+  .info{ padding: 14px 14px 16px; display:flex; flex-direction: column; gap: 5px; flex: 1; }
+  .produto h3{
     font-family:'Fraunces', serif;
     font-weight:500;
     font-size: clamp(15px, 3.6vw, 18px);
@@ -300,7 +299,7 @@
     overflow: hidden;
     white-space: nowrap;
   }
-  .cartao-categoria h2 span, .produto h3 span{
+  .produto h3 span{
     display: inline-block;
   }
   .rolar span{
@@ -320,14 +319,64 @@
   .codigo{ font-size: 11px; color: var(--text-footer); letter-spacing: 0.5px; margin: -2px 0 4px; }
   .preco{ font-size: clamp(16px, 4vw, 18px); font-weight: 700; color: var(--gold-light); margin: auto 0 10px; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
-  .monograma{
+
+  /* ---------- Lista editorial de categorias ---------- */
+  .lista-categorias{
+    display: flex;
+    flex-direction: column;
+    max-width: 760px;
+    border-top: 1px solid var(--border);
+  }
+  .item-categoria{
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    padding: 24px 8px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    animation: surgir 0.5s var(--easing) both;
+    transition: background 0.3s var(--easing);
+  }
+  .item-categoria .numero{
+    flex-shrink: 0;
+    width: 26px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    color: var(--text-footer);
+    font-variant-numeric: tabular-nums;
+  }
+  .item-categoria .texto{
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .item-categoria h2{
     font-family: 'Fraunces', serif;
     font-weight: 500;
-    font-size: clamp(40px, 11vw, 64px);
-    color: var(--gold);
-    opacity: 0.5;
-    line-height: 1;
+    font-size: clamp(21px, 5vw, 29px);
+    margin: 0;
+    color: var(--text);
+    line-height: 1.25;
+    transition: color 0.3s var(--easing), transform 0.3s var(--easing);
   }
+  .item-categoria .seta{
+    flex-shrink: 0;
+    font-size: 20px;
+    color: var(--gold-light);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.3s var(--easing), transform 0.3s var(--easing);
+  }
+  .item-categoria:active{ background: var(--card-hover); }
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
@@ -512,13 +561,16 @@
   @media (hover: hover) and (pointer: fine){
     header:hover .brilho-cursor{ opacity: 1; }
     .voltar:hover{ border-color: var(--gold); color: var(--gold-light); background: var(--card-hover); }
-    .cartao-categoria:hover, .produto:hover{
+    .produto:hover{
       border-color: var(--border-hover);
       background: var(--card-hover);
       transform: translateY(-3px);
       box-shadow: 0 14px 30px -12px rgba(0,0,0,0.55);
     }
-    .cartao-categoria:hover .capa img, .produto:hover .foto img{ transform: scale(1.05); }
+    .produto:hover .foto img{ transform: scale(1.05); }
+    .item-categoria:hover{ background: var(--card-hover); }
+    .item-categoria:hover h2{ color: var(--gold-light); transform: translateX(4px); }
+    .item-categoria:hover .seta{ opacity: 1; transform: translateX(0); }
     .btn-whats:hover{ background: var(--gold); color: var(--bg); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
@@ -827,7 +879,7 @@
   });
 
   function aplicarRolagemNosTitulos(){
-    document.querySelectorAll('.cartao-categoria h2, .produto h3').forEach(titulo => {
+    document.querySelectorAll('.produto h3').forEach(titulo => {
       const span = titulo.querySelector('span');
       if(!span) return;
       const excesso = span.scrollWidth - titulo.clientWidth;
@@ -859,27 +911,24 @@
 
   function renderCategorias(categorias){
     trocarTela(() => {
-      const grade = document.createElement('div');
-      grade.className = 'grade';
+      const lista = document.createElement('div');
+      lista.className = 'lista-categorias';
 
       categorias.forEach((categoria, indice) => {
-        const inicial = categoria.nome.trim().charAt(0).toUpperCase() || '?';
-        const capaHtml = categoria.capa
-          ? `<img src="${categoria.capa}" alt="${categoria.nome}">`
-          : `<div class="monograma">${inicial}</div>`;
-
-        const cartao = document.createElement('button');
-        cartao.className = 'cartao-categoria';
-        cartao.style.animationDelay = `${indice * 0.05}s`;
-        cartao.innerHTML = `
-          <div class="capa">${capaHtml}</div>
-          <div class="legenda">
-            <h2><span>${categoria.nome}</span></h2>
+        const numero = String(indice + 1).padStart(2, '0');
+        const item = document.createElement('button');
+        item.className = 'item-categoria';
+        item.style.animationDelay = `${indice * 0.04}s`;
+        item.innerHTML = `
+          <span class="numero">${numero}</span>
+          <span class="texto">
+            <h2>${categoria.nome}</h2>
             <p class="contagem">${categoria.produtos.length} ${categoria.produtos.length === 1 ? 'produto' : 'produtos'}</p>
-          </div>
+          </span>
+          <span class="seta">→</span>
         `;
-        cartao.addEventListener('click', () => renderProdutos(categorias, indice));
-        grade.appendChild(cartao);
+        item.addEventListener('click', () => renderProdutos(categorias, indice));
+        lista.appendChild(item);
       });
 
       conteudo.innerHTML = '';
@@ -887,7 +936,7 @@
         conteudo.innerHTML = '<p class="estado">Nenhum produto encontrado ainda.</p>';
         return;
       }
-      conteudo.appendChild(grade);
+      conteudo.appendChild(lista);
     });
   }
 

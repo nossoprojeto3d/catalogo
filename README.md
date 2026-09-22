@@ -24,8 +24,9 @@ Colunas, exatamente nessa grafia (linha 1):
 `Categoria | CapaCategoria | Produto | Codigo | Descricao | Preco | Foto`
 
 - Uma linha por produto.
-- `CapaCategoria` só precisa ser preenchida na primeira linha de cada
-  categoria — as demais podem ficar em branco.
+- `CapaCategoria` não é usada na tela hoje (a seleção de categoria é só
+  texto) — pode deixar em branco. A coluna continua existindo pra não
+  bagunçar as outras, caso volte a ser usada no futuro.
 - `Codigo` é opcional, mas ajuda a identificar o produto exato quando o
   pedido chega no WhatsApp (ex: `DEC-01`).
 - `Descricao` também é opcional — se ficar vazia, o card do produto
