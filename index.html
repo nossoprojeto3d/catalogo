@@ -568,6 +568,67 @@
   }
   .flutuante svg{ width: 24px; height: 24px; }
 
+  /* ---------- Toast de informações importantes (uma vez só) ---------- */
+  .toast-info{
+    position: fixed;
+    left: 18px;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    z-index: 25;
+    width: calc(100vw - 36px);
+    max-width: 300px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--frame);
+    border: 1px solid var(--border-hover);
+    border-radius: 12px;
+    padding: 14px 12px 14px 16px;
+    box-shadow: 0 14px 34px -12px rgba(0,0,0,0.6);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 0.4s var(--easing), transform 0.4s var(--easing);
+  }
+  .toast-info.visivel{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .toast-info p{
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+  .link-toast-info{
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--gold-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+  .toast-info-fechar{
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border-hover);
+    background: rgba(18,14,9,0.6);
+    color: var(--text-tertiary);
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+  }
+  .toast-info-fechar svg{ width: 11px; height: 11px; }
+  @media (min-width: 900px){
+    .toast-info{ left: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .toast-info{ transition: opacity 0.4s var(--easing); transform: none; }
+  }
+
   /* ---------- Rodapé ---------- */
   footer{
     border-top: 1px solid var(--border);
@@ -737,6 +798,13 @@
 <a class="flutuante" id="botaoFlutuante" href="#" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
 </a>
+
+<div class="toast-info" id="toastInfo">
+  <p>Antes de pedir, vale conferir nossas <button class="link-toast-info" id="toastInfoLink">informações importantes</button> (garantia, cores e cuidados).</p>
+  <button class="toast-info-fechar" id="toastInfoFechar" aria-label="Fechar aviso">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  </button>
+</div>
 
 <footer>
   <div class="rodape-conteudo">
@@ -1030,6 +1098,30 @@
   document.getElementById('modalInfoFechar').addEventListener('click', fecharModalInfo);
   modalInfo.addEventListener('click', (evento) => {
     if(evento.target === modalInfo) fecharModalInfo();
+  });
+
+  // ---------- Toast de informações importantes (aparece uma vez só) ----------
+  const CHAVE_TOAST_INFO = 'np3d_viu_toast_info';
+  const toastInfo = document.getElementById('toastInfo');
+
+  function fecharToastInfo(){
+    toastInfo.classList.remove('visivel');
+    try{ localStorage.setItem(CHAVE_TOAST_INFO, '1'); }catch(erro){ /* modo privado etc. */ }
+  }
+
+  try{
+    if(!localStorage.getItem(CHAVE_TOAST_INFO)){
+      setTimeout(() => {
+        toastInfo.classList.add('visivel');
+        setTimeout(fecharToastInfo, 10000);
+      }, 3000);
+    }
+  }catch(erro){ /* localStorage bloqueado — não mostra, pra não repetir sempre */ }
+
+  document.getElementById('toastInfoFechar').addEventListener('click', fecharToastInfo);
+  document.getElementById('toastInfoLink').addEventListener('click', () => {
+    fecharToastInfo();
+    abrirModalInfo();
   });
 
   function aplicarRolagemNosTitulos(){
