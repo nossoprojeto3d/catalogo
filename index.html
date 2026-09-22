@@ -1066,7 +1066,7 @@
     }, 250);
   });
 
-  fetch(urlDaPlanilha())
+  fetch(`${urlDaPlanilha()}&_=${Date.now()}`, { cache: 'no-store' })
     .then(resposta => {
       if(!resposta.ok) throw new Error('Não foi possível acessar a planilha.');
       return resposta.text();
