@@ -21,13 +21,28 @@ Abrir o `index.html` e preencher, no topo do script:
 
 Colunas, exatamente nessa grafia (linha 1):
 
-`Categoria | Produto | Codigo | Descricao | Preco | Foto`
+`Categoria | Produto | Codigo | Descricao | Preco | Foto | Tag | PrecoPromocional | MaisVendido`
 
 - Uma linha por produto.
 - `Codigo` é opcional, mas ajuda a identificar o produto exato quando o
   pedido chega no WhatsApp (ex: `DEC-01`).
 - `Descricao` também é opcional — se ficar vazia, o card do produto
   simplesmente fica mais compacto.
+- `Tag` é opcional — texto livre tipo `Lançamento`, `Oferta`, `Novo`,
+  `Exclusivo`... aparece como um selo em cima da foto do produto. Deixe
+  vazio pra não mostrar nenhum.
+- `PrecoPromocional` é opcional — preencha só quando o produto estiver
+  em promoção (ex: `19,90`). O card passa a mostrar o preço original
+  riscado + esse valor, e ganha uma borda dourada de destaque. A
+  mensagem que vai pro WhatsApp também já leva o valor promocional.
+- `MaisVendido` é opcional — controla o carrossel "Mais vendidos" que
+  aparece acima das categorias. Preencha com um número pra definir a
+  posição (`1` aparece primeiro, `2` em seguida, e assim por diante).
+  Se não quiser se preocupar com a ordem, qualquer texto/número serve
+  só pra marcar o produto — ele entra no fim da lista. Deixe vazio pra
+  não aparecer no carrossel. Clicar no card do carrossel leva direto
+  até o produto na listagem da categoria dele, com o botão de
+  WhatsApp já ali.
 - A planilha precisa estar compartilhada como "Qualquer pessoa com o
   link → Leitor", senão a página não consegue ler os dados.
 

@@ -283,6 +283,22 @@
     transition: border-color 0.25s var(--easing), background 0.25s var(--easing), transform 0.25s var(--easing), box-shadow 0.25s var(--easing);
     animation: surgir 0.5s var(--easing) both;
   }
+  .produto-promocao{
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25);
+  }
+
+  @keyframes pulsarDestaque{
+    0%, 100%{ box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25); }
+    30%{ box-shadow: 0 0 0 5px rgba(201, 162, 39, 0.4); }
+  }
+  .produto-destacado{
+    border-color: var(--gold);
+    animation: pulsarDestaque 1.8s var(--easing);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .produto-destacado{ animation: none; }
+  }
 
   .foto{
     width: 100%;
@@ -293,7 +309,23 @@
     position: relative;
     cursor: zoom-in;
   }
+  .foto-conteudo{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
   .foto img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.5s var(--easing); }
+  .selo-produto{
+    position: absolute;
+    top: 10px; left: 10px;
+    z-index: 2;
+    background: rgba(18,14,9,0.8);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 100px;
+    pointer-events: none;
+  }
 
   .info{ padding: 14px 14px 16px; display:flex; flex-direction: column; gap: 5px; flex: 1; }
   .produto h3{
@@ -325,7 +357,72 @@
   .descricao{ font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 0 0 2px; }
   .codigo{ font-size: 11px; color: var(--text-footer); letter-spacing: 0.5px; margin: -2px 0 4px; }
   .preco{ font-size: clamp(16px, 4vw, 18px); font-weight: 700; color: var(--gold-light); margin: auto 0 10px; }
+  .preco-linha{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 8px; margin: auto 0 10px; }
+  .preco-linha .preco{ margin: 0; }
+  .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
+
+  /* ---------- Carrossel de mais vendidos ---------- */
+  .secao-vendidos{ margin-bottom: 32px; }
+  .titulo-secao{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(17px, 3.6vw, 20px);
+    color: var(--gold-light);
+    margin: 0 0 14px;
+  }
+  .carrossel-vendidos{
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 20px;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -20px;
+    padding: 2px 20px 10px;
+  }
+  .carrossel-vendidos::-webkit-scrollbar{ height: 6px; }
+  .carrossel-vendidos::-webkit-scrollbar-thumb{ background: var(--border-hover); border-radius: 100px; }
+  .card-vendido{
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+    width: 148px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 0;
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.25s var(--easing), transform 0.25s var(--easing);
+    animation: surgir 0.5s var(--easing) both;
+  }
+  .card-vendido .foto{ cursor: pointer; }
+  .info-vendido{ padding: 10px 12px 12px; display:flex; flex-direction:column; gap:4px; }
+  .card-vendido h3{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 13.5px;
+    margin: 0;
+    color: var(--text);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .preco-vendido{
+    display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+    font-size: 13px; font-weight: 700; color: var(--gold-light); margin: 0;
+  }
+  .preco-vendido .preco-riscado{ font-size: 11px; }
+  @media (min-width: 900px){
+    .carrossel-vendidos{ margin: 0 -24px; padding: 2px 24px 10px; }
+  }
 
   /* ---------- Cards de vidro para seleção de categoria ---------- */
   .grade-categorias{
@@ -725,6 +822,8 @@
       box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.3), 0 22px 45px -18px rgba(201, 162, 39, 0.4);
     }
     .card-categoria:hover .estrela{ opacity: 1; }
+    .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
+    .card-vendido:hover .foto img{ transform: scale(1.05); }
     .btn-whats:hover{ background: var(--gold); color: var(--bg); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
@@ -909,6 +1008,9 @@
     const indicePreco = cabecalhoCsv.indexOf('preco');
     const indiceFoto = cabecalhoCsv.indexOf('foto');
     const indiceCodigo = cabecalhoCsv.indexOf('codigo');
+    const indiceTag = cabecalhoCsv.indexOf('tag');
+    const indicePrecoPromocional = cabecalhoCsv.indexOf('precopromocional');
+    const indiceMaisVendido = cabecalhoCsv.indexOf('maisvendido');
 
     const categorias = [];
     const mapaCategorias = {};
@@ -931,12 +1033,22 @@
 
       const nomeProduto = (linha[indiceProduto] || '').trim();
       if(nomeProduto){
+        const maisVendidoTexto = (linha[indiceMaisVendido] || '').trim();
+        let maisVendido = null;
+        if(maisVendidoTexto !== ''){
+          const numero = Number(maisVendidoTexto.replace(',', '.'));
+          maisVendido = isNaN(numero) ? 999 : numero;
+        }
+
         mapaCategorias[nomeCategoria].produtos.push({
           nome: nomeProduto,
           descricao: (linha[indiceDescricao] || '').trim(),
           preco: (linha[indicePreco] || '').trim(),
           foto: (linha[indiceFoto] || '').trim(),
-          codigo: (linha[indiceCodigo] || '').trim()
+          codigo: (linha[indiceCodigo] || '').trim(),
+          tag: (linha[indiceTag] || '').trim(),
+          precoPromocional: (linha[indicePrecoPromocional] || '').trim(),
+          maisVendido: maisVendido
         });
       }
     }
@@ -960,7 +1072,9 @@
     let mensagem = `Olá! Vim pelo catálogo e tenho interesse neste produto:\n\n`;
     mensagem += `Categoria: ${categoria}\n`;
     mensagem += `Produto: ${produto.nome}\n`;
-    mensagem += `Valor: R$ ${produto.preco}\n`;
+    mensagem += produto.precoPromocional
+      ? `Valor: R$ ${produto.precoPromocional} (promocional, de R$ ${produto.preco})\n`
+      : `Valor: R$ ${produto.preco}\n`;
     if(produto.codigo) mensagem += `Código: ${produto.codigo}\n`;
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
   }
@@ -1006,57 +1120,71 @@
     return candidatos;
   }
 
-  function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
+  // Carrega a foto (link direto ou candidatas por código) dentro de uma
+  // área .foto já criada, sem nunca mostrar ícone de imagem quebrada —
+  // só troca o placeholder pela <img> quando uma candidata carrega de
+  // verdade. Reaproveitado pelo card de produto normal e pelo card do
+  // carrossel de mais vendidos. comZoom liga o clique-pra-ampliar.
+  function anexarFotoProduto(areaFoto, produto, nomeCategoria, comZoom){
     const candidatosPorCodigo = produto.codigo ? candidatosFotoPorCodigo(produto.codigo, nomeCategoria) : [];
     const candidatosFoto = produto.foto
       ? [produto.foto, ...candidatosPorCodigo]
       : candidatosPorCodigo;
 
+    if(!candidatosFoto.length) return;
+
+    const conteudo = areaFoto.querySelector('.foto-conteudo') || areaFoto;
+    let tentativa = 0;
+
+    const tentarProximaFoto = () => {
+      if(tentativa >= candidatosFoto.length) return;
+      const candidata = candidatosFoto[tentativa];
+      tentativa++;
+      const sonda = new Image();
+      sonda.onload = () => {
+        conteudo.innerHTML = `<img src="${candidata}" alt="${escaparHTML(produto.nome)}" decoding="async">`;
+      };
+      sonda.onerror = tentarProximaFoto;
+      sonda.src = candidata;
+    };
+    tentarProximaFoto();
+
+    if(comZoom){
+      areaFoto.addEventListener('click', () => {
+        const imagem = conteudo.querySelector('img');
+        if(imagem && imagem.complete && imagem.naturalWidth > 0){
+          abrirLightbox(imagem.src, produto.nome);
+        }
+      });
+    }
+  }
+
+  function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
     const card = document.createElement('div');
-    card.className = 'produto';
+    card.className = 'produto' + (produto.precoPromocional ? ' produto-promocao' : '');
+    card.dataset.nome = produto.nome;
+    if(produto.codigo) card.dataset.codigo = produto.codigo;
     card.style.animationDelay = `${(indice || 0) * 0.05}s`;
     card.innerHTML = `
-      <div class="foto"><div class="foto-vazia">Foto em breve</div></div>
+      <div class="foto">
+        <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
+        ${produto.tag ? `<span class="selo-produto">${escaparHTML(produto.tag)}</span>` : ''}
+      </div>
       <div class="info">
         ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
         <h3><span>${escaparHTML(produto.nome)}</span></h3>
         ${produto.codigo ? `<p class="codigo">Cód. ${escaparHTML(produto.codigo)}</p>` : ''}
         ${produto.descricao ? `<p class="descricao">${escaparHTML(produto.descricao)}</p>` : ''}
-        <p class="preco">R$ ${escaparHTML(produto.preco)}</p>
+        ${produto.precoPromocional
+          ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
+          : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
         <a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
           ${iconeWhats} Escolher no WhatsApp
         </a>
       </div>
     `;
 
-    if(candidatosFoto.length){
-      const areaFoto = card.querySelector('.foto');
-      let tentativa = 0;
-
-      // Testa cada candidata "escondida" (fora da tela, com Image()) e só
-      // troca o placeholder pela <img> de verdade quando uma carregar —
-      // assim o card nunca mostra o ícone de imagem quebrada enquanto
-      // tenta os nomes possíveis, só o "Foto em breve" até achar uma.
-      const tentarProximaFoto = () => {
-        if(tentativa >= candidatosFoto.length) return;
-        const candidata = candidatosFoto[tentativa];
-        tentativa++;
-        const sonda = new Image();
-        sonda.onload = () => {
-          areaFoto.innerHTML = `<img src="${candidata}" alt="${escaparHTML(produto.nome)}" decoding="async">`;
-        };
-        sonda.onerror = tentarProximaFoto;
-        sonda.src = candidata;
-      };
-      tentarProximaFoto();
-
-      areaFoto.addEventListener('click', () => {
-        const imagem = areaFoto.querySelector('img');
-        if(imagem && imagem.complete && imagem.naturalWidth > 0){
-          abrirLightbox(imagem.src, produto.nome);
-        }
-      });
-    }
+    anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, true);
 
     return card;
   }
@@ -1146,7 +1274,7 @@
     });
   }
 
-  function trocarTela(construir, rolarTopo = true){
+  function trocarTela(construir, rolarTopo = true, aposConstruir){
     conteudo.style.opacity = '0';
     conteudo.style.transform = 'translateY(6px)';
     setTimeout(() => {
@@ -1157,11 +1285,92 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       requestAnimationFrame(aplicarRolagemNosTitulos);
+      if(aposConstruir) aposConstruir();
     }, 180);
+  }
+
+  // Monta o carrossel "Mais vendidos" com os produtos que têm a coluna
+  // MaisVendido preenchida na planilha (ordenados por esse número).
+  // Retorna null se não houver nenhum, pra não sobrar seção vazia.
+  function construirCarrosselVendidos(categorias){
+    const itens = [];
+    categorias.forEach(categoria => {
+      categoria.produtos.forEach(produto => {
+        if(produto.maisVendido !== null){
+          itens.push({ produto, categoriaNome: categoria.nome });
+        }
+      });
+    });
+    if(itens.length === 0) return null;
+
+    itens.sort((a, b) => a.produto.maisVendido - b.produto.maisVendido);
+
+    const secao = document.createElement('section');
+    secao.className = 'secao-vendidos';
+    secao.innerHTML = `<h2 class="titulo-secao">Mais vendidos</h2>`;
+
+    const trilha = document.createElement('div');
+    trilha.className = 'carrossel-vendidos';
+    itens.forEach(({ produto, categoriaNome }) => {
+      trilha.appendChild(criarCardVendido(produto, categoriaNome, categorias));
+    });
+    secao.appendChild(trilha);
+
+    return secao;
+  }
+
+  function criarCardVendido(produto, categoriaNome, categorias){
+    const card = document.createElement('button');
+    card.className = 'card-vendido';
+    card.innerHTML = `
+      <div class="foto">
+        <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
+        ${produto.tag ? `<span class="selo-produto">${escaparHTML(produto.tag)}</span>` : ''}
+      </div>
+      <div class="info-vendido">
+        <h3>${escaparHTML(produto.nome)}</h3>
+        <p class="preco-vendido">
+          ${produto.precoPromocional
+            ? `<span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span>R$ ${escaparHTML(produto.precoPromocional)}</span>`
+            : `<span>R$ ${escaparHTML(produto.preco)}</span>`}
+        </p>
+      </div>
+    `;
+    anexarFotoProduto(card.querySelector('.foto'), produto, categoriaNome, false);
+    card.addEventListener('click', () => irParaProdutoNaListagem(categorias, categoriaNome, produto));
+    return card;
+  }
+
+  // Abre a categoria do produto clicado no carrossel, rola até o card
+  // dele na listagem e destaca a borda por um instante — o pedido em
+  // si é feito pelo botão "Escolher no WhatsApp" que já existe no card.
+  function irParaProdutoNaListagem(categorias, categoriaNome, produto){
+    const indiceCategoria = categorias.findIndex(categoria => categoria.nome === categoriaNome);
+    if(indiceCategoria === -1) return;
+
+    renderProdutos(categorias, indiceCategoria, false, () => {
+      const seletor = produto.codigo
+        ? `.produto[data-codigo="${CSS.escape(produto.codigo)}"]`
+        : `.produto[data-nome="${CSS.escape(produto.nome)}"]`;
+      const alvo = document.querySelector(seletor);
+      if(!alvo) return;
+      alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      alvo.classList.add('produto-destacado');
+      setTimeout(() => alvo.classList.remove('produto-destacado'), 1800);
+    });
   }
 
   function renderCategorias(categorias){
     trocarTela(() => {
+      conteudo.innerHTML = '';
+      if(categorias.length === 0){
+        conteudo.innerHTML = '<p class="estado">Nenhum produto encontrado ainda.</p>';
+        return;
+      }
+
+      const carrossel = construirCarrosselVendidos(categorias);
+      if(carrossel) conteudo.appendChild(carrossel);
+
       const grade = document.createElement('div');
       grade.className = 'grade-categorias';
 
@@ -1177,12 +1386,6 @@
         card.addEventListener('click', () => renderProdutos(categorias, indice));
         grade.appendChild(card);
       });
-
-      conteudo.innerHTML = '';
-      if(categorias.length === 0){
-        conteudo.innerHTML = '<p class="estado">Nenhum produto encontrado ainda.</p>';
-        return;
-      }
       conteudo.appendChild(grade);
 
       const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1199,7 +1402,7 @@
     });
   }
 
-  function renderProdutos(categorias, indiceCategoria){
+  function renderProdutos(categorias, indiceCategoria, rolarTopo = true, aposConstruir){
     trocarTela(() => {
       const categoria = categorias[indiceCategoria];
 
@@ -1222,7 +1425,7 @@
       conteudo.innerHTML = '';
       conteudo.appendChild(trilha);
       conteudo.appendChild(grade);
-    });
+    }, rolarTopo, aposConstruir);
   }
 
   function renderBusca(categorias, termo){
