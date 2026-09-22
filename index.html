@@ -22,15 +22,13 @@
     --frame: #17130D;
     --border: #241C12;
     --border-hover: #3A3226;
-    --gold: #C9A227;
-    --gold-light: #E7C873;
-    --gold-mid: #B08D2B;
-    --gold-dark: #8A6F1F;
-    /* Tons tirados direto da nossa logo (o "NP" dourado) — dá o mesmo
-       efeito de metal/brilho nos elementos de destaque da tela. */
-    --logo-bronze: #C3914B;
-    --logo-brilho: #F7C97A;
-    --logo-degrade: linear-gradient(135deg, var(--logo-bronze) 0%, var(--logo-brilho) 50%, var(--logo-bronze) 100%);
+    /* Os 3 tons abaixo vieram de amostragem real dos pixels da nossa
+       logo (o "NP" dourado) — sombra, tom médio e brilho — pra toda
+       cor de destaque do site vir da nossa identidade visual, em vez
+       de um dourado genérico. */
+    --gold-dark: #9B5206;
+    --gold: #E3AC5D;
+    --gold-light: #FCD48C;
     --text: #F4EFE3;
     --text-secondary: #C9C1B0;
     --text-tertiary: #A69C87;
@@ -119,14 +117,14 @@
     top: 50%; left: 50%;
     width: 560px; height: 560px;
     margin: -280px 0 0 -280px;
-    background: radial-gradient(circle, rgba(201,162,39,0.22) 0%, rgba(201,162,39,0) 68%);
+    background: radial-gradient(circle, rgba(227, 172, 93, 0.22) 0%, rgba(227, 172, 93, 0) 68%);
     animation: derivar 14s ease-in-out infinite;
   }
   .brilho-cursor{
     position: absolute;
     inset: 0;
     opacity: 0;
-    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 38%), rgba(231,200,115,0.16), transparent 70%);
+    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 38%), rgba(252, 212, 140, 0.16), transparent 70%);
     transition: opacity 0.4s var(--easing);
   }
 
@@ -159,7 +157,7 @@
     width: 72px;
     height: auto;
     margin: 0 0 22px;
-    filter: drop-shadow(0 0 18px rgba(201,162,39,0.28));
+    filter: drop-shadow(0 0 18px rgba(227, 172, 93, 0.28));
     animation: surgir 0.7s var(--easing) both, respirar 5s ease-in-out 0.7s infinite;
   }
   .selo{
@@ -199,8 +197,8 @@
     to{ opacity: 1; transform: translateY(0); }
   }
   @keyframes respirar{
-    0%, 100%{ filter: drop-shadow(0 0 18px rgba(201,162,39,0.28)); transform: scale(1); }
-    50%{ filter: drop-shadow(0 0 28px rgba(201,162,39,0.42)); transform: scale(1.03); }
+    0%, 100%{ filter: drop-shadow(0 0 18px rgba(227, 172, 93, 0.28)); transform: scale(1); }
+    50%{ filter: drop-shadow(0 0 28px rgba(227, 172, 93, 0.42)); transform: scale(1.03); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -313,8 +311,8 @@
   }
 
   @keyframes pulsarDestaque{
-    0%, 100%{ box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25); }
-    30%{ box-shadow: 0 0 0 5px rgba(201, 162, 39, 0.4); }
+    0%, 100%{ box-shadow: 0 0 0 1px rgba(227, 172, 93, 0.25); }
+    30%{ box-shadow: 0 0 0 5px rgba(227, 172, 93, 0.4); }
   }
   .produto-destacado{
     border-color: var(--gold);
@@ -378,7 +376,7 @@
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    background: radial-gradient(circle, rgba(231, 200, 115, 0.55) 0%, rgba(201, 162, 39, 0) 70%);
+    background: radial-gradient(circle, rgba(252, 212, 140, 0.55) 0%, rgba(227, 172, 93, 0) 70%);
     opacity: 0;
     transform: scale(0.3);
     animation: brilharTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -404,7 +402,7 @@
     letter-spacing: 0.5px;
     text-transform: uppercase;
     color: var(--gold-light);
-    text-shadow: 0 0 22px rgba(201, 162, 39, 0.7);
+    text-shadow: 0 0 22px rgba(227, 172, 93, 0.7);
     font-size: clamp(19px, 7.5vw, 27px);
     opacity: 0;
     transform: scale(0.45) rotate(-6deg);
@@ -432,8 +430,8 @@
     100%{ opacity: 1; transform: scale(1); }
   }
   @keyframes pulsoSeloTag{
-    0%{ box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.55); }
-    100%{ box-shadow: 0 0 0 7px rgba(201, 162, 39, 0); }
+    0%{ box-shadow: 0 0 0 0 rgba(227, 172, 93, 0.55); }
+    100%{ box-shadow: 0 0 0 7px rgba(227, 172, 93, 0); }
   }
   @media (prefers-reduced-motion: reduce){
     .capa-selo-tag{ animation: none; opacity: 0; }
@@ -586,8 +584,8 @@
     transition: border-color 0.2s var(--easing), background 0.2s var(--easing), color 0.2s var(--easing);
   }
   .pill.ativo{
-    background: var(--logo-degrade);
-    border-color: var(--logo-bronze);
+    background: var(--gold);
+    border-color: var(--gold);
     color: var(--bg);
     font-weight: 700;
   }
@@ -595,16 +593,16 @@
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
-    background: var(--logo-degrade);
-    border: 1px solid var(--logo-bronze);
+    background: var(--gold);
+    border: 1px solid var(--gold);
     color: var(--bg);
     text-decoration: none;
     font-weight: 700;
     font-size: 13px;
     padding: 11px 16px;
     border-radius: 100px;
-    box-shadow: 0 8px 20px -10px rgba(199, 148, 74, 0.55);
-    transition: filter 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
+    box-shadow: 0 8px 20px -10px rgba(227, 172, 93, 0.55);
+    transition: background 0.2s var(--easing), border-color 0.2s var(--easing), color 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
   }
   .btn-whats:active{ transform: scale(0.97); }
   .btn-whats svg{ width: 14px; height: 14px; flex-shrink:0; }
@@ -786,12 +784,36 @@
     background: var(--gold);
     color: var(--bg);
     display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 10px 26px -8px rgba(201,162,39,0.55);
+    overflow: hidden;
+    box-shadow: 0 10px 26px -8px rgba(227, 172, 93, 0.55);
     text-decoration: none;
     z-index: 30;
     transition: transform 0.2s var(--easing);
+    animation: respirarFlutuante 4s ease-in-out infinite;
   }
-  .flutuante svg{ width: 24px; height: 24px; }
+  @keyframes respirarFlutuante{
+    0%, 100%{ box-shadow: 0 10px 26px -8px rgba(227, 172, 93, 0.55); }
+    50%{ box-shadow: 0 10px 32px -6px rgba(227, 172, 93, 0.85), 0 0 20px 3px rgba(252, 212, 140, 0.4); }
+  }
+  .flutuante svg{ position: relative; z-index: 1; width: 24px; height: 24px; }
+  /* Faixa de brilho que passa de vez em quando pelo botão — some some
+     do olho, mas dá aquele "cintilar" (só transform, leve). */
+  .flutuante::before{
+    content: '';
+    position: absolute;
+    inset: -60%;
+    background: linear-gradient(115deg, transparent 42%, rgba(255,255,255,0.6) 50%, transparent 58%);
+    transform: translateX(-140%);
+    animation: cintilarFlutuante 4s ease-in-out infinite;
+  }
+  @keyframes cintilarFlutuante{
+    0%, 35%{ transform: translateX(-140%); }
+    60%, 100%{ transform: translateX(140%); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .flutuante{ animation: none; }
+    .flutuante::before{ animation: none; opacity: 0; }
+  }
 
   /* ---------- Toast de informações importantes (uma vez só) ---------- */
   .toast-info{
@@ -948,8 +970,8 @@
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
     .pill:hover{ border-color: var(--gold); color: var(--gold-light); }
-    .pill.ativo:hover{ color: var(--bg); filter: brightness(1.1); }
-    .btn-whats:hover{ filter: brightness(1.1); }
+    .pill.ativo:hover{ background: var(--gold-dark); border-color: var(--gold-dark); color: var(--text); }
+    .btn-whats:hover{ background: var(--gold-dark); border-color: var(--gold-dark); color: var(--text); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
