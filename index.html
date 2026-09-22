@@ -751,7 +751,7 @@
 
     const fotoHtml = candidatosFoto.length
       ? `<img alt="${produto.nome}">`
-      : `<div class="foto-vazia">Foto do produto</div>`;
+      : `<div class="foto-vazia">Foto em breve</div>`;
 
     const card = document.createElement('div');
     card.className = 'produto';
@@ -777,7 +777,7 @@
 
       const tentarProximaFoto = () => {
         if(tentativa >= candidatosFoto.length){
-          areaFoto.innerHTML = `<div class="foto-vazia">Foto do produto</div>`;
+          areaFoto.innerHTML = `<div class="foto-vazia">Foto em breve</div>`;
           return;
         }
         imagem.src = candidatosFoto[tentativa];
