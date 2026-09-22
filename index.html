@@ -322,7 +322,7 @@
     padding: 4px 9px;
     border-radius: 100px;
     pointer-events: none;
-    animation: chamativoSelo 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: chamativoSelo 0.9s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
   .selo-tag{
     left: 10px;
@@ -1195,11 +1195,28 @@
   // Selos (tag + promoção) entram com uma animação chamativa (estoura
   // grande e recolhe rápido pro tamanho final) e depois ficam quietos —
   // chama atenção na hora sem poluir a tela depois.
-  function aplicarAtrasoNosSelos(card, atrasoBase){
-    const seloTag = card.querySelector('.selo-tag');
-    if(seloTag) seloTag.style.animationDelay = `${atrasoBase + 0.35}s`;
-    const seloPromocao = card.querySelector('.selo-promocao');
-    if(seloPromocao) seloPromocao.style.animationDelay = `${atrasoBase + 0.35}s`;
+  // Numa listagem, a maioria dos cards nasce fora da tela (abaixo da
+  // dobra) — se o selo animasse na hora que o card é criado, quem tem
+  // muito produto nunca chegaria a ver o efeito, porque ele já teria
+  // acontecido e sumido antes da rolagem chegar ali. Por isso o selo
+  // nasce pausado, e só toca quando o card realmente aparece na tela.
+  const observadorSelos = ('IntersectionObserver' in window)
+    ? new IntersectionObserver((entradas, observador) => {
+        entradas.forEach(entrada => {
+          if(!entrada.isIntersecting) return;
+          entrada.target.querySelectorAll('.selo-produto').forEach(selo => {
+            selo.style.animationPlayState = 'running';
+          });
+          observador.unobserve(entrada.target);
+        });
+      }, { threshold: 0.35 })
+    : null;
+
+  function prepararSelosParaEntrada(card){
+    const selos = card.querySelectorAll('.selo-produto');
+    if(!selos.length || !observadorSelos) return;
+    selos.forEach(selo => { selo.style.animationPlayState = 'paused'; });
+    observadorSelos.observe(card);
   }
 
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
@@ -1230,7 +1247,7 @@
     `;
 
     anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, true);
-    aplicarAtrasoNosSelos(card, atraso);
+    prepararSelosParaEntrada(card);
 
     return card;
   }
@@ -1384,7 +1401,7 @@
       </div>
     `;
     anexarFotoProduto(card.querySelector('.foto'), produto, categoriaNome, false);
-    aplicarAtrasoNosSelos(card, 0.15);
+    prepararSelosParaEntrada(card);
     card.addEventListener('click', () => irParaProdutoNaListagem(categorias, categoriaNome, produto));
     return card;
   }
