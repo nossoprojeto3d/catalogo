@@ -289,10 +289,11 @@
     transition: border-color 0.25s var(--easing), background 0.25s var(--easing), transform 0.25s var(--easing), box-shadow 0.25s var(--easing);
     animation: surgir 0.5s var(--easing) both;
   }
-  .produto-promocao{
+  .produto-selo{
     /* mantém a entrada normal do card (surgir) e soma o tremor logo
        depois que ela termina, pra não brigar com o próprio translateY
-       da entrada */
+       da entrada — dispara sempre que o card tem algum selo (tag ou
+       promoção), não só quando tá em promoção */
     animation: surgir 0.5s var(--easing) both, tremerCard 0.6s 0.5s ease-in-out both;
   }
   @keyframes tremerCard{
@@ -303,7 +304,7 @@
     80%{ transform: translateX(2px); }
   }
   @media (prefers-reduced-motion: reduce){
-    .produto-promocao{ animation: surgir 0.5s var(--easing) both; }
+    .produto-selo{ animation: surgir 0.5s var(--easing) both; }
   }
 
   @keyframes pulsarDestaque{
@@ -348,22 +349,40 @@
     color: var(--bg);
   }
 
-  /* Selo de tag: antes da foto carregar, o texto da tag "explode"
-     grande e centralizado no card; depois some enquanto o seloziho
-     pequeno (no canto, igual aos outros selos) aparece no lugar dele.
-     Só anima transform/opacity (leve, não força recálculo de layout a
-     cada quadro — importante pra rodar bem em celular mais simples). */
+  /* Selo de tag: antes da foto carregar, o texto da tag "explode" grande
+     e centralizado no card (com um brilho por trás e uma leve rotação de
+     entrada), depois encolhe e desaparece enquanto o selinho pequeno (no
+     canto, igual aos outros selos) "pousa" no lugar dele com uma
+     pequena batida. Só anima transform/opacity/box-shadow (leve, não
+     força recálculo de layout a cada quadro — importante pra rodar bem
+     em celular mais simples). */
   .capa-selo-tag{
     position: absolute;
     inset: 0;
     z-index: 3;
     background: var(--frame);
     pointer-events: none;
-    animation: sumirCapaSelo 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: sumirCapaSelo 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
   @keyframes sumirCapaSelo{
-    0%, 72%{ opacity: 1; }
+    0%, 60%{ opacity: 1; }
     100%{ opacity: 0; }
+  }
+  .explosao-brilho{
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(231, 200, 115, 0.55) 0%, rgba(201, 162, 39, 0) 70%);
+    opacity: 0;
+    transform: scale(0.3);
+    animation: brilharTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes brilharTag{
+    0%{ opacity: 0; transform: scale(0.3); }
+    14%{ opacity: 0.9; transform: scale(1.1); }
+    45%{ opacity: 0.35; transform: scale(1.6); }
+    65%, 100%{ opacity: 0; transform: scale(1.9); }
   }
   .explosao-tag{
     position: absolute;
@@ -383,14 +402,14 @@
     text-shadow: 0 0 22px rgba(201, 162, 39, 0.7);
     font-size: clamp(19px, 7.5vw, 27px);
     opacity: 0;
-    transform: scale(0.4);
-    animation: explodirTag 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform: scale(0.45) rotate(-6deg);
+    animation: explodirTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
   @keyframes explodirTag{
-    0%{ opacity: 0; transform: scale(0.4); }
-    18%{ opacity: 1; transform: scale(1.12); }
-    30%, 66%{ opacity: 1; transform: scale(1); }
-    78%, 100%{ opacity: 0; transform: scale(1); }
+    0%{ opacity: 0; transform: scale(0.45) rotate(-6deg); }
+    22%{ opacity: 1; transform: scale(1.12) rotate(2deg); }
+    32%, 60%{ opacity: 1; transform: scale(1) rotate(0deg); }
+    72%, 100%{ opacity: 0; transform: scale(1) rotate(0deg); }
   }
   .selo-tag{
     left: 10px;
@@ -400,14 +419,20 @@
     transform-origin: top left;
     opacity: 0;
     transform: scale(0.5);
-    animation: aparecerSeloTag 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: aparecerSeloTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both, pulsoSeloTag 0.55s 1.6s ease-out both;
   }
   @keyframes aparecerSeloTag{
-    0%, 74%{ opacity: 0; transform: scale(0.5); }
+    0%, 68%{ opacity: 0; transform: scale(0.5); }
+    85%{ opacity: 1; transform: scale(1.15); }
     100%{ opacity: 1; transform: scale(1); }
+  }
+  @keyframes pulsoSeloTag{
+    0%{ box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.55); }
+    100%{ box-shadow: 0 0 0 7px rgba(201, 162, 39, 0); }
   }
   @media (prefers-reduced-motion: reduce){
     .capa-selo-tag{ animation: none; opacity: 0; }
+    .explosao-brilho{ animation: none; opacity: 0; }
     .explosao-tag{ animation: none; opacity: 0; }
     .selo-tag{ animation: none; opacity: 1; transform: scale(1); }
   }
@@ -1231,21 +1256,23 @@
 
 
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
+    const temSelo = !!(produto.tag || produto.precoPromocional);
     const card = document.createElement('div');
-    card.className = 'produto' + (produto.precoPromocional ? ' produto-promocao' : '');
+    card.className = 'produto' + (temSelo ? ' produto-selo' : '');
     card.dataset.nome = produto.nome;
     if(produto.codigo) card.dataset.codigo = produto.codigo;
     const atraso = (indice || 0) * 0.05;
-    // Card com promoção tem 2 animações (entrada + tremor); o tremor
-    // precisa do seu próprio atraso (0.5s a mais) pra só começar depois
-    // que a entrada terminar, senão os dois "transform" brigam entre si.
-    card.style.animationDelay = produto.precoPromocional
+    // Card com tag ou promoção tem 2 animações (entrada + tremor); o
+    // tremor precisa do seu próprio atraso (0.5s a mais) pra só começar
+    // depois que a entrada terminar, senão os dois "transform" brigam
+    // entre si.
+    card.style.animationDelay = temSelo
       ? `${atraso}s, ${atraso + 0.5}s`
       : `${atraso}s`;
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
-        ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-brilho"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
       </div>
       <div class="info">
