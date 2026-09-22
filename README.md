@@ -47,8 +47,8 @@ Forma recomendada — automática pelo código do produto:
    página encontra a imagem sozinha pelo código.
 
 Extensões aceitas: `.jpg`, `.jpeg`, `.png`, `.webp`. Se nenhum arquivo
-correspondente for encontrado, o card mostra o placeholder "Foto do
-produto" em vez de imagem quebrada.
+correspondente for encontrado, o card mostra o placeholder "Foto em
+breve" em vez de imagem quebrada.
 
 Forma alternativa — link direto: se preferir, ainda dá pra preencher a
 coluna `Foto` da planilha com um link direto de imagem (ex.: subindo a
@@ -63,13 +63,18 @@ arquivo abaixo de ~400KB pra carregar rápido no celular.
 
 ```
 index.html      → a página do catálogo
-imagens/         → opcional, caso hospede fotos aqui em vez de usar ImgBB
+logo.png         → logo da marca (favicon, cabeçalho e rodapé)
+imagens/         → fotos dos produtos (veja a seção Fotos acima)
 ```
 
 ## Como funciona por dentro
 
-Tudo em um arquivo só (HTML + CSS + JS), sem build, sem dependências. A
-página busca a planilha publicada em CSV, monta as categorias e produtos em
-memória, e desenha os cards. Se a planilha não responder (link errado,
-sem internet, compartilhamento desligado), aparece uma tela de manutenção
-com um botão direto pro WhatsApp, em vez de dar erro na cara do cliente.
+Tudo em um arquivo HTML principal (+ CSS e JS inline), sem build e sem
+dependência de servidor — só uma libzinha via CDN (Vanilla-Tilt) pro efeito
+de inclinação nos cards de categoria, carregada com verificação de
+integridade (SRI). A página busca a planilha publicada em CSV, sempre sem
+cache (pra nunca mostrar preço/produto desatualizado), monta as categorias
+e produtos em memória, e desenha os cards. Se a planilha não responder
+(link errado, sem internet, compartilhamento desligado), aparece uma tela
+de manutenção com um botão direto pro WhatsApp, em vez de dar erro na cara
+do cliente.
