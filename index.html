@@ -837,15 +837,11 @@
       ? [produto.foto, ...candidatosPorCodigo]
       : candidatosPorCodigo;
 
-    const fotoHtml = candidatosFoto.length
-      ? `<img alt="${escaparHTML(produto.nome)}" decoding="async">`
-      : `<div class="foto-vazia">Foto em breve</div>`;
-
     const card = document.createElement('div');
     card.className = 'produto';
     card.style.animationDelay = `${(indice || 0) * 0.05}s`;
     card.innerHTML = `
-      <div class="foto">${fotoHtml}</div>
+      <div class="foto"><div class="foto-vazia">Foto em breve</div></div>
       <div class="info">
         ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
         <h3><span>${escaparHTML(produto.nome)}</span></h3>
@@ -860,22 +856,28 @@
 
     if(candidatosFoto.length){
       const areaFoto = card.querySelector('.foto');
-      const imagem = areaFoto.querySelector('img');
       let tentativa = 0;
 
+      // Testa cada candidata "escondida" (fora da tela, com Image()) e só
+      // troca o placeholder pela <img> de verdade quando uma carregar —
+      // assim o card nunca mostra o ícone de imagem quebrada enquanto
+      // tenta os nomes possíveis, só o "Foto em breve" até achar uma.
       const tentarProximaFoto = () => {
-        if(tentativa >= candidatosFoto.length){
-          areaFoto.innerHTML = `<div class="foto-vazia">Foto em breve</div>`;
-          return;
-        }
-        imagem.src = candidatosFoto[tentativa];
+        if(tentativa >= candidatosFoto.length) return;
+        const candidata = candidatosFoto[tentativa];
         tentativa++;
+        const sonda = new Image();
+        sonda.onload = () => {
+          areaFoto.innerHTML = `<img src="${candidata}" alt="${escaparHTML(produto.nome)}" decoding="async">`;
+        };
+        sonda.onerror = tentarProximaFoto;
+        sonda.src = candidata;
       };
-      imagem.addEventListener('error', tentarProximaFoto);
       tentarProximaFoto();
 
       areaFoto.addEventListener('click', () => {
-        if(imagem.isConnected && imagem.complete && imagem.naturalWidth > 0){
+        const imagem = areaFoto.querySelector('img');
+        if(imagem && imagem.complete && imagem.naturalWidth > 0){
           abrirLightbox(imagem.src, produto.nome);
         }
       });
