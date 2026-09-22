@@ -26,6 +26,11 @@
     --gold-light: #E7C873;
     --gold-mid: #B08D2B;
     --gold-dark: #8A6F1F;
+    /* Tons tirados direto da nossa logo (o "NP" dourado) — dá o mesmo
+       efeito de metal/brilho nos elementos de destaque da tela. */
+    --logo-bronze: #C3914B;
+    --logo-brilho: #F7C97A;
+    --logo-degrade: linear-gradient(135deg, var(--logo-bronze) 0%, var(--logo-brilho) 50%, var(--logo-bronze) 100%);
     --text: #F4EFE3;
     --text-secondary: #C9C1B0;
     --text-tertiary: #A69C87;
@@ -486,7 +491,7 @@
   .preco-linha .preco{ margin: 0; }
   .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; }
   .info .preco, .info .preco-linha{ margin-top: 4px; }
-  .info .btn-whats{ margin-top: auto; align-self: flex-start; }
+  .info .btn-whats{ margin-top: auto; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
 
   /* ---------- Carrossel de mais vendidos ---------- */
@@ -581,28 +586,28 @@
     transition: border-color 0.2s var(--easing), background 0.2s var(--easing), color 0.2s var(--easing);
   }
   .pill.ativo{
-    background: var(--gold-light);
-    border-color: var(--gold-light);
+    background: var(--logo-degrade);
+    border-color: var(--logo-bronze);
     color: var(--bg);
     font-weight: 700;
   }
   .sentinela-scroll{ height: 1px; }
 
   .btn-whats{
-    display:flex; align-items:center; justify-content:center; gap: 6px;
-    background: var(--gold-light);
-    border: 1px solid var(--gold-light);
+    display:flex; align-items:center; justify-content:center; gap: 7px;
+    background: var(--logo-degrade);
+    border: 1px solid var(--logo-bronze);
     color: var(--bg);
     text-decoration: none;
     font-weight: 700;
-    font-size: 12.5px;
-    padding: 9px 14px;
+    font-size: 13px;
+    padding: 11px 16px;
     border-radius: 100px;
-    box-shadow: 0 8px 20px -10px rgba(231, 200, 115, 0.5);
-    transition: background 0.2s var(--easing), border-color 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
+    box-shadow: 0 8px 20px -10px rgba(199, 148, 74, 0.55);
+    transition: filter 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
   }
   .btn-whats:active{ transform: scale(0.97); }
-  .btn-whats svg{ width: 13px; height: 13px; flex-shrink:0; }
+  .btn-whats svg{ width: 14px; height: 14px; flex-shrink:0; }
 
   .estado{ text-align:center; color: var(--text-tertiary); padding: 60px 20px; font-size: 14.5px; grid-column: 1 / -1; }
 
@@ -943,8 +948,8 @@
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
     .pill:hover{ border-color: var(--gold); color: var(--gold-light); }
-    .pill.ativo:hover{ background: var(--gold); border-color: var(--gold); color: var(--bg); }
-    .btn-whats:hover{ background: var(--gold); border-color: var(--gold); }
+    .pill.ativo:hover{ color: var(--bg); filter: brightness(1.1); }
+    .btn-whats:hover{ filter: brightness(1.1); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
