@@ -1403,7 +1403,7 @@
     }, 180);
   }
 
-  // Monta o carrossel "Mais vendidos" com os produtos que têm a coluna
+  // Monta o carrossel "Os queridinhos" com os produtos que têm a coluna
   // MaisVendido preenchida na planilha (ordenados por esse número).
   // Retorna null se não houver nenhum, pra não sobrar seção vazia.
   function construirCarrosselVendidos(categorias){
@@ -1421,7 +1421,7 @@
 
     const secao = document.createElement('section');
     secao.className = 'secao-vendidos';
-    secao.innerHTML = `<h2 class="titulo-secao">Mais vendidos</h2>`;
+    secao.innerHTML = `<h2 class="titulo-secao">Os queridinhos</h2>`;
 
     const trilha = document.createElement('div');
     trilha.className = 'carrossel-vendidos';
