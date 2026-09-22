@@ -581,8 +581,8 @@
     transition: border-color 0.2s var(--easing), background 0.2s var(--easing), color 0.2s var(--easing);
   }
   .pill.ativo{
-    background: var(--gold-mid);
-    border-color: var(--gold-mid);
+    background: var(--gold-light);
+    border-color: var(--gold-light);
     color: var(--bg);
     font-weight: 700;
   }
@@ -590,15 +590,15 @@
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 6px;
-    background: var(--gold-mid);
-    border: 1px solid var(--gold-mid);
+    background: var(--gold-light);
+    border: 1px solid var(--gold-light);
     color: var(--bg);
     text-decoration: none;
     font-weight: 700;
     font-size: 12.5px;
     padding: 9px 14px;
     border-radius: 100px;
-    box-shadow: 0 8px 20px -10px rgba(176, 141, 43, 0.6);
+    box-shadow: 0 8px 20px -10px rgba(231, 200, 115, 0.5);
     transition: background 0.2s var(--easing), border-color 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
   }
   .btn-whats:active{ transform: scale(0.97); }
@@ -943,8 +943,8 @@
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
     .pill:hover{ border-color: var(--gold); color: var(--gold-light); }
-    .pill.ativo:hover{ color: var(--bg); }
-    .btn-whats:hover{ background: var(--gold-light); border-color: var(--gold-light); }
+    .pill.ativo:hover{ background: var(--gold); border-color: var(--gold); color: var(--bg); }
+    .btn-whats:hover{ background: var(--gold); border-color: var(--gold); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
