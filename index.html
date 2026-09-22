@@ -436,10 +436,9 @@
     line-height: 1.28;
     overflow: hidden;
     white-space: nowrap;
-    text-shadow: 0 1px 10px rgba(0,0,0,0.55);
   }
-  .produto h3{ font-size: clamp(18px, 4.6vw, 22px); }
-  .card-vendido h3{ font-size: 14px; }
+  .produto h3{ font-size: clamp(17px, 4.2vw, 20px); }
+  .card-vendido h3{ font-size: 14px; text-shadow: 0 1px 10px rgba(0,0,0,0.55); }
   .produto h3 span, .card-vendido h3 span{
     display: inline-block;
   }
@@ -456,13 +455,14 @@
   }
   .contagem{ font-size: 12.5px; color: var(--text-tertiary); margin:0; }
 
-  .info{ padding: 14px 16px 16px; display:flex; flex-direction: column; gap: 8px; flex: 1; }
+  .info{ padding: 16px 16px 18px; display:flex; flex-direction: column; gap: 8px; flex: 1; }
   .descricao{ font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin: 0; }
   .codigo{ font-size: 11px; color: var(--text-footer); letter-spacing: 0.5px; margin: 0; }
-  .preco{ font-size: clamp(18px, 4.8vw, 21px); font-weight: 700; color: var(--gold-light); margin: 0; text-shadow: 0 1px 10px rgba(0,0,0,0.55); }
-  .preco-linha{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 8px; margin: 0; }
+  .preco{ font-size: clamp(19px, 5vw, 22px); font-weight: 700; color: var(--gold-light); margin: 0; }
+  .preco-linha{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 8px; margin: 4px 0 0; }
   .preco-linha .preco{ margin: 0; }
-  .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; text-shadow: none; }
+  .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; }
+  .info .preco, .info .preco-linha{ margin-top: 4px; }
   .info .btn-whats{ margin-top: auto; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
 
@@ -576,15 +576,16 @@
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
-    background: transparent;
+    background: var(--gold);
     border: 1px solid var(--gold);
-    color: var(--gold-light);
+    color: var(--bg);
     text-decoration: none;
-    font-weight: 600;
-    font-size: 13px;
-    padding: 10px 12px;
+    font-weight: 700;
+    font-size: 13.5px;
+    padding: 12px 14px;
     border-radius: 100px;
-    transition: background 0.2s var(--easing), color 0.2s var(--easing), transform 0.15s var(--easing);
+    box-shadow: 0 8px 20px -10px rgba(201, 162, 39, 0.6);
+    transition: background 0.2s var(--easing), border-color 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
   }
   .btn-whats:active{ transform: scale(0.97); }
   .btn-whats svg{ width: 14px; height: 14px; flex-shrink:0; }
@@ -912,7 +913,7 @@
     .card-categoria:hover .estrela{ opacity: 1; }
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
-    .btn-whats:hover{ background: var(--gold); color: var(--bg); }
+    .btn-whats:hover{ background: var(--gold-light); border-color: var(--gold-light); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
@@ -1281,17 +1282,15 @@
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
         ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
-        <div class="legenda-foto">
-          ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
-          <h3><span>${escaparHTML(produto.nome)}</span></h3>
-          ${produto.precoPromocional
-            ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
-            : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
-        </div>
       </div>
       <div class="info">
-        ${produto.codigo ? `<p class="codigo">Cód. ${escaparHTML(produto.codigo)}</p>` : ''}
+        ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
+        <h3><span>${escaparHTML(produto.nome)}</span></h3>
         ${produto.descricao ? `<p class="descricao">${escaparHTML(produto.descricao)}</p>` : ''}
+        ${produto.codigo ? `<p class="codigo">Cód. ${escaparHTML(produto.codigo)}</p>` : ''}
+        ${produto.precoPromocional
+          ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
+          : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
         <a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
           ${iconeWhats} Quero esse!
         </a>
