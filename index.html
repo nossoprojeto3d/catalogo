@@ -1454,6 +1454,19 @@
     let agendado = false;
     function atualizarFoco(){
       agendado = false;
+
+      // Se todos os cards já cabem sem precisar rolar (comum em telas
+      // largas), não tem "centro do que tá visível" de verdade — nesse
+      // caso mantém todo mundo no estado normal, sem focar nenhum à toa.
+      if(trilha.scrollWidth <= trilha.clientWidth + 1){
+        cartoes.forEach(cartao => {
+          cartao.style.setProperty('--foco-escala', 1);
+          cartao.style.opacity = '';
+          cartao.classList.remove('card-vendido-foco');
+        });
+        return;
+      }
+
       const areaCarrossel = trilha.getBoundingClientRect();
       const centro = areaCarrossel.left + areaCarrossel.width / 2;
       const metade = areaCarrossel.width / 2 || 1;
