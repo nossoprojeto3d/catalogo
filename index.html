@@ -320,6 +320,14 @@
   .codigo{ font-size: 11px; color: var(--text-footer); letter-spacing: 0.5px; margin: -2px 0 4px; }
   .preco{ font-size: clamp(16px, 4vw, 18px); font-weight: 700; color: var(--gold-light); margin: auto 0 10px; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
+  .monograma{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(40px, 11vw, 64px);
+    color: var(--gold);
+    opacity: 0.5;
+    line-height: 1;
+  }
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
@@ -855,9 +863,10 @@
       grade.className = 'grade';
 
       categorias.forEach((categoria, indice) => {
+        const inicial = categoria.nome.trim().charAt(0).toUpperCase() || '?';
         const capaHtml = categoria.capa
           ? `<img src="${categoria.capa}" alt="${categoria.nome}">`
-          : `<div class="foto-vazia">Foto da categoria</div>`;
+          : `<div class="monograma">${inicial}</div>`;
 
         const cartao = document.createElement('button');
         cartao.className = 'cartao-categoria';
