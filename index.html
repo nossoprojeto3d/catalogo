@@ -1333,7 +1333,6 @@
   function montarCategorias(linhasCsv){
     const cabecalhoCsv = linhasCsv[0].map(c => c.trim().toLowerCase());
     const indiceCategoria = cabecalhoCsv.indexOf('categoria');
-    const indiceCapa = cabecalhoCsv.indexOf('capacategoria');
     const indiceProduto = cabecalhoCsv.indexOf('produto');
     const indiceDescricao = cabecalhoCsv.indexOf('descricao');
     const indicePreco = cabecalhoCsv.indexOf('preco');
@@ -1354,14 +1353,9 @@
       if(!nomeCategoria) continue;
 
       if(!mapaCategorias[nomeCategoria]){
-        const nova = { nome: nomeCategoria, capa: '', produtos: [] };
+        const nova = { nome: nomeCategoria, produtos: [] };
         mapaCategorias[nomeCategoria] = nova;
         categorias.push(nova);
-      }
-
-      const capa = (linha[indiceCapa] || '').trim();
-      if(capa && !mapaCategorias[nomeCategoria].capa){
-        mapaCategorias[nomeCategoria].capa = capa;
       }
 
       const nomeProduto = (linha[indiceProduto] || '').trim();
@@ -1448,7 +1442,7 @@
   }
 
   // Nome de cor (texto livre da planilha) -> cor de verdade pra bolinha.
-  // Nome que a gente n\u00e3o reconhece cai num tom neutro \u2014 o texto do chip
+  // Nome que a gente não reconhece cai num tom neutro — o texto do chip
   // continua mostrando a palavra certa de qualquer jeito.
   const MAPA_CORES = {
     branco: '#F5F5F0', preto: '#1A1A1A', vermelho: '#C0392B',
@@ -1492,9 +1486,12 @@
 
   function candidatosFotoPorCodigo(codigo, nomeCategoria){
     const variantesCodigo = [...new Set([codigo, codigo.toUpperCase(), codigo.toLowerCase()])];
+    // Raiz primeiro: é onde a imensa maioria das fotos realmente está
+    // hoje, então acerta já na 1ª tentativa em vez de gastar vários
+    // 404 sequenciais testando a subpasta da categoria antes.
     const pastas = [
-      `${PASTA_IMAGENS}${encodeURIComponent(nomeCategoria)}/`,
-      PASTA_IMAGENS
+      PASTA_IMAGENS,
+      `${PASTA_IMAGENS}${encodeURIComponent(nomeCategoria)}/`
     ];
     const candidatos = [];
     pastas.forEach(pasta => {
@@ -1559,8 +1556,11 @@
   // Texto do selo de promoção: usa o desconto em % quando dá pra
   // calcular a partir de Preco/PrecoPromocional, senão cai pra "Oferta".
   function calcularSeloPromocao(produto){
-    const original = Number(String(produto.preco).replace(',', '.').replace(/[^\d.]/g, ''));
-    const promocional = Number(String(produto.precoPromocional).replace(',', '.').replace(/[^\d.]/g, ''));
+    // Remove o ponto de milhar antes de trocar a vírgula decimal por
+    // ponto — sem isso, preço "1.234,56" virava "1.234.56" (NaN) e o
+    // selo caía sempre pro "Oferta" genérico em vez do percentual.
+    const original = Number(String(produto.preco).replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, ''));
+    const promocional = Number(String(produto.precoPromocional).replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, ''));
     if(original > 0 && promocional > 0 && promocional < original){
       const percentual = Math.round((1 - promocional / original) * 100);
       if(percentual > 0) return `-${percentual}%`;
@@ -1613,6 +1613,21 @@
     return card;
   }
 
+  // Trava o scroll do fundo da página enquanto qualquer sobreposição
+  // (zoom da foto, modal de info, folha de categorias) está aberta.
+  // Contador em vez de setar/limpar `overflow` direto: se uma abrir
+  // por cima da outra (ex.: Esc fecha as duas de uma vez), a primeira
+  // a fechar não pode liberar o scroll enquanto a outra ainda tá aberta.
+  let travasDeScrollAbertas = 0;
+  function travarScroll(){
+    travasDeScrollAbertas++;
+    document.body.style.overflow = 'hidden';
+  }
+  function destravarScroll(){
+    travasDeScrollAbertas = Math.max(0, travasDeScrollAbertas - 1);
+    if(travasDeScrollAbertas === 0) document.body.style.overflow = '';
+  }
+
   // ---------- Zoom da foto (vira um "mini detalhes" quando tem cor) ----------
   const lightbox = document.getElementById('lightbox');
   const lightboxImagem = document.getElementById('lightboxImagem');
@@ -1626,7 +1641,7 @@
     lightboxDescricao.textContent = produto.descricao || '';
     montarCoresLightbox(produto, categoria);
     lightbox.classList.add('aberto');
-    document.body.style.overflow = 'hidden';
+    travarScroll();
   }
 
   // O botão "Quero esse!" só aparece aqui dentro quando o produto tem
@@ -1665,8 +1680,9 @@
     lightboxCores.hidden = false;
   }
   function fecharLightbox(){
+    if(!lightbox.classList.contains('aberto')) return;
     lightbox.classList.remove('aberto');
-    document.body.style.overflow = '';
+    destravarScroll();
   }
   document.getElementById('lightboxFechar').addEventListener('click', fecharLightbox);
   lightbox.addEventListener('click', (evento) => {
@@ -1681,11 +1697,12 @@
 
   function abrirModalInfo(){
     modalInfo.classList.add('aberto');
-    document.body.style.overflow = 'hidden';
+    travarScroll();
   }
   function fecharModalInfo(){
+    if(!modalInfo.classList.contains('aberto')) return;
     modalInfo.classList.remove('aberto');
-    document.body.style.overflow = '';
+    destravarScroll();
   }
   document.getElementById('botaoInfoImportante').addEventListener('click', abrirModalInfo);
   document.getElementById('modalInfoFechar').addEventListener('click', fecharModalInfo);
@@ -1698,13 +1715,14 @@
 
   function abrirFolhaCategorias(){
     folhaCategorias.classList.add('aberto');
-    document.body.style.overflow = 'hidden';
+    travarScroll();
     const seletor = document.getElementById('seletorCategoria');
     if(seletor) seletor.setAttribute('aria-expanded', 'true');
   }
   function fecharFolhaCategorias(){
+    if(!folhaCategorias.classList.contains('aberto')) return;
     folhaCategorias.classList.remove('aberto');
-    document.body.style.overflow = '';
+    destravarScroll();
     const seletor = document.getElementById('seletorCategoria');
     if(seletor) seletor.setAttribute('aria-expanded', 'false');
   }
@@ -2196,19 +2214,30 @@
     }, 250);
   });
 
-  fetch(`${urlDaPlanilha()}&_=${Date.now()}`, { cache: 'no-store' })
-    .then(resposta => {
-      if(!resposta.ok) throw new Error('Não foi possível acessar a planilha.');
-      return resposta.text();
-    })
-    .then(texto => {
-      const linhasCsv = interpretarCSV(texto);
-      categoriasCarregadas = montarCategorias(linhasCsv);
-      renderCatalogo(categoriasCarregadas);
-    })
-    .catch(() => {
-      renderManutencao();
-    });
+  // Uma tentativa extra antes de mostrar a tela de manutenção — evita
+  // cair nela por causa de uma falha passageira de rede (comum no
+  // celular), sem mudar nada pro caminho feliz (que é a esmagadora
+  // maioria das visitas).
+  function carregarCatalogo(tentativasRestantes){
+    fetch(`${urlDaPlanilha()}&_=${Date.now()}`, { cache: 'no-store' })
+      .then(resposta => {
+        if(!resposta.ok) throw new Error('Não foi possível acessar a planilha.');
+        return resposta.text();
+      })
+      .then(texto => {
+        const linhasCsv = interpretarCSV(texto);
+        categoriasCarregadas = montarCategorias(linhasCsv);
+        renderCatalogo(categoriasCarregadas);
+      })
+      .catch(() => {
+        if(tentativasRestantes > 0){
+          setTimeout(() => carregarCatalogo(tentativasRestantes - 1), 1500);
+        }else{
+          renderManutencao();
+        }
+      });
+  }
+  carregarCatalogo(1);
 </script>
 
 </body>
