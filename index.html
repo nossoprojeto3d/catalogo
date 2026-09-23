@@ -1713,7 +1713,7 @@
         <span>/</span>
         <span class="categoria-atual">Escolher categoria</span>
       `;
-      trilha.querySelector('.voltar').addEventListener('click', () => renderCatalogo(categorias));
+      trilha.querySelector('.voltar').addEventListener('click', () => renderCatalogo(categorias, null, false));
       conteudo.appendChild(trilha);
 
       const pills = document.createElement('div');
@@ -1722,7 +1722,7 @@
         const botao = document.createElement('button');
         botao.className = 'pill';
         botao.textContent = rotulo;
-        botao.addEventListener('click', () => renderCatalogo(categorias, nomeCategoria));
+        botao.addEventListener('click', () => renderCatalogo(categorias, nomeCategoria, false));
         return botao;
       };
       pills.appendChild(criarPillNavegacao('Tudo por Aqui', null));
@@ -1733,7 +1733,7 @@
     }, false);
   }
 
-  function renderCatalogo(categorias, filtroInicial){
+  function renderCatalogo(categorias, filtroInicial, rolarTopo = true){
     trocarTela(() => {
       desconectarObservadorScroll();
       conteudo.innerHTML = '';
@@ -1752,17 +1752,30 @@
       pills.id = 'pillsCategorias';
       pills.appendChild(criarBotaoPill('Tudo por Aqui', null, categorias));
 
-      // No celular a fileira fica compacta (Tudo por Aqui + as 2
-      // primeiras categorias) com um pill "Ver mais" que abre a tela
-      // de escolher categoria — em vez de rolar por uma fileira longa
-      // ou esconder tudo atrás de um "ver mais" que expande ali mesmo.
-      // No desktop já cabe tudo, então mostra a lista completa.
+      // No celular a fileira fica compacta (Tudo por Aqui + 2 vagas)
+      // com um pill "Ver mais" que abre a tela de escolher categoria —
+      // em vez de rolar por uma fileira longa ou esconder tudo atrás de
+      // um "ver mais" que expande ali mesmo. No desktop já cabe tudo,
+      // então mostra a lista completa.
       const ehCelular = window.matchMedia('(max-width: 539px)').matches;
       if(ehCelular){
-        categorias.slice(0, 2).forEach(categoria => {
+        // A 1ª vaga é sempre a 1ª categoria da lista (Lançamentos, se
+        // existir, já fica em 1º por causa do sort). A 2ª vaga mostra
+        // a categoria ativa no momento — pra sempre ter alguma marcada
+        // — e só cai pra 2ª categoria da lista quando não tem nenhuma
+        // categoria específica selecionada (ou quando a ativa já é a
+        // da 1ª vaga).
+        const categoriasCompactas = categorias.slice(0, 1);
+        const categoriaAtiva = filtroAtivo ? categorias.find(categoria => categoria.nome === filtroAtivo) : null;
+        if(categoriaAtiva && categoriaAtiva !== categoriasCompactas[0]){
+          categoriasCompactas.push(categoriaAtiva);
+        }else if(categorias.length > 1){
+          categoriasCompactas.push(categorias[1]);
+        }
+        categoriasCompactas.forEach(categoria => {
           pills.appendChild(criarBotaoPill(formatarNomeCategoria(categoria.nome), categoria.nome, categorias));
         });
-        if(categorias.length > 2){
+        if(categorias.length > categoriasCompactas.length){
           const botaoVerMais = document.createElement('button');
           botaoVerMais.type = 'button';
           botaoVerMais.className = 'pill';
@@ -1791,7 +1804,7 @@
       quantidadeExibida = 0;
       montarListaFiltrada(categorias);
       exibirMaisProdutos();
-    });
+    }, rolarTopo);
   }
 
   function renderBusca(categorias, termo){
