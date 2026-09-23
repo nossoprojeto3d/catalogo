@@ -1074,6 +1074,11 @@
   .flutuante-favoritos{
     position: relative;
     left: auto; right: auto; bottom: auto;
+    /* A base .flutuante tem z-index:30 (pra ficar acima do conteúdo da
+       página) — aqui dentro do wrapper isso fazia o botão pintar por
+       cima da bolinha de contagem, que é irmã dele. Zera pra deixar a
+       ordem ser decidida só pelo z-index da própria bolinha. */
+    z-index: auto;
     background: rgba(18,14,9,0.82);
     border: 1px solid var(--gold);
     color: var(--gold-light);
