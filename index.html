@@ -536,45 +536,49 @@
   }
 
   /* ---------- Pills de categoria (filtro rápido) ---------- */
+  .pills-bloco{ margin: 0 0 22px; }
   .pills-categorias{
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scroll-padding-left: 20px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin: 0 -20px 22px;
-    padding: 2px 20px 4px;
-    mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
   }
-  .pills-categorias::-webkit-scrollbar{ display: none; }
-  /* A rolagem horizontal é só pra telas de celular — a partir daqui tem
-     espaço de sobra, então volta a quebrar linha normalmente, sem
-     esconder nenhuma categoria atrás de scroll. */
-  @media (min-width: 540px){
-    .pills-categorias{
-      flex-wrap: wrap;
-      overflow-x: visible;
-      scroll-snap-type: none;
-      margin: 0 0 22px;
-      padding: 0;
-      mask-image: none;
-      -webkit-mask-image: none;
+  /* No celular, começa mostrando só 2 linhas — o resto fica escondido
+     até tocar em "Ver mais". Nada de arrastar de lado, que é um gesto
+     que muita gente nem tenta em pill/chip. A altura de 2 linhas é
+     calculada a partir da altura fixa do pill (line-height + padding),
+     que não muda com o tamanho do texto. */
+  @media (max-width: 539px){
+    .pills-categorias.recolhido{
+      max-height: calc(2 * (16px + 18px + 2px) + 8px);
+      overflow: hidden;
     }
   }
+  .pill-alternar{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--gold-light);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 2px 0;
+    margin: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pill-alternar[hidden]{ display: none; }
   .pill{
     display: inline-flex;
     align-items: center;
     flex: 0 0 auto;
-    scroll-snap-align: start;
     background: var(--frame);
     border: 1px solid var(--border);
     color: var(--text-secondary);
     font-family: inherit;
     font-size: 13.5px;
+    line-height: 16px;
     font-weight: 500;
     white-space: nowrap;
     padding: 9px 16px;
@@ -1690,6 +1694,30 @@
     return botao;
   }
 
+  // No celular, mostra só as 2 primeiras linhas de categorias e deixa
+  // um botão "Ver mais" revelar o resto com um toque — em vez de pedir
+  // pra arrastar de lado, gesto que nem sempre é óbvio num pill. No
+  // desktop (onde o CSS não limita a altura) isso não faz nada, porque
+  // tudo já cabe sem precisar esconder.
+  function configurarExpansaoPills(pills, botaoAlternar){
+    pills.classList.add('recolhido');
+    requestAnimationFrame(() => {
+      const temMaisLinhas = pills.scrollHeight > pills.clientHeight + 2;
+      if(!temMaisLinhas){
+        pills.classList.remove('recolhido');
+        return;
+      }
+      let aberto = false;
+      botaoAlternar.hidden = false;
+      botaoAlternar.textContent = 'Ver mais ▾';
+      botaoAlternar.addEventListener('click', () => {
+        aberto = !aberto;
+        pills.classList.toggle('recolhido', !aberto);
+        botaoAlternar.textContent = aberto ? 'Ver menos ▴' : 'Ver mais ▾';
+      });
+    });
+  }
+
   function renderCatalogo(categorias){
     trocarTela(() => {
       desconectarObservadorScroll();
@@ -1704,6 +1732,9 @@
       const carrossel = construirCarrosselVendidos(categorias);
       if(carrossel) conteudo.appendChild(carrossel);
 
+      const blocoPills = document.createElement('div');
+      blocoPills.className = 'pills-bloco';
+
       const pills = document.createElement('div');
       pills.className = 'pills-categorias';
       pills.id = 'pillsCategorias';
@@ -1711,7 +1742,16 @@
       categorias.forEach(categoria => {
         pills.appendChild(criarBotaoPill(formatarNomeCategoria(categoria.nome), categoria.nome, categorias));
       });
-      conteudo.appendChild(pills);
+      blocoPills.appendChild(pills);
+
+      const botaoAlternarPills = document.createElement('button');
+      botaoAlternarPills.type = 'button';
+      botaoAlternarPills.className = 'pill-alternar';
+      botaoAlternarPills.hidden = true;
+      blocoPills.appendChild(botaoAlternarPills);
+
+      conteudo.appendChild(blocoPills);
+      configurarExpansaoPills(pills, botaoAlternarPills);
 
       const grade = document.createElement('div');
       grade.className = 'grade';
