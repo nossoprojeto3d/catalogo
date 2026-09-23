@@ -1478,6 +1478,15 @@
   // ---------- Foto automática pelo código do produto (pasta imagens/) ----------
   const PASTA_IMAGENS = 'imagens/';
   const EXTENSOES_FOTO = ['jpg', 'jpeg', 'png', 'webp'];
+  // Mesmo valor pra todas as fotos dessa visita — evita re-baixar a
+  // mesma foto repetida na tela (grid + carrossel + zoom), mas garante
+  // que toda nova visita busca a versão mais recente do arquivo, sem
+  // ficar presa em cache antigo do navegador/CDN quando a foto é trocada.
+  const CACHE_BUST_FOTOS = Date.now();
+
+  function comCacheBust(url){
+    return `${url}${url.includes('?') ? '&' : '?'}v=${CACHE_BUST_FOTOS}`;
+  }
 
   function candidatosFotoPorCodigo(codigo, nomeCategoria){
     const variantesCodigo = [...new Set([codigo, codigo.toUpperCase(), codigo.toLowerCase()])];
@@ -1489,7 +1498,7 @@
     pastas.forEach(pasta => {
       variantesCodigo.forEach(variante => {
         EXTENSOES_FOTO.forEach(extensao => {
-          candidatos.push(`${pasta}${encodeURIComponent(variante)}.${extensao}`);
+          candidatos.push(comCacheBust(`${pasta}${encodeURIComponent(variante)}.${extensao}`));
         });
       });
     });
