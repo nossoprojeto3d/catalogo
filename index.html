@@ -586,6 +586,13 @@
     transition: border-color 0.2s var(--easing), color 0.2s var(--easing);
   }
   .seletor-categoria svg{ width: 14px; height: 14px; flex-shrink: 0; transition: transform 0.2s var(--easing); }
+  .seletor-categoria-rotulo{
+    color: var(--text-tertiary);
+    font-weight: 400;
+    padding-right: 8px;
+    border-right: 1px solid var(--border-hover);
+  }
+  .seletor-categoria-valor{ font-weight: 600; }
   .seletor-categoria[aria-expanded="true"] svg{ transform: rotate(180deg); }
   .sentinela-scroll{ height: 1px; }
 
@@ -1130,7 +1137,7 @@
     <button class="folha-fechar" id="folhaCategoriasFechar" aria-label="Fechar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
-    <h2>Escolher categoria</h2>
+    <h2>Escolha a categoria que vai levar seu dinheirinho hoje</h2>
     <div class="folha-lista" id="folhaCategoriasLista"></div>
   </div>
 </div>
@@ -1887,7 +1894,8 @@
       seletor.id = 'seletorCategoria';
       seletor.setAttribute('aria-expanded', 'false');
       seletor.innerHTML = `
-        <span id="seletorCategoriaTexto">Tudo por Aqui</span>
+        <span class="seletor-categoria-rotulo">Categoria</span>
+        <span class="seletor-categoria-valor" id="seletorCategoriaTexto">Tudo por Aqui</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
       `;
       seletor.addEventListener('click', abrirFolhaCategorias);
