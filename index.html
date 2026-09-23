@@ -165,8 +165,8 @@
     display: block;
     font-family: 'Work Sans', sans-serif;
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 3.5px;
+    font-weight: 500;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--text-tertiary);
     margin: 0 0 10px;
@@ -175,10 +175,11 @@
   header h1{
     position: relative;
     font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-weight: 400;
     font-size: clamp(28px, 7vw, 42px);
     line-height: 1.15;
-    margin: 0 0 14px;
+    letter-spacing: 0.3px;
+    margin: 0 0 18px;
     color: var(--gold-light);
     animation: surgir 0.7s var(--easing) 0.1s both;
   }
@@ -188,7 +189,7 @@
     max-width: 420px;
     color: var(--text-secondary);
     font-size: 14.5px;
-    line-height: 1.6;
+    line-height: 1.75;
     animation: surgir 0.7s var(--easing) 0.15s both;
   }
 
@@ -458,10 +459,11 @@
   .card-vendido .legenda-foto{ padding: 18px 10px 10px; }
   .produto h3, .card-vendido h3{
     font-family:'Fraunces', serif;
-    font-weight:500;
+    font-weight:400;
     margin: 0;
     color: var(--text);
     line-height: 1.28;
+    letter-spacing: 0.2px;
     overflow: hidden;
     white-space: nowrap;
   }
@@ -483,8 +485,8 @@
   }
   .contagem{ font-size: 12.5px; color: var(--text-tertiary); margin:0; }
 
-  .info{ padding: 16px 16px 18px; display:flex; flex-direction: column; gap: 8px; flex: 1; }
-  .preco{ font-size: clamp(16px, 4vw, 18px); font-weight: 700; color: var(--gold-light); margin: 0; }
+  .info{ padding: 18px 18px 20px; display:flex; flex-direction: column; gap: 11px; flex: 1; }
+  .preco{ font-size: clamp(16px, 4vw, 18px); font-weight: 600; color: var(--gold-light); margin: 0; letter-spacing: 0.2px; }
   .preco-linha{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 8px; margin: 4px 0 0; }
   .preco-linha .preco{ margin: 0; }
   .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; }
@@ -496,10 +498,11 @@
   .secao-vendidos{ margin-bottom: 32px; }
   .titulo-secao{
     font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-weight: 400;
     font-size: clamp(17px, 3.6vw, 20px);
+    letter-spacing: 0.3px;
     color: var(--gold-light);
-    margin: 0 0 14px;
+    margin: 0 0 16px;
   }
   .carrossel-vendidos{
     display: flex;
@@ -591,25 +594,26 @@
     transition: border-color 0.2s var(--easing), background 0.2s var(--easing), color 0.2s var(--easing);
   }
   .pill.ativo{
-    background: var(--gold);
+    background: transparent;
     border-color: var(--gold);
-    color: var(--bg);
-    font-weight: 700;
+    color: var(--gold-light);
+    font-weight: 500;
+    letter-spacing: 0.2px;
   }
   .sentinela-scroll{ height: 1px; }
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 7px;
-    background: var(--gold);
+    background: transparent;
     border: 1px solid var(--gold);
-    color: var(--bg);
+    color: var(--gold-light);
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 500;
+    letter-spacing: 0.3px;
     font-size: 13.5px;
     padding: 13px 16px;
     border-radius: 100px;
-    box-shadow: 0 8px 20px -10px rgba(227, 172, 93, 0.55);
-    transition: background 0.2s var(--easing), border-color 0.2s var(--easing), color 0.2s var(--easing), transform 0.15s var(--easing), box-shadow 0.2s var(--easing);
+    transition: background 0.2s var(--easing), border-color 0.2s var(--easing), color 0.2s var(--easing), transform 0.15s var(--easing);
   }
   .btn-whats:active{ transform: scale(0.97); }
   .btn-whats svg{ width: 14px; height: 14px; flex-shrink:0; }
@@ -633,15 +637,16 @@
   }
   .manutencao h2{
     font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 22px;
+    letter-spacing: 0.3px;
     color: var(--gold-light);
-    margin: 0 0 12px;
+    margin: 0 0 16px;
   }
   .manutencao p{
     font-size: 14px;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.75;
     margin: 0 0 28px;
   }
   .btn-whats-grande{
@@ -760,24 +765,26 @@
   .modal-info-fechar svg{ width: 16px; height: 16px; }
   .modal-info-painel h2{
     font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 22px;
+    letter-spacing: 0.3px;
     color: var(--gold-light);
-    margin: 0 0 20px;
+    margin: 0 0 22px;
     padding-right: 30px;
   }
-  .modal-info-item + .modal-info-item{ margin-top: 20px; }
+  .modal-info-item + .modal-info-item{ margin-top: 24px; }
   .modal-info-item h3{
     font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 15px;
+    letter-spacing: 0.2px;
     color: var(--gold-light);
-    margin: 0 0 6px;
+    margin: 0 0 8px;
   }
   .modal-info-item p{
     font-size: 13.5px;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.7;
     margin: 0;
   }
 
@@ -902,13 +909,13 @@
   .rodape-marca{ display:flex; flex-direction: column; align-items: center; gap: 10px; }
   @media (min-width: 640px){ .rodape-marca{ align-items: flex-start; } }
   .rodape-marca img{ width: 34px; height: auto; opacity: 0.9; }
-  .rodape-marca .nome{ font-family: 'Fraunces', serif; font-size: 16px; color: var(--gold-light); }
-  .rodape-marca .frase{ font-size: 13px; color: var(--text-footer); max-width: 240px; line-height: 1.5; }
+  .rodape-marca .nome{ font-family: 'Fraunces', serif; font-weight: 400; font-size: 16px; letter-spacing: 0.3px; color: var(--gold-light); }
+  .rodape-marca .frase{ font-size: 13px; color: var(--text-footer); max-width: 240px; line-height: 1.6; }
 
   .rodape-coluna h4{
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2px;
+    font-weight: 500;
+    letter-spacing: 2.2px;
     text-transform: uppercase;
     color: var(--text-tertiary);
     margin: 0 0 14px;
@@ -977,8 +984,8 @@
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
     .pill:hover{ border-color: var(--gold); color: var(--gold-light); }
-    .pill.ativo:hover{ background: var(--gold-dark); border-color: var(--gold-dark); color: var(--text); }
-    .btn-whats:hover{ background: var(--gold-dark); border-color: var(--gold-dark); color: var(--text); }
+    .pill.ativo:hover{ background: rgba(227, 172, 93, 0.1); border-color: var(--gold-light); color: var(--gold-light); }
+    .btn-whats:hover{ background: rgba(227, 172, 93, 0.1); border-color: var(--gold-light); color: var(--gold-light); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
