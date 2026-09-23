@@ -1064,6 +1064,8 @@
     opacity: 0;
     visibility: hidden;
     transform: scale(0.85);
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
     transition: opacity 0.2s var(--easing), transform 0.2s var(--easing), visibility 0.2s;
   }
   .flutuante-favoritos::before{ content: none; }
@@ -1072,6 +1074,8 @@
     visibility: visible;
     transform: scale(1);
   }
+  /* Bolinha com a quantidade — também funciona como "limpar tudo"
+     (mais rápido que desmarcar favorito por favorito). */
   .favoritos-contador{
     position: absolute;
     top: -4px; right: -4px;
@@ -1080,12 +1084,19 @@
     padding: 0 5px;
     border-radius: 100px;
     background: var(--gold);
+    border: none;
     color: var(--bg);
+    font-family: inherit;
     font-size: 11px;
     font-weight: 700;
     line-height: 20px;
     text-align: center;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s var(--easing);
   }
+  .favoritos-contador:active{ transform: scale(0.85); }
 
   /* ---------- Toast de informações importantes (uma vez só) ---------- */
   .toast-info{
@@ -1248,6 +1259,7 @@
     .flutuante:hover{ transform: scale(1.06); }
     .btn-favorito:hover{ color: var(--gold-light); }
     .favoritos-item-remover:hover{ background: var(--card-hover); color: var(--text); }
+    .favoritos-contador:hover{ background: var(--gold-light); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
   }
@@ -1352,7 +1364,7 @@
 
 <button type="button" class="flutuante flutuante-favoritos" id="botaoFavoritosFlutuante" aria-label="Ver favoritos">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
-  <span class="favoritos-contador" id="favoritosContador" hidden>0</span>
+  <button type="button" class="favoritos-contador" id="favoritosContador" aria-label="Limpar todos os favoritos" hidden>0</button>
 </button>
 
 <a class="flutuante" id="botaoFlutuante" href="#" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
@@ -1755,9 +1767,11 @@
         ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-brilho"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
         ${produto.esgotado ? `<div class="veu-esgotado"><span class="selo-esgotado">Esgotado</span></div>` : ''}
+        ${produto.esgotado ? '' : `
         <button type="button" class="btn-favorito${favoritoAtivo ? ' ativo' : ''}" data-chave="${escaparHTML(chaveFavorito)}" aria-pressed="${favoritoAtivo}" aria-label="${favoritoAtivo ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
           <svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
         </button>
+        `}
       </div>
       <div class="info">
         ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
@@ -1776,10 +1790,13 @@
     `;
 
     anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, true);
-    card.querySelector('.btn-favorito').addEventListener('click', (evento) => {
-      evento.stopPropagation();
-      alternarFavorito(nomeCategoria, produto);
-    });
+    const botaoFavorito = card.querySelector('.btn-favorito');
+    if(botaoFavorito){
+      botaoFavorito.addEventListener('click', (evento) => {
+        evento.stopPropagation();
+        alternarFavorito(nomeCategoria, produto);
+      });
+    }
 
     return card;
   }
@@ -1917,15 +1934,51 @@
   }
   atualizarBotaoFavoritosFlutuante();
 
+  // Esvazia tudo de uma vez — usado pelo "x" no cantinho do botão
+  // flutuante (mais rápido que remover favorito por favorito).
+  function limparFavoritos(){
+    if(favoritos.length === 0) return;
+    favoritos = [];
+    try{ localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos)); }catch(erro){ /* modo privado etc. */ }
+    atualizarBotaoFavoritosFlutuante();
+    sincronizarBotoesFavorito();
+    if(folhaFavoritos.classList.contains('aberto')) construirListaFavoritos();
+  }
+  favoritosContador.addEventListener('click', (evento) => {
+    evento.stopPropagation();
+    limparFavoritos();
+  });
+
+  // Produto esgotado não entra na lista (nem no link do WhatsApp) —
+  // se ele foi favoritado antes e esgotou depois, some sozinho daqui
+  // sem precisar de ação do cliente (mas o coração ainda pode ter
+  // ficado marcado num card antigo, então limpa do armazenamento
+  // também). Só faz essa limpeza quando a planilha já carregou de
+  // verdade — categoriasCarregadas vazio (ainda carregando, ou
+  // manutenção) não pode ser confundido com "nenhum favorito válido".
   function resolverItensFavoritos(){
     const itens = [];
+    if(categoriasCarregadas.length === 0) return itens;
+
+    const chavesValidas = new Set();
     categoriasCarregadas.forEach(categoria => {
       categoria.produtos.forEach(produto => {
-        if(favoritos.includes(chaveProduto(categoria.nome, produto))){
+        if(produto.esgotado) return;
+        const chave = chaveProduto(categoria.nome, produto);
+        if(favoritos.includes(chave)){
           itens.push({ produto, categoriaNome: categoria.nome });
+          chavesValidas.add(chave);
         }
       });
     });
+
+    const favoritosValidos = favoritos.filter(chave => chavesValidas.has(chave));
+    if(favoritosValidos.length !== favoritos.length){
+      favoritos = favoritosValidos;
+      try{ localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos)); }catch(erro){ /* modo privado etc. */ }
+      atualizarBotaoFavoritosFlutuante();
+    }
+
     return itens;
   }
 
