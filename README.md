@@ -21,7 +21,7 @@ Abrir o `index.html` e preencher, no topo do script:
 
 Colunas, exatamente nessa grafia (linha 1):
 
-`Categoria | Produto | Codigo | Descricao | Preco | Foto | Tag | PrecoPromocional | MaisVendido`
+`Categoria | Produto | Codigo | Descricao | Preco | Foto | Tag | PrecoPromocional | MaisVendido | Esgotado`
 
 - Uma linha por produto.
 - `Codigo` é opcional, mas ajuda a identificar o produto exato quando o
@@ -44,6 +44,12 @@ Colunas, exatamente nessa grafia (linha 1):
   descrição ou tag) — é só uma vitrine; clicar no card leva direto até
   o produto na listagem completa da categoria dele, com o botão de
   WhatsApp já ali.
+- `Esgotado` é opcional — preencha com qualquer texto (ex.: `sim`) quando
+  o produto estiver fora de estoque. O card mostra um selo "Esgotado" e o
+  botão vira "Avise-me quando voltar" (manda WhatsApp com uma mensagem
+  diferente, avisando que é uma peça esgotada). O produto continua
+  aparecendo na listagem, só que sempre por último. Deixe vazio assim
+  que repor o estoque — não precisa apagar e recriar a linha.
 - A planilha precisa estar compartilhada como "Qualquer pessoa com o
   link → Leitor", senão a página não consegue ler os dados.
 

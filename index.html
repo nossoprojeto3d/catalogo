@@ -353,6 +353,36 @@
     color: var(--bg);
   }
 
+  /* Produto esgotado: escurece/dessatura a foto e mostra um selo
+     central neutro (de propósito sem dourado, pra não parecer que é
+     uma promoção) — o produto continua na listagem, só sinaliza que
+     não dá pra pedir agora. */
+  .produto-esgotado .foto img{ filter: grayscale(0.6) brightness(0.6); }
+  .veu-esgotado{
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .selo-esgotado{
+    background: rgba(18,14,9,0.85);
+    border: 1px solid var(--border-hover);
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 7px 18px;
+    border-radius: 100px;
+  }
+  .btn-whats.btn-esgotado{
+    border-color: var(--border-hover);
+    color: var(--text-secondary);
+  }
+
   /* Selo de tag: antes da foto carregar, o texto da tag "explode" grande
      e centralizado no card (com um brilho por trás e uma leve rotação de
      entrada), depois encolhe e desaparece enquanto o selinho pequeno (no
@@ -1173,6 +1203,7 @@
     const indiceTag = cabecalhoCsv.indexOf('tag');
     const indicePrecoPromocional = cabecalhoCsv.indexOf('precopromocional');
     const indiceMaisVendido = cabecalhoCsv.indexOf('maisvendido');
+    const indiceEsgotado = cabecalhoCsv.indexOf('esgotado');
 
     const categorias = [];
     const mapaCategorias = {};
@@ -1210,7 +1241,8 @@
           codigo: (linha[indiceCodigo] || '').trim(),
           tag: (linha[indiceTag] || '').trim(),
           precoPromocional: (linha[indicePrecoPromocional] || '').trim(),
-          maisVendido: maisVendido
+          maisVendido: maisVendido,
+          esgotado: !!(linha[indiceEsgotado] || '').trim()
         });
       }
     }
@@ -1231,6 +1263,9 @@
       // ordem alfabética continua igual).
       categoria.produtos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
       categoria.produtos.sort((a, b) => (a.tag ? 0 : 1) - (b.tag ? 0 : 1));
+      // Esgotado sempre por último, sem perder a ordem entre si (a
+      // peça continua na listagem, só não fica na frente).
+      categoria.produtos.sort((a, b) => (a.esgotado ? 1 : 0) - (b.esgotado ? 1 : 0));
     });
 
     return categorias;
@@ -1250,6 +1285,14 @@
     mensagem += produto.precoPromocional
       ? `Valor: R$ ${produto.precoPromocional} (promocional, de R$ ${produto.preco})\n`
       : `Valor: R$ ${produto.preco}\n`;
+    if(produto.codigo) mensagem += `Código: ${produto.codigo}\n`;
+    return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
+  }
+
+  function linkAvisarQuandoVoltar(produto, categoria){
+    let mensagem = `Oi! Vi esse no catálogo de vocês, mas tá esgotado — pode me avisar quando voltar?\n\n`;
+    mensagem += `Categoria: ${categoria}\n`;
+    mensagem += `Produto: ${produto.nome}\n`;
     if(produto.codigo) mensagem += `Código: ${produto.codigo}\n`;
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
   }
@@ -1350,7 +1393,9 @@
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
     const temSelo = !!(produto.tag || produto.precoPromocional);
     const card = document.createElement('div');
-    card.className = 'produto' + (temSelo ? ' produto-selo' : '');
+    card.className = 'produto'
+      + (temSelo ? ' produto-selo' : '')
+      + (produto.esgotado ? ' produto-esgotado' : '');
     card.dataset.nome = produto.nome;
     if(produto.codigo) card.dataset.codigo = produto.codigo;
     const atraso = (indice || 0) * 0.05;
@@ -1366,6 +1411,7 @@
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
         ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-brilho"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
+        ${produto.esgotado ? `<div class="veu-esgotado"><span class="selo-esgotado">Esgotado</span></div>` : ''}
       </div>
       <div class="info">
         ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
@@ -1373,9 +1419,13 @@
         ${produto.precoPromocional
           ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
           : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
-        <a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
-          ${iconeWhats} Quero esse!
-        </a>
+        ${produto.esgotado
+          ? `<a class="btn-whats btn-esgotado" href="${linkAvisarQuandoVoltar(produto, nomeCategoria)}" target="_blank" rel="noopener">
+              ${iconeWhats} Avise-me quando voltar
+            </a>`
+          : `<a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
+              ${iconeWhats} Quero esse!
+            </a>`}
       </div>
     `;
 
@@ -1597,10 +1647,11 @@
     // Carrossel é só vitrine: foto + nome, sem preço, descrição ou tag —
     // isso fica só na listagem completa, pra incentivar o clique.
     const card = document.createElement('button');
-    card.className = 'card-vendido';
+    card.className = 'card-vendido' + (produto.esgotado ? ' produto-esgotado' : '');
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
+        ${produto.esgotado ? `<div class="veu-esgotado"><span class="selo-esgotado">Esgotado</span></div>` : ''}
         <div class="legenda-foto">
           <h3><span>${escaparHTML(produto.nome)}</span></h3>
         </div>
