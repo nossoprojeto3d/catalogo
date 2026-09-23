@@ -504,7 +504,7 @@
     pointer-events: none;
   }
   .legenda-foto .contagem{ color: var(--text-tertiary); text-shadow: 0 1px 8px rgba(0,0,0,0.6); }
-  .card-vendido .legenda-foto{ padding: 18px 10px 10px; }
+  .card-vendido .legenda-foto{ padding: 20px 14px 12px; }
   .produto h3, .card-vendido h3{
     font-family:'Fraunces', serif;
     font-weight:400;
@@ -516,7 +516,7 @@
     white-space: nowrap;
   }
   .produto h3{ font-size: clamp(15px, 3.6vw, 17px); }
-  .card-vendido h3{ font-size: 14px; text-shadow: 0 1px 10px rgba(0,0,0,0.55); }
+  .card-vendido h3{ font-size: 15.5px; text-shadow: 0 1px 10px rgba(0,0,0,0.55); }
   .produto h3 span, .card-vendido h3 span{
     display: inline-block;
   }
@@ -562,7 +562,7 @@
   .carrossel-vendidos::-webkit-scrollbar{ display: none; }
   .card-vendido{
     flex: 0 0 auto;
-    width: 148px;
+    width: 230px;
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -577,11 +577,13 @@
     transition: border-color 0.25s var(--easing), transform 0.25s var(--easing);
     animation: surgir 0.5s var(--easing) both;
   }
-  /* Card do carrossel é só vitrine — foto mais vertical (tipo pôster)
-     já que não tem mais preço/descrição ocupando espaço embaixo. */
-  .card-vendido .foto{ cursor: pointer; aspect-ratio: 3 / 4; }
+  /* Card do carrossel é só vitrine — foto na mesma proporção 4:3 das
+     fotos de produto (em vez de recortar pra um pôster vertical),
+     maior que o card da grade normal pra dar mais destaque à foto. */
+  .card-vendido .foto{ cursor: pointer; }
   @media (min-width: 900px){
     .carrossel-vendidos{ margin: 0 -24px; padding: 2px 24px 10px; }
+    .card-vendido{ width: 300px; }
   }
 
   /* ---------- Seletor de categoria (abre a folha) ---------- */
