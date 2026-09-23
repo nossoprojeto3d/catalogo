@@ -1525,11 +1525,17 @@
     if(trilha.querySelectorAll('.card-vendido').length < 2) return;
 
     const VELOCIDADE_PX_POR_SEGUNDO = 26;
-    const PAUSA_APOS_INTERACAO_MS = 2500;
+    const PAUSA_APOS_INTERACAO_MS = 1500;
 
     let direcao = 1;
     let ultimoQuadro = null;
-    let ultimaInteracao = 0;
+    // Começa contando como se tivesse acabado de "interagir" agora —
+    // assim o primeiro movimento sempre demora exatamente
+    // PAUSA_APOS_INTERACAO_MS a partir de quando o carrossel aparece,
+    // e não um tempo variável dependendo de quanto a página demorou
+    // pra carregar (que era o bug: `tempoAtual` do rAF é relativo à
+    // navegação, não ao carrossel).
+    let ultimaInteracao = performance.now();
     let emTela = false;
     let cancelado = false;
 
