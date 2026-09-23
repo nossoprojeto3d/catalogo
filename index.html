@@ -399,11 +399,6 @@
   .btn-whats.btn-esgotado{
     border-color: var(--border-hover);
     color: var(--text-secondary);
-    /* Texto maior que "Quero esse!" — deixa quebrar linha em vez de
-       vazar pra fora da pílula em cards mais estreitos (2 colunas). */
-    white-space: normal;
-    text-align: center;
-    line-height: 1.3;
   }
 
   /* Selo de tag: antes da foto carregar, o texto da tag "explode" grande
@@ -1605,7 +1600,7 @@
           : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
         ${produto.esgotado
           ? `<a class="btn-whats btn-esgotado" href="${linkAvisarQuandoVoltar(produto, nomeCategoria)}" target="_blank" rel="noopener">
-              ${iconeWhats} Avise-me quando voltar
+              ${iconeWhats} Avise-me
             </a>`
           : `<a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
               ${iconeWhats} Quero esse!
