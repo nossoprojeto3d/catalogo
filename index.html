@@ -632,6 +632,20 @@
     border-radius: 100px;
     margin: 4px auto 16px;
   }
+  /* A partir daqui já tem espaço de sobra — em vez de "subir de baixo"
+     (bom pro alcance do polegar no celular), vira um modal centralizado
+     de verdade, senão fica um painel grudado no rodapé da tela. */
+  @media (min-width: 640px){
+    .folha{ align-items: center; padding: 24px; }
+    .folha-painel{
+      max-height: 80vh;
+      border-bottom: 1px solid var(--border-hover);
+      border-radius: 20px;
+      transform: scale(0.96) translateY(10px);
+    }
+    .folha.aberto .folha-painel{ transform: scale(1) translateY(0); }
+    .folha-alca{ display: none; }
+  }
   .folha-fechar{
     position: absolute;
     top: 14px; right: 14px;
