@@ -352,6 +352,28 @@
     pointer-events: none;
   }
   .dica-zoom svg{ width: 13px; height: 13px; }
+  .btn-favorito{
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    z-index: 2;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(18,14,9,0.65);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    cursor: pointer;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s var(--easing), color 0.15s var(--easing);
+  }
+  .btn-favorito:active{ transform: scale(0.88); }
+  .btn-favorito.ativo{ color: var(--gold-light); }
+  .btn-favorito svg{ width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .btn-favorito.ativo svg{ fill: var(--gold-light); }
   .selo-produto{
     position: absolute;
     top: 10px;
@@ -708,6 +730,53 @@
   .folha-item-marca{ color: var(--gold); opacity: 0; }
   .folha-item.ativo .folha-item-marca{ opacity: 1; }
 
+  /* ---------- Painel de favoritos ---------- */
+  .favoritos-lista{
+    display:flex; flex-direction: column; gap: 10px;
+    max-height: 46vh;
+    overflow-y: auto;
+    margin: 0 0 18px;
+  }
+  .favoritos-item{
+    display:flex; align-items:center; gap: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px;
+  }
+  .favoritos-item-foto{
+    width: 52px; height: 52px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--frame);
+  }
+  .favoritos-item-foto img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .favoritos-item-info{ flex: 1; min-width: 0; }
+  .favoritos-item-nome{
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    color: var(--text);
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .favoritos-item-preco{ font-size: 12.5px; color: var(--gold-light); margin: 0; }
+  .favoritos-item-remover{
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+  }
+  .favoritos-item-remover svg{ width: 14px; height: 14px; }
+  .favoritos-item-remover:active{ background: var(--card-hover); }
+  .favoritos-vazio{ text-align:center; color: var(--text-tertiary); font-size: 13.5px; padding: 24px 10px; margin: 0 0 4px; }
+  .favoritos-enviar{ width: 100%; }
+
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 6px;
     background: transparent;
@@ -980,6 +1049,44 @@
     .flutuante::before{ animation: none; opacity: 0; }
   }
 
+  /* Botão flutuante dos favoritos: mesma base do de WhatsApp, mas em
+     estilo contorno (fundo transparente) pra não competir com ele —
+     o WhatsApp continua sendo a ação principal. Só aparece quando
+     tem pelo menos 1 favorito guardado. */
+  .flutuante-favoritos{
+    left: 18px;
+    right: auto;
+    background: rgba(18,14,9,0.82);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    box-shadow: 0 10px 26px -10px rgba(0,0,0,0.5);
+    animation: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.85);
+    transition: opacity 0.2s var(--easing), transform 0.2s var(--easing), visibility 0.2s;
+  }
+  .flutuante-favoritos::before{ content: none; }
+  .flutuante-favoritos.visivel{
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+  }
+  .favoritos-contador{
+    position: absolute;
+    top: -4px; right: -4px;
+    z-index: 1;
+    min-width: 20px; height: 20px;
+    padding: 0 5px;
+    border-radius: 100px;
+    background: var(--gold);
+    color: var(--bg);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+  }
+
   /* ---------- Toast de informações importantes (uma vez só) ---------- */
   .toast-info{
     position: fixed;
@@ -1139,6 +1246,8 @@
     .chip-cor:hover{ border-color: var(--gold); color: var(--gold-light); }
     .btn-whats:hover{ background: rgba(227, 172, 93, 0.1); border-color: var(--gold-light); color: var(--gold-light); }
     .flutuante:hover{ transform: scale(1.06); }
+    .btn-favorito:hover{ color: var(--gold-light); }
+    .favoritos-item-remover:hover{ background: var(--card-hover); color: var(--text); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
   }
@@ -1225,6 +1334,26 @@
     <div class="folha-lista" id="folhaCategoriasLista"></div>
   </div>
 </div>
+
+<div class="folha" id="folhaFavoritos">
+  <div class="folha-painel">
+    <div class="folha-alca"></div>
+    <button class="folha-fechar" id="folhaFavoritosFechar" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <h2>Seus favoritos</h2>
+    <div class="favoritos-lista" id="favoritosLista"></div>
+    <a class="btn-whats btn-whats-grande favoritos-enviar" id="favoritosEnviar" href="#" target="_blank" rel="noopener" hidden>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
+      Enviar meus favoritos
+    </a>
+  </div>
+</div>
+
+<button type="button" class="flutuante flutuante-favoritos" id="botaoFavoritosFlutuante" aria-label="Ver favoritos">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
+  <span class="favoritos-contador" id="favoritosContador" hidden>0</span>
+</button>
 
 <a class="flutuante" id="botaoFlutuante" href="#" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
@@ -1569,6 +1698,39 @@
   }
 
 
+  // ---------- Favoritos (guardados no navegador, sem conta/servidor) ----------
+  const CHAVE_FAVORITOS = 'np3d_favoritos';
+  let favoritos = [];
+  try{
+    const salvos = JSON.parse(localStorage.getItem(CHAVE_FAVORITOS) || '[]');
+    if(Array.isArray(salvos)) favoritos = salvos;
+  }catch(erro){ /* modo privado etc. */ }
+
+  // Código do produto identifica melhor; sem código, cai pro par
+  // categoria+nome (só pra não colidir com outro produto de mesmo
+  // nome numa categoria diferente).
+  function chaveProduto(nomeCategoria, produto){
+    return produto.codigo ? `codigo:${produto.codigo}` : `nome:${nomeCategoria}::${produto.nome}`;
+  }
+
+  function sincronizarBotoesFavorito(){
+    document.querySelectorAll('.btn-favorito').forEach(botao => {
+      const ativo = favoritos.includes(botao.dataset.chave);
+      botao.classList.toggle('ativo', ativo);
+      botao.setAttribute('aria-pressed', String(ativo));
+      botao.setAttribute('aria-label', ativo ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
+    });
+  }
+
+  function alternarFavorito(nomeCategoria, produto){
+    const chave = chaveProduto(nomeCategoria, produto);
+    const indice = favoritos.indexOf(chave);
+    if(indice === -1) favoritos.push(chave); else favoritos.splice(indice, 1);
+    try{ localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos)); }catch(erro){ /* modo privado etc. */ }
+    atualizarBotaoFavoritosFlutuante();
+    sincronizarBotoesFavorito();
+  }
+
   function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
     const temSelo = !!(produto.tag || produto.precoPromocional);
     const card = document.createElement('div');
@@ -1585,12 +1747,17 @@
     card.style.animationDelay = temSelo
       ? `${atraso}s, ${atraso + 0.5}s`
       : `${atraso}s`;
+    const chaveFavorito = chaveProduto(nomeCategoria, produto);
+    const favoritoAtivo = favoritos.includes(chaveFavorito);
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
         ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-brilho"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
         ${produto.esgotado ? `<div class="veu-esgotado"><span class="selo-esgotado">Esgotado</span></div>` : ''}
+        <button type="button" class="btn-favorito${favoritoAtivo ? ' ativo' : ''}" data-chave="${escaparHTML(chaveFavorito)}" aria-pressed="${favoritoAtivo}" aria-label="${favoritoAtivo ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+          <svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
+        </button>
       </div>
       <div class="info">
         ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
@@ -1609,6 +1776,10 @@
     `;
 
     anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, true);
+    card.querySelector('.btn-favorito').addEventListener('click', (evento) => {
+      evento.stopPropagation();
+      alternarFavorito(nomeCategoria, produto);
+    });
 
     return card;
   }
@@ -1689,7 +1860,7 @@
     if(evento.target === lightbox) fecharLightbox();
   });
   document.addEventListener('keydown', (evento) => {
-    if(evento.key === 'Escape'){ fecharLightbox(); fecharModalInfo(); fecharFolhaCategorias(); }
+    if(evento.key === 'Escape'){ fecharLightbox(); fecharModalInfo(); fecharFolhaCategorias(); fecharFolhaFavoritos(); }
   });
 
   // ---------- Modal de informações importantes ----------
@@ -1729,6 +1900,101 @@
   document.getElementById('folhaCategoriasFechar').addEventListener('click', fecharFolhaCategorias);
   folhaCategorias.addEventListener('click', (evento) => {
     if(evento.target === folhaCategorias) fecharFolhaCategorias();
+  });
+
+  // ---------- Painel de favoritos ----------
+  const folhaFavoritos = document.getElementById('folhaFavoritos');
+  const favoritosLista = document.getElementById('favoritosLista');
+  const favoritosEnviar = document.getElementById('favoritosEnviar');
+  const botaoFavoritosFlutuante = document.getElementById('botaoFavoritosFlutuante');
+  const favoritosContador = document.getElementById('favoritosContador');
+
+  function atualizarBotaoFavoritosFlutuante(){
+    const quantidade = favoritos.length;
+    botaoFavoritosFlutuante.classList.toggle('visivel', quantidade > 0);
+    favoritosContador.hidden = quantidade === 0;
+    favoritosContador.textContent = quantidade;
+  }
+  atualizarBotaoFavoritosFlutuante();
+
+  function resolverItensFavoritos(){
+    const itens = [];
+    categoriasCarregadas.forEach(categoria => {
+      categoria.produtos.forEach(produto => {
+        if(favoritos.includes(chaveProduto(categoria.nome, produto))){
+          itens.push({ produto, categoriaNome: categoria.nome });
+        }
+      });
+    });
+    return itens;
+  }
+
+  // Uma mensagem só, com todos os favoritos listados — em vez do
+  // cliente ter que mandar uma mensagem separada pra cada produto.
+  function linkWhatsappFavoritos(itens){
+    let mensagem = `Oi! Separei esses favoritos no catálogo de vocês:\n\n`;
+    itens.forEach(({ produto, categoriaNome }, indice) => {
+      const valor = produto.precoPromocional || produto.preco;
+      mensagem += `${indice + 1}) ${produto.nome} — R$ ${valor}`;
+      if(produto.esgotado) mensagem += ' (esgotado — avisar quando voltar)';
+      mensagem += `\n`;
+      mensagem += `   Categoria: ${categoriaNome}\n`;
+      if(produto.codigo) mensagem += `   Código: ${produto.codigo}\n`;
+    });
+    mensagem += `\nPodem me ajudar com esses?`;
+    return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
+  }
+
+  function construirListaFavoritos(){
+    const itens = resolverItensFavoritos();
+    favoritosLista.innerHTML = '';
+
+    if(itens.length === 0){
+      favoritosLista.innerHTML = '<p class="favoritos-vazio">Nenhum favorito ainda — toque no coração de um produto pra guardar aqui.</p>';
+      favoritosEnviar.hidden = true;
+      return;
+    }
+
+    favoritosEnviar.hidden = false;
+    favoritosEnviar.href = linkWhatsappFavoritos(itens);
+
+    itens.forEach(({ produto, categoriaNome }) => {
+      const valor = produto.precoPromocional || produto.preco;
+      const linha = document.createElement('div');
+      linha.className = 'favoritos-item';
+      linha.innerHTML = `
+        <div class="favoritos-item-foto"></div>
+        <div class="favoritos-item-info">
+          <p class="favoritos-item-nome">${escaparHTML(produto.nome)}</p>
+          <p class="favoritos-item-preco">R$ ${escaparHTML(valor)}</p>
+        </div>
+        <button type="button" class="favoritos-item-remover" aria-label="Remover dos favoritos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      `;
+      anexarFotoProduto(linha.querySelector('.favoritos-item-foto'), produto, categoriaNome, false);
+      linha.querySelector('.favoritos-item-remover').addEventListener('click', () => {
+        alternarFavorito(categoriaNome, produto);
+        construirListaFavoritos();
+      });
+      favoritosLista.appendChild(linha);
+    });
+  }
+
+  function abrirFolhaFavoritos(){
+    construirListaFavoritos();
+    folhaFavoritos.classList.add('aberto');
+    travarScroll();
+  }
+  function fecharFolhaFavoritos(){
+    if(!folhaFavoritos.classList.contains('aberto')) return;
+    folhaFavoritos.classList.remove('aberto');
+    destravarScroll();
+  }
+  botaoFavoritosFlutuante.addEventListener('click', abrirFolhaFavoritos);
+  document.getElementById('folhaFavoritosFechar').addEventListener('click', fecharFolhaFavoritos);
+  folhaFavoritos.addEventListener('click', (evento) => {
+    if(evento.target === folhaFavoritos) fecharFolhaFavoritos();
   });
 
   // ---------- Toast de informações importantes (aparece uma vez só) ----------
