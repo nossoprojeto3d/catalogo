@@ -1052,28 +1052,37 @@
   /* Botão flutuante dos favoritos: mesma base do de WhatsApp, mas em
      estilo contorno (fundo transparente) pra não competir com ele —
      o WhatsApp continua sendo a ação principal. Só aparece quando
-     tem pelo menos 1 favorito guardado. */
-  .flutuante-favoritos{
+     tem pelo menos 1 favorito guardado.
+     Precisa do wrapper porque a bolinha de contagem é outro botão —
+     um <button> não pode conter outro <button> (HTML inválido faz o
+     navegador fechar o de fora cedo demais e desalinha a bolinha). */
+  .flutuante-favoritos-wrap{
+    position: fixed;
     left: 18px;
-    right: auto;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    z-index: 30;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.85);
+    transition: opacity 0.2s var(--easing), transform 0.2s var(--easing), visibility 0.2s;
+  }
+  .flutuante-favoritos-wrap.visivel{
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+  }
+  .flutuante-favoritos{
+    position: relative;
+    left: auto; right: auto; bottom: auto;
     background: rgba(18,14,9,0.82);
     border: 1px solid var(--gold);
     color: var(--gold-light);
     box-shadow: 0 10px 26px -10px rgba(0,0,0,0.5);
     animation: none;
-    opacity: 0;
-    visibility: hidden;
-    transform: scale(0.85);
     outline: none;
     -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.2s var(--easing), transform 0.2s var(--easing), visibility 0.2s;
   }
   .flutuante-favoritos::before{ content: none; }
-  .flutuante-favoritos.visivel{
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
-  }
   /* Bolinha com a quantidade — também funciona como "limpar tudo"
      (mais rápido que desmarcar favorito por favorito). */
   .favoritos-contador{
@@ -1362,10 +1371,12 @@
   </div>
 </div>
 
-<button type="button" class="flutuante flutuante-favoritos" id="botaoFavoritosFlutuante" aria-label="Ver favoritos">
-  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
+<div class="flutuante-favoritos-wrap" id="favoritosWrap">
+  <button type="button" class="flutuante flutuante-favoritos" id="botaoFavoritosFlutuante" aria-label="Ver favoritos">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
+  </button>
   <button type="button" class="favoritos-contador" id="favoritosContador" aria-label="Limpar todos os favoritos" hidden>0</button>
-</button>
+</div>
 
 <a class="flutuante" id="botaoFlutuante" href="#" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
@@ -1923,12 +1934,13 @@
   const folhaFavoritos = document.getElementById('folhaFavoritos');
   const favoritosLista = document.getElementById('favoritosLista');
   const favoritosEnviar = document.getElementById('favoritosEnviar');
+  const favoritosWrap = document.getElementById('favoritosWrap');
   const botaoFavoritosFlutuante = document.getElementById('botaoFavoritosFlutuante');
   const favoritosContador = document.getElementById('favoritosContador');
 
   function atualizarBotaoFavoritosFlutuante(){
     const quantidade = favoritos.length;
-    botaoFavoritosFlutuante.classList.toggle('visivel', quantidade > 0);
+    favoritosWrap.classList.toggle('visivel', quantidade > 0);
     favoritosContador.hidden = quantidade === 0;
     favoritosContador.textContent = quantidade;
   }
