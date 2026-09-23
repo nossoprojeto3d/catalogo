@@ -399,6 +399,11 @@
   .btn-whats.btn-esgotado{
     border-color: var(--border-hover);
     color: var(--text-secondary);
+    /* Texto maior que "Quero esse!" — deixa quebrar linha em vez de
+       vazar pra fora da pílula em cards mais estreitos (2 colunas). */
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
   }
 
   /* Selo de tag: antes da foto carregar, o texto da tag "explode" grande
