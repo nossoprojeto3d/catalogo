@@ -808,6 +808,50 @@
     padding: 0 8px;
   }
   .lightbox-descricao:empty{ display: none; }
+  .lightbox-cores{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .lightbox-cores-titulo{
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+  .lightbox-cores-lista{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 420px;
+  }
+  .chip-cor{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--frame);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s var(--easing), color 0.2s var(--easing);
+  }
+  .chip-cor-bolinha{
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+  }
+  .chip-cor.ativo{ border-color: var(--gold); color: var(--gold-light); }
+  .lightbox-comprar{ margin-top: 4px; }
   .lightbox-fechar{
     position: absolute;
     top: 18px; right: 18px;
@@ -1090,6 +1134,7 @@
     .card-vendido:hover .foto img{ transform: scale(1.05); }
     .seletor-categoria:hover{ border-color: var(--gold-light); }
     .folha-item:hover{ background: var(--card-hover); color: var(--gold-light); }
+    .chip-cor:hover{ border-color: var(--gold); color: var(--gold-light); }
     .btn-whats:hover{ background: rgba(227, 172, 93, 0.1); border-color: var(--gold-light); color: var(--gold-light); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
@@ -1135,6 +1180,11 @@
   <div class="lightbox-conteudo">
     <img id="lightboxImagem" src="" alt="">
     <p class="lightbox-descricao" id="lightboxDescricao"></p>
+    <div class="lightbox-cores" id="lightboxCores" hidden></div>
+    <a class="btn-whats lightbox-comprar" id="lightboxComprar" href="#" target="_blank" rel="noopener" hidden>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
+      Quero esse!
+    </a>
   </div>
 </div>
 
@@ -1291,6 +1341,7 @@
     const indicePrecoPromocional = cabecalhoCsv.indexOf('precopromocional');
     const indiceMaisVendido = cabecalhoCsv.indexOf('maisvendido');
     const indiceEsgotado = cabecalhoCsv.indexOf('esgotado');
+    const indiceCores = cabecalhoCsv.indexOf('cores');
 
     const categorias = [];
     const mapaCategorias = {};
@@ -1329,7 +1380,10 @@
           tag: (linha[indiceTag] || '').trim(),
           precoPromocional: (linha[indicePrecoPromocional] || '').trim(),
           maisVendido: maisVendido,
-          esgotado: !!(linha[indiceEsgotado] || '').trim()
+          esgotado: !!(linha[indiceEsgotado] || '').trim(),
+          cores: (linha[indiceCores] || '').trim()
+            ? (linha[indiceCores] || '').split(',').map(cor => cor.trim()).filter(Boolean)
+            : []
         });
       }
     }
@@ -1365,10 +1419,11 @@
   document.getElementById('botaoFlutuante').href = linkWhatsappGeral();
   document.getElementById('linkRodapeWhats').href = linkWhatsappGeral();
 
-  function linkWhatsapp(produto, categoria){
+  function linkWhatsapp(produto, categoria, corEscolhida){
     let mensagem = `Oi! Vi esse no catálogo de vocês e quero saber mais:\n\n`;
     mensagem += `Categoria: ${categoria}\n`;
     mensagem += `Produto: ${produto.nome}\n`;
+    if(corEscolhida) mensagem += `Cor: ${corEscolhida}\n`;
     mensagem += produto.precoPromocional
       ? `Valor: R$ ${produto.precoPromocional} (promocional, de R$ ${produto.preco})\n`
       : `Valor: R$ ${produto.preco}\n`;
@@ -1388,6 +1443,22 @@
     return String(texto)
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase().trim();
+  }
+
+  // Nome de cor (texto livre da planilha) -> cor de verdade pra bolinha.
+  // Nome que a gente n\u00e3o reconhece cai num tom neutro \u2014 o texto do chip
+  // continua mostrando a palavra certa de qualquer jeito.
+  const MAPA_CORES = {
+    branco: '#F5F5F0', preto: '#1A1A1A', vermelho: '#C0392B',
+    azul: '#2E5FA3', verde: '#3E8E5A', amarelo: '#E8C547',
+    roxo: '#7B4EA0', lilas: '#B79CC9', rosa: '#E195B8',
+    laranja: '#D9782D', cinza: '#8A8A85', dourado: '#C9A227',
+    prateado: '#B8B8B2', prata: '#B8B8B2', marrom: '#6B4A34',
+    bege: '#D9C7A3', turquesa: '#3FA9A0', vinho: '#5E2129',
+    transparente: 'transparent'
+  };
+  function corParaCss(nomeCor){
+    return MAPA_CORES[normalizarTexto(nomeCor)] || '#8B7A5F';
   }
 
   // Troca "-" (separando palavras) ou "/" por um ponto tipográfico, só
@@ -1468,7 +1539,7 @@
       areaFoto.addEventListener('click', () => {
         const imagem = conteudo.querySelector('img');
         if(imagem && imagem.complete && imagem.naturalWidth > 0){
-          abrirLightbox(imagem.src, produto.nome, produto.descricao);
+          abrirLightbox(produto, nomeCategoria, imagem.src);
         }
       });
     }
@@ -1531,17 +1602,56 @@
     return card;
   }
 
-  // ---------- Zoom da foto ----------
+  // ---------- Zoom da foto (vira um "mini detalhes" quando tem cor) ----------
   const lightbox = document.getElementById('lightbox');
   const lightboxImagem = document.getElementById('lightboxImagem');
   const lightboxDescricao = document.getElementById('lightboxDescricao');
+  const lightboxCores = document.getElementById('lightboxCores');
+  const lightboxComprar = document.getElementById('lightboxComprar');
 
-  function abrirLightbox(src, alt, descricao){
+  function abrirLightbox(produto, categoria, src){
     lightboxImagem.src = src;
-    lightboxImagem.alt = alt;
-    lightboxDescricao.textContent = descricao || '';
+    lightboxImagem.alt = produto.nome;
+    lightboxDescricao.textContent = produto.descricao || '';
+    montarCoresLightbox(produto, categoria);
     lightbox.classList.add('aberto');
     document.body.style.overflow = 'hidden';
+  }
+
+  // O botão "Quero esse!" só aparece aqui dentro quando o produto tem
+  // cor pra escolher — sem isso, o botão do card já resolve, não
+  // precisa duplicar. Escolher uma cor atualiza o link na hora.
+  function montarCoresLightbox(produto, categoria){
+    if(!produto.cores || produto.cores.length === 0){
+      lightboxCores.hidden = true;
+      lightboxCores.innerHTML = '';
+      lightboxComprar.hidden = true;
+      return;
+    }
+
+    let corEscolhida = produto.cores[0];
+    lightboxComprar.href = linkWhatsapp(produto, categoria, corEscolhida);
+    lightboxComprar.hidden = false;
+
+    lightboxCores.innerHTML = `
+      <p class="lightbox-cores-titulo">Cor</p>
+      <div class="lightbox-cores-lista"></div>
+    `;
+    const lista = lightboxCores.querySelector('.lightbox-cores-lista');
+    produto.cores.forEach(cor => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip-cor' + (cor === corEscolhida ? ' ativo' : '');
+      chip.innerHTML = `<span class="chip-cor-bolinha" style="background:${corParaCss(cor)}"></span>${escaparHTML(cor)}`;
+      chip.addEventListener('click', () => {
+        corEscolhida = cor;
+        lista.querySelectorAll('.chip-cor').forEach(item => item.classList.remove('ativo'));
+        chip.classList.add('ativo');
+        lightboxComprar.href = linkWhatsapp(produto, categoria, corEscolhida);
+      });
+      lista.appendChild(chip);
+    });
+    lightboxCores.hidden = false;
   }
   function fecharLightbox(){
     lightbox.classList.remove('aberto');

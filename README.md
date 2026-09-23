@@ -21,7 +21,7 @@ Abrir o `index.html` e preencher, no topo do script:
 
 Colunas, exatamente nessa grafia (linha 1):
 
-`Categoria | Produto | Codigo | Descricao | Preco | Foto | Tag | PrecoPromocional | MaisVendido | Esgotado`
+`Categoria | Produto | Codigo | Descricao | Preco | Foto | Tag | PrecoPromocional | MaisVendido | Esgotado | Cores`
 
 - Uma linha por produto.
 - `Codigo` é opcional, mas ajuda a identificar o produto exato quando o
@@ -50,6 +50,15 @@ Colunas, exatamente nessa grafia (linha 1):
   diferente, avisando que é uma peça esgotada). O produto continua
   aparecendo na listagem, só que sempre por último. Deixe vazio assim
   que repor o estoque — não precisa apagar e recriar a linha.
+- `Cores` é opcional — lista de cores separadas por vírgula (ex.:
+  `Branco, Preto, Dourado`). Quando preenchida, some das mãos do card na
+  listagem (pra não desalinhar o card de quem não tem cor) e aparece só
+  no zoom da foto, como bolinhas clicáveis — escolher uma já atualiza o
+  botão "Quero esse!" que aparece ali, incluindo a cor na mensagem do
+  WhatsApp. Nomes comuns (branco, preto, azul, verde, dourado etc.)
+  ganham a bolinha na cor certa; nome que a página não reconhece cai num
+  tom neutro, mas o texto continua certo. Produto sem cor cadastrada
+  continua exatamente como antes, sem essa seção aparecer.
 - A planilha precisa estar compartilhada como "Qualquer pessoa com o
   link → Leitor", senão a página não consegue ler os dados.
 
