@@ -566,69 +566,106 @@
     .carrossel-vendidos{ margin: 0 -24px; padding: 2px 24px 10px; }
   }
 
-  /* ---------- Pills de categoria (filtro rápido) ---------- */
-  .pills-categorias{
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin: 0 -20px 22px;
-    padding: 2px 20px 4px;
-    mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%);
-  }
-  .pills-categorias::-webkit-scrollbar{ display: none; }
-  /* No desktop já cabe tudo numa boa, então mostra todas as categorias
-     quebrando linha, sem precisar de "Ver mais" nem de scroll — isso é
-     só pro celular, onde a lista completa não cabe. */
-  @media (min-width: 540px){
-    .pills-categorias{
-      flex-wrap: wrap;
-      overflow-x: visible;
-      margin: 0 0 22px;
-      padding: 0;
-      mask-image: none;
-      -webkit-mask-image: none;
-    }
-  }
-  /* Usado na tela "Escolher categoria" — ali sempre queremos ver a
-     lista inteira quebrando linha, mesmo no celular. */
-  .pills-categorias.pills-todas{
-    flex-wrap: wrap;
-    overflow-x: visible;
-    margin: 0;
-    padding: 0;
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-  .pill{
+  /* ---------- Seletor de categoria (abre a folha) ---------- */
+  .seletor-categoria{
     display: inline-flex;
     align-items: center;
-    flex: 0 0 auto;
-    background: var(--frame);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
     font-family: inherit;
     font-size: 13.5px;
-    line-height: 16px;
-    font-weight: 500;
-    white-space: nowrap;
-    padding: 9px 16px;
-    border-radius: 100px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: border-color 0.2s var(--easing), background 0.2s var(--easing), color 0.2s var(--easing);
-  }
-  .pill.ativo{
-    background: transparent;
-    border-color: var(--gold);
-    color: var(--gold-light);
     font-weight: 500;
     letter-spacing: 0.2px;
+    padding: 11px 18px;
+    border-radius: 100px;
+    cursor: pointer;
+    margin: 0 0 22px;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s var(--easing), color 0.2s var(--easing);
   }
+  .seletor-categoria svg{ width: 14px; height: 14px; flex-shrink: 0; transition: transform 0.2s var(--easing); }
+  .seletor-categoria[aria-expanded="true"] svg{ transform: rotate(180deg); }
   .sentinela-scroll{ height: 1px; }
+
+  /* ---------- Folha (bottom sheet) com a lista de categorias ---------- */
+  .folha{
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(9, 7, 4, 0.7);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s var(--easing);
+  }
+  .folha.aberto{ opacity: 1; pointer-events: auto; }
+  .folha-painel{
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    max-height: 78vh;
+    overflow-y: auto;
+    background: var(--frame);
+    border: 1px solid var(--border-hover);
+    border-bottom: none;
+    border-radius: 20px 20px 0 0;
+    padding: 12px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -20px 50px -20px rgba(0,0,0,0.6);
+    transform: translateY(100%);
+    transition: transform 0.3s var(--easing);
+  }
+  .folha.aberto .folha-painel{ transform: translateY(0); }
+  .folha-alca{
+    width: 36px; height: 4px;
+    background: var(--border-hover);
+    border-radius: 100px;
+    margin: 4px auto 16px;
+  }
+  .folha-fechar{
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border-hover);
+    background: rgba(18,14,9,0.7);
+    color: var(--text);
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+  }
+  .folha-fechar svg{ width: 14px; height: 14px; }
+  .folha-painel h2{
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 17px;
+    letter-spacing: 0.3px;
+    color: var(--gold-light);
+    margin: 0 0 14px;
+    text-align: center;
+  }
+  .folha-lista{ display:flex; flex-direction: column; gap: 2px; }
+  .folha-item{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 10px;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s var(--easing), color 0.15s var(--easing);
+  }
+  .folha-item:active{ background: var(--card-hover); }
+  .folha-item.ativo{ color: var(--gold-light); font-weight: 600; }
+  .folha-item-marca{ color: var(--gold); opacity: 0; }
+  .folha-item.ativo .folha-item-marca{ opacity: 1; }
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 6px;
@@ -1012,8 +1049,8 @@
     .produto:hover .foto img{ transform: scale(1.05); }
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
-    .pill:hover{ border-color: var(--gold); color: var(--gold-light); }
-    .pill.ativo:hover{ background: rgba(227, 172, 93, 0.1); border-color: var(--gold-light); color: var(--gold-light); }
+    .seletor-categoria:hover{ border-color: var(--gold-light); }
+    .folha-item:hover{ background: var(--card-hover); color: var(--gold-light); }
     .btn-whats:hover{ background: rgba(227, 172, 93, 0.1); border-color: var(--gold-light); color: var(--gold-light); }
     .flutuante:hover{ transform: scale(1.06); }
     .rodape-links a:hover{ color: var(--gold-light); }
@@ -1084,6 +1121,17 @@
       <h3>Cores, imagens e acabamento</h3>
       <p>As imagens são referências — cores, tonalidades e efeitos podem variar em relação à peça física, especialmente em filamentos multicoloridos (duo color/tricolor), cuja posição das cores e transições muda a cada impressão. Pequenas marcas de camada, variações de acabamento e medidas aproximadas fazem parte do processo de impressão 3D e não são consideradas defeito — cada peça é única. Consulte a disponibilidade de cores antes de fechar o pedido.</p>
     </div>
+  </div>
+</div>
+
+<div class="folha" id="folhaCategorias">
+  <div class="folha-painel">
+    <div class="folha-alca"></div>
+    <button class="folha-fechar" id="folhaCategoriasFechar" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <h2>Escolher categoria</h2>
+    <div class="folha-lista" id="folhaCategoriasLista"></div>
   </div>
 </div>
 
@@ -1455,7 +1503,7 @@
     if(evento.target === lightbox) fecharLightbox();
   });
   document.addEventListener('keydown', (evento) => {
-    if(evento.key === 'Escape'){ fecharLightbox(); fecharModalInfo(); }
+    if(evento.key === 'Escape'){ fecharLightbox(); fecharModalInfo(); fecharFolhaCategorias(); }
   });
 
   // ---------- Modal de informações importantes ----------
@@ -1473,6 +1521,26 @@
   document.getElementById('modalInfoFechar').addEventListener('click', fecharModalInfo);
   modalInfo.addEventListener('click', (evento) => {
     if(evento.target === modalInfo) fecharModalInfo();
+  });
+
+  // ---------- Folha (bottom sheet) de categorias ----------
+  const folhaCategorias = document.getElementById('folhaCategorias');
+
+  function abrirFolhaCategorias(){
+    folhaCategorias.classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+    const seletor = document.getElementById('seletorCategoria');
+    if(seletor) seletor.setAttribute('aria-expanded', 'true');
+  }
+  function fecharFolhaCategorias(){
+    folhaCategorias.classList.remove('aberto');
+    document.body.style.overflow = '';
+    const seletor = document.getElementById('seletorCategoria');
+    if(seletor) seletor.setAttribute('aria-expanded', 'false');
+  }
+  document.getElementById('folhaCategoriasFechar').addEventListener('click', fecharFolhaCategorias);
+  folhaCategorias.addEventListener('click', (evento) => {
+    if(evento.target === folhaCategorias) fecharFolhaCategorias();
   });
 
   // ---------- Toast de informações importantes (aparece uma vez só) ----------
@@ -1721,9 +1789,7 @@
 
   function aplicarFiltro(categorias, nomeCategoria){
     filtroAtivo = nomeCategoria;
-    document.querySelectorAll('#pillsCategorias .pill').forEach(botao => {
-      botao.classList.toggle('ativo', (botao.dataset.categoria || null) === nomeCategoria);
-    });
+    atualizarSeletorCategoria(categorias);
 
     desconectarObservadorScroll();
     const grade = document.getElementById('gradeProdutos');
@@ -1761,49 +1827,44 @@
     tentarDestacar();
   }
 
-  function criarBotaoPill(rotulo, nomeCategoria, categorias){
-    const botao = document.createElement('button');
-    botao.className = 'pill' + (filtroAtivo === nomeCategoria ? ' ativo' : '');
-    botao.textContent = rotulo;
-    botao.dataset.categoria = nomeCategoria || '';
-    botao.addEventListener('click', () => aplicarFiltro(categorias, nomeCategoria));
-    return botao;
+  // Botão único que mostra a categoria atual e abre a folha (bottom
+  // sheet) com a lista completa — em vez de fileira de pills, que já
+  // tentamos de 3 jeitos diferentes e continuava confuso com muita
+  // categoria. Um controle só, sempre mostra onde você está, nunca
+  // esconde nada atrás de "ver mais".
+  function atualizarSeletorCategoria(categorias){
+    const texto = document.getElementById('seletorCategoriaTexto');
+    if(!texto) return;
+    const categoriaAtiva = filtroAtivo ? categorias.find(categoria => categoria.nome === filtroAtivo) : null;
+    texto.textContent = categoriaAtiva ? formatarNomeCategoria(categoriaAtiva.nome) : 'Tudo por Aqui';
+
+    document.querySelectorAll('#folhaCategoriasLista .folha-item').forEach(item => {
+      item.classList.toggle('ativo', (item.dataset.categoria || '') === (filtroAtivo || ''));
+    });
   }
 
-  // Tela dedicada só pra escolher categoria — usada a partir do pill
-  // "Ver mais" no celular, onde a fileira principal só mostra Tudo por
-  // Aqui + as 2 primeiras categorias. Aqui a lista aparece inteira,
-  // quebrando linha (sem scroll lateral, sem esconder nada).
-  function renderEscolherCategoria(categorias){
-    trocarTela(() => {
-      desconectarObservadorScroll();
-      conteudo.innerHTML = '';
+  function construirFolhaCategorias(categorias){
+    const lista = document.getElementById('folhaCategoriasLista');
+    if(!lista) return;
+    lista.innerHTML = '';
 
-      const trilha = document.createElement('div');
-      trilha.className = 'trilha';
-      trilha.innerHTML = `
-        <button class="voltar">‹ Voltar</button>
-        <span>/</span>
-        <span class="categoria-atual">Escolher categoria</span>
-      `;
-      trilha.querySelector('.voltar').addEventListener('click', () => renderCatalogo(categorias, null, false));
-      conteudo.appendChild(trilha);
-
-      const pills = document.createElement('div');
-      pills.className = 'pills-categorias pills-todas';
-      const criarPillNavegacao = (rotulo, nomeCategoria) => {
-        const botao = document.createElement('button');
-        botao.className = 'pill';
-        botao.textContent = rotulo;
-        botao.addEventListener('click', () => renderCatalogo(categorias, nomeCategoria, false));
-        return botao;
-      };
-      pills.appendChild(criarPillNavegacao('Tudo por Aqui', null));
-      categorias.forEach(categoria => {
-        pills.appendChild(criarPillNavegacao(formatarNomeCategoria(categoria.nome), categoria.nome));
+    const criarItem = (rotulo, nomeCategoria) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'folha-item' + (filtroAtivo === nomeCategoria ? ' ativo' : '');
+      item.dataset.categoria = nomeCategoria || '';
+      item.innerHTML = `<span>${escaparHTML(rotulo)}</span><span class="folha-item-marca">✓</span>`;
+      item.addEventListener('click', () => {
+        aplicarFiltro(categorias, nomeCategoria);
+        fecharFolhaCategorias();
       });
-      conteudo.appendChild(pills);
-    }, false);
+      return item;
+    };
+
+    lista.appendChild(criarItem('Tudo por Aqui', null));
+    categorias.forEach(categoria => {
+      lista.appendChild(criarItem(formatarNomeCategoria(categoria.nome), categoria.nome));
+    });
   }
 
   function renderCatalogo(categorias, filtroInicial, rolarTopo = true){
@@ -1820,49 +1881,20 @@
       const carrossel = construirCarrosselVendidos(categorias);
       if(carrossel) conteudo.appendChild(carrossel);
 
-      const pills = document.createElement('div');
-      pills.className = 'pills-categorias';
-      pills.id = 'pillsCategorias';
-      pills.appendChild(criarBotaoPill('Tudo por Aqui', null, categorias));
+      const seletor = document.createElement('button');
+      seletor.type = 'button';
+      seletor.className = 'seletor-categoria';
+      seletor.id = 'seletorCategoria';
+      seletor.setAttribute('aria-expanded', 'false');
+      seletor.innerHTML = `
+        <span id="seletorCategoriaTexto">Tudo por Aqui</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      `;
+      seletor.addEventListener('click', abrirFolhaCategorias);
+      conteudo.appendChild(seletor);
 
-      // No celular a fileira fica compacta (Tudo por Aqui + 2 vagas)
-      // com um pill "Ver mais" que abre a tela de escolher categoria —
-      // em vez de rolar por uma fileira longa ou esconder tudo atrás de
-      // um "ver mais" que expande ali mesmo. No desktop já cabe tudo,
-      // então mostra a lista completa.
-      const ehCelular = window.matchMedia('(max-width: 539px)').matches;
-      if(ehCelular){
-        // A 1ª vaga é sempre a 1ª categoria da lista (Lançamentos, se
-        // existir, já fica em 1º por causa do sort). A 2ª vaga mostra
-        // a categoria ativa no momento — pra sempre ter alguma marcada
-        // — e só cai pra 2ª categoria da lista quando não tem nenhuma
-        // categoria específica selecionada (ou quando a ativa já é a
-        // da 1ª vaga).
-        const categoriasCompactas = categorias.slice(0, 1);
-        const categoriaAtiva = filtroAtivo ? categorias.find(categoria => categoria.nome === filtroAtivo) : null;
-        if(categoriaAtiva && categoriaAtiva !== categoriasCompactas[0]){
-          categoriasCompactas.push(categoriaAtiva);
-        }else if(categorias.length > 1){
-          categoriasCompactas.push(categorias[1]);
-        }
-        categoriasCompactas.forEach(categoria => {
-          pills.appendChild(criarBotaoPill(formatarNomeCategoria(categoria.nome), categoria.nome, categorias));
-        });
-        if(categorias.length > categoriasCompactas.length){
-          const botaoVerMais = document.createElement('button');
-          botaoVerMais.type = 'button';
-          botaoVerMais.className = 'pill';
-          botaoVerMais.dataset.categoria = '__vermais__';
-          botaoVerMais.textContent = 'Ver mais ›';
-          botaoVerMais.addEventListener('click', () => renderEscolherCategoria(categorias));
-          pills.appendChild(botaoVerMais);
-        }
-      }else{
-        categorias.forEach(categoria => {
-          pills.appendChild(criarBotaoPill(formatarNomeCategoria(categoria.nome), categoria.nome, categorias));
-        });
-      }
-      conteudo.appendChild(pills);
+      construirFolhaCategorias(categorias);
+      atualizarSeletorCategoria(categorias);
 
       const grade = document.createElement('div');
       grade.className = 'grade';
