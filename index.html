@@ -2290,19 +2290,26 @@
   let filtroAtivo = null; // null = "Todos"; caso contrário, nome da categoria
   let listaFiltrada = [];
   let quantidadeExibida = 0;
+  // Um observer só, criado uma vez e reaproveitado pra sempre (só troca
+  // quem ele observa) — criar um IntersectionObserver novo a cada troca
+  // de categoria (disconnect + new) podia deixá-lo "surdo": ele parava
+  // de disparar depois de voltar pra "Tudo por Aqui" vindo de outra
+  // categoria, travando a rolagem infinita em 1-2 lotes. Reaproveitar a
+  // mesma instância (só chamando observe/disconnect nela) resolve.
   let observadorScroll = null;
 
   function desconectarObservadorScroll(){
-    if(observadorScroll){ observadorScroll.disconnect(); observadorScroll = null; }
+    if(observadorScroll) observadorScroll.disconnect();
   }
 
   function configurarObservadorScroll(){
-    if(observadorScroll) return;
     const sentinela = document.getElementById('sentinelaScroll');
     if(!sentinela) return;
-    observadorScroll = new IntersectionObserver((entradas) => {
-      if(entradas[0].isIntersecting) exibirMaisProdutos();
-    }, { rootMargin: '600px 0px' });
+    if(!observadorScroll){
+      observadorScroll = new IntersectionObserver((entradas) => {
+        if(entradas[0].isIntersecting) exibirMaisProdutos();
+      }, { rootMargin: '600px 0px' });
+    }
     observadorScroll.observe(sentinela);
   }
 
@@ -2328,6 +2335,17 @@
       desconectarObservadorScroll();
     }else{
       configurarObservadorScroll();
+      // O IntersectionObserver só dispara de novo quando a sentinela
+      // cruza a borda da tela (entra/sai) — se ela já nasceu visível
+      // (tela grande, poucos itens, ou voltando de uma categoria
+      // curta) não há nova "entrada" pra avisar que ainda cabe mais,
+      // e a lista trava faltando produto. Confere a posição na hora e
+      // já carrega o próximo lote se a sentinela ainda estiver dentro
+      // da mesma margem usada pelo observer, sem esperar o usuário rolar.
+      const sentinela = document.getElementById('sentinelaScroll');
+      if(sentinela && sentinela.getBoundingClientRect().top < window.innerHeight + 600){
+        exibirMaisProdutos();
+      }
     }
   }
 
