@@ -30,7 +30,12 @@ Colunas, exatamente nessa grafia (linha 1):
   simplesmente fica mais compacto.
 - `Tag` é opcional — texto livre tipo `Lançamento`, `Oferta`, `Novo`,
   `Exclusivo`... aparece como um selo em cima da foto do produto. Deixe
-  vazio pra não mostrar nenhum.
+  vazio pra não mostrar nenhum. Escrever qualquer texto que contenha a
+  palavra "Lançamento" (ex: `Lançamento`, `Novo Lançamento`) também
+  coloca o produto automaticamente numa categoria "Lançamentos" que
+  aparece sempre primeiro na lista — o produto continua normalmente
+  na categoria original dele também, essa é só uma vitrine extra.
+  Não precisa criar essa categoria na planilha, ela se monta sozinha.
 - `PrecoPromocional` é opcional — preencha só quando o produto estiver
   em promoção (ex: `19,90`). O card passa a mostrar o preço original
   riscado + esse valor, e o card treme brevemente ao aparecer na tela.

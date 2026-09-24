@@ -1536,9 +1536,36 @@
           esgotado: !!(linha[indiceEsgotado] || '').trim(),
           cores: (linha[indiceCores] || '').trim()
             ? (linha[indiceCores] || '').split(',').map(cor => cor.trim()).filter(Boolean)
-            : []
+            : [],
+          // Categoria "de verdade" do produto (a da planilha) — guardada
+          // à parte pra sobreviver mesmo quando o produto também aparece
+          // dentro da categoria virtual "Lançamentos" logo abaixo.
+          categoriaOriginal: nomeCategoria
         });
       }
+    }
+
+    // Categoria virtual "Lançamentos": junta, sem duplicar a categoria
+    // real, todo produto de qualquer categoria cuja Tag contenha a
+    // palavra "lançamento" — o produto continua aparecendo normalmente
+    // na categoria dele também. Só existe se tiver pelo menos 1 produto
+    // assim; não conta 2x em "Tudo por Aqui" nem na busca (ver
+    // montarListaFiltrada/renderBusca/construirCarrosselVendidos).
+    const produtosLancamento = [];
+    categorias.forEach(categoria => {
+      categoria.produtos.forEach(produto => {
+        if(normalizarTexto(produto.tag).includes('lancamento')) produtosLancamento.push(produto);
+      });
+    });
+    if(produtosLancamento.length > 0){
+      let categoriaLancamentos = categorias.find(categoria => normalizarTexto(categoria.nome) === 'lancamentos');
+      if(!categoriaLancamentos){
+        categoriaLancamentos = { nome: 'Lançamentos', produtos: [], virtual: true };
+        categorias.push(categoriaLancamentos);
+      }
+      produtosLancamento.forEach(produto => {
+        if(!categoriaLancamentos.produtos.includes(produto)) categoriaLancamentos.produtos.push(produto);
+      });
     }
 
     categorias.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
@@ -2134,9 +2161,10 @@
   function construirCarrosselVendidos(categorias){
     const itens = [];
     categorias.forEach(categoria => {
+      if(categoria.virtual) return; // já contado na categoria real dele
       categoria.produtos.forEach(produto => {
         if(produto.maisVendido !== null){
-          itens.push({ produto, categoriaNome: categoria.nome });
+          itens.push({ produto, categoriaNome: produto.categoriaOriginal });
         }
       });
     });
@@ -2306,8 +2334,12 @@
   function montarListaFiltrada(categorias){
     listaFiltrada = [];
     categorias.forEach(categoria => {
-      if(filtroAtivo && categoria.nome !== filtroAtivo) return;
-      categoria.produtos.forEach(produto => listaFiltrada.push({ produto, categoriaNome: categoria.nome }));
+      if(filtroAtivo){
+        if(categoria.nome !== filtroAtivo) return;
+      }else if(categoria.virtual){
+        return; // "Tudo por Aqui" não repete quem já mostrou na categoria real
+      }
+      categoria.produtos.forEach(produto => listaFiltrada.push({ produto, categoriaNome: produto.categoriaOriginal }));
     });
   }
 
@@ -2444,10 +2476,11 @@
       const resultados = [];
 
       categorias.forEach(categoria => {
+        if(categoria.virtual) return; // já entra na busca pela categoria real dele
         categoria.produtos.forEach(produto => {
           const alvo = normalizarTexto(`${produto.nome} ${produto.codigo}`);
           if(alvo.includes(termoNormalizado)){
-            resultados.push({ produto, categoria: categoria.nome });
+            resultados.push({ produto, categoria: produto.categoriaOriginal });
           }
         });
       });
