@@ -479,6 +479,14 @@
     transform: scale(0.45) rotate(-6deg);
     animation: explodirTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
+  /* Abaixo de 540px a grade vira 2 colunas (mesmo ponto de corte de
+     .grade) e o card fica bem mais estreito — o tamanho em vw acima
+     foi pensado pra largura cheia da tela, então nessa faixa o texto
+     no auge do efeito (escala 1.12x) estourava a foto e cortava a
+     primeira/última letra. Reduzido só aqui. */
+  @media (max-width: 539px){
+    .explosao-tag{ font-size: clamp(14px, 4.4vw, 20px); }
+  }
   @keyframes explodirTag{
     0%{ opacity: 0; transform: scale(0.45) rotate(-6deg); }
     22%{ opacity: 1; transform: scale(1.12) rotate(2deg); }
