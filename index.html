@@ -2624,16 +2624,48 @@
     }, 250);
   });
 
+  // Cache curto por aba em sessionStorage — evita refazer as 10
+  // buscas na planilha toda vez que o cliente troca de categoria ou
+  // volta pra página dentro da mesma visita. Preço/estoque continuam
+  // "ao vivo" na prática: o cache expira sozinho em poucos minutos.
+  const DURACAO_CACHE_ABA_MS = 5 * 60 * 1000;
+
+  function lerCacheAba(nomeAba){
+    try{
+      const bruto = sessionStorage.getItem(`np3d_cache_aba_${nomeAba}`);
+      if(!bruto) return null;
+      const { texto, ts } = JSON.parse(bruto);
+      if(typeof texto !== 'string' || Date.now() - ts > DURACAO_CACHE_ABA_MS) return null;
+      return texto;
+    }catch(erro){
+      return null;
+    }
+  }
+
+  function salvarCacheAba(nomeAba, texto){
+    try{
+      sessionStorage.setItem(`np3d_cache_aba_${nomeAba}`, JSON.stringify({ texto, ts: Date.now() }));
+    }catch(erro){
+      // sessionStorage indisponível (aba anônima, quota cheia etc.) —
+      // segue sem cache, sem quebrar o carregamento.
+    }
+  }
+
   // Busca o CSV de uma aba (categoria) e já monta a categoria a partir
   // dele. Se a aba não existir ou a planilha não responder, a promise
   // rejeita — e Promise.all(...) abaixo cai no catch de carregarCatalogo.
   function buscarAba(nomeAba){
+    const textoEmCache = lerCacheAba(nomeAba);
+    if(textoEmCache !== null){
+      return Promise.resolve(montarCategoriaDaAba(nomeAba, interpretarCSV(textoEmCache)));
+    }
     return fetch(`${urlDaAba(nomeAba)}&_=${Date.now()}`, { cache: 'no-store' })
       .then(resposta => {
         if(!resposta.ok) throw new Error('Não foi possível acessar a aba ' + nomeAba + '.');
         return resposta.text();
       })
       .then(texto => {
+        salvarCacheAba(nomeAba, texto);
         const linhasCsv = interpretarCSV(texto);
         return montarCategoriaDaAba(nomeAba, linhasCsv);
       });
