@@ -35,7 +35,7 @@
     --text: #F4EFE3;
     --text-secondary: #C9C1B0;
     --text-tertiary: #A69C87;
-    --text-footer: #786F5C;
+    --text-footer: #8F8570; /* contraste 5,3:1 com o fundo (mínimo pra leitura: 4,5) */
     --easing: cubic-bezier(0.22, 1, 0.36, 1);
   }
   *{ box-sizing: border-box; }
@@ -209,6 +209,16 @@
     .brilho-ambiente, .particula, .logo-marca{ animation: none !important; }
   }
 
+  /* No celular o cabeçalho ocupava quase metade da primeira tela;
+     mais compacto, a busca e "Os queridinhos" já aparecem de cara. */
+  @media (max-width: 600px){
+    header{ padding: 40px 22px 30px; }
+    .logo-marca{ width: 56px; margin-bottom: 16px; }
+    header h1{ margin-bottom: 10px; }
+    header p{ font-size: 14px; line-height: 1.6; }
+    body main{ padding-top: 26px; } /* "body" pra vencer a regra de main, que vem depois */
+  }
+
   /* ---------- Conteúdo ---------- */
   main{
     max-width: 1080px;
@@ -243,9 +253,15 @@
     padding: 13px 16px 13px 44px;
     border-radius: 100px;
     outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    /* Ao focar, o campo sobe pro topo (ver campoBusca 'focus'); essa
+       folga deixa ele abaixo da barra fixa em vez de escondido nela. */
+    scroll-margin-top: 76px;
     transition: border-color 0.2s var(--easing), background 0.2s var(--easing);
   }
   .busca-campo::placeholder{ color: var(--text-tertiary); }
+  .busca-campo::-webkit-search-decoration{ -webkit-appearance: none; }
   .busca-campo:focus{ border-color: var(--gold); background: var(--card-hover); }
 
   .trilha{
@@ -542,25 +558,21 @@
     color: var(--text);
     line-height: 1.28;
     letter-spacing: 0.2px;
+    /* Nome longo quebra em até 2 linhas, parado, em vez de rolar de
+       lado — leitura mais calma com vários cards na tela ao mesmo
+       tempo. Passou de 2 linhas, termina em "..." e o nome completo
+       aparece no zoom da foto. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
-  .produto h3{ font-size: clamp(15px, 3.6vw, 17px); }
+  /* Reserva sempre o espaço de 2 linhas, pra preço e botão ficarem
+     na mesma altura nos dois cards lado a lado. */
+  .produto h3{ font-size: clamp(15px, 3.6vw, 17px); min-height: 2.56em; }
   .card-vendido h3{ font-size: 15.5px; text-shadow: 0 1px 10px rgba(0,0,0,0.55); }
-  .produto h3 span, .card-vendido h3 span{
-    display: inline-block;
-  }
-  .rolar span{
-    animation: rolarTexto var(--duracao, 6s) ease-in-out infinite;
-  }
-  @keyframes rolarTexto{
-    0%, 12%{ transform: translateX(0); }
-    45%, 55%{ transform: translateX(var(--deslocamento, 0)); }
-    88%, 100%{ transform: translateX(0); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .rolar span{ animation: none; }
-  }
   .contagem{ font-size: 12.5px; color: var(--text-tertiary); margin:0; }
 
   .info{ padding: 18px 18px 20px; display:flex; flex-direction: column; gap: 11px; flex: 1; }
@@ -735,6 +747,13 @@
   }
   .folha-item:active{ background: var(--card-hover); }
   .folha-item.ativo{ color: var(--gold-light); font-weight: 600; }
+  .folha-item-nome{ flex: 1; }
+  .folha-item-quantidade{
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
   .folha-item-marca{ color: var(--gold); opacity: 0; }
   .folha-item.ativo .folha-item-marca{ opacity: 1; }
 
@@ -870,7 +889,7 @@
   .lightbox-conteudo img{
     display: block;
     max-width: 100%;
-    max-height: 78vh;
+    max-height: 62vh; /* sobra espaço pra nome, preço e botão */
     border-radius: 8px;
     box-shadow: 0 24px 60px -12px rgba(0,0,0,0.6);
     transform: scale(0.96);
@@ -887,6 +906,24 @@
     padding: 0 8px;
   }
   .lightbox-descricao:empty{ display: none; }
+  .lightbox-cabecalho{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    max-width: 480px;
+    padding: 0 8px;
+  }
+  .lightbox-nome{
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    line-height: 1.3;
+    color: var(--text);
+    margin: 0;
+  }
+  .lightbox-preco{ justify-content: center; }
+  .lightbox-cores[hidden]{ display: none; }
   .lightbox-cores{
     display: flex;
     flex-direction: column;
@@ -1203,7 +1240,7 @@
   .rodape-marca .nome{ font-family: 'Fraunces', serif; font-weight: 400; font-size: 16px; letter-spacing: 0.3px; color: var(--gold-light); }
   .rodape-marca .frase{ font-size: 13px; color: var(--text-footer); max-width: 240px; line-height: 1.6; }
 
-  .rodape-coluna h4{
+  .rodape-coluna h2{
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 2.2px;
@@ -1314,7 +1351,7 @@
 <main>
   <div class="busca">
     <svg class="busca-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-    <input type="text" id="campoBusca" class="busca-campo" placeholder="Buscar por produto ou código..." autocomplete="off">
+    <input type="search" id="campoBusca" class="busca-campo" placeholder="Buscar por produto ou código..." autocomplete="off" enterkeyhint="search" aria-label="Buscar por produto ou código">
   </div>
   <div id="conteudo"></div>
 </main>
@@ -1325,11 +1362,15 @@
   </button>
   <div class="lightbox-conteudo">
     <img id="lightboxImagem" src="" alt="">
+    <div class="lightbox-cabecalho">
+      <p class="lightbox-nome" id="lightboxNome"></p>
+      <p class="preco-linha lightbox-preco" id="lightboxPreco"></p>
+    </div>
     <p class="lightbox-descricao" id="lightboxDescricao"></p>
     <div class="lightbox-cores" id="lightboxCores" hidden></div>
-    <a class="btn-whats lightbox-comprar" id="lightboxComprar" href="#" target="_blank" rel="noopener" hidden>
+    <a class="btn-whats lightbox-comprar" id="lightboxComprar" href="#" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
-      Quero esse!
+      <span id="lightboxComprarTexto">Quero esse!</span>
     </a>
   </div>
 </div>
@@ -1411,12 +1452,12 @@
       <p class="frase">Transformamos ideias em peças 3D personalizadas.</p>
     </div>
     <div class="rodape-coluna">
-      <h4>Cadê a gente</h4>
+      <h2>Cadê a gente</h2>
       <p>Atendemos Goiânia e região</p>
       <p>Enviamos para todo o Brasil</p>
     </div>
     <div class="rodape-coluna">
-      <h4>Fale com a gente</h4>
+      <h2>Fale com a gente</h2>
       <div class="rodape-links">
         <a href="#" id="linkRodapeWhats" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
@@ -1890,10 +1931,19 @@
   const lightboxDescricao = document.getElementById('lightboxDescricao');
   const lightboxCores = document.getElementById('lightboxCores');
   const lightboxComprar = document.getElementById('lightboxComprar');
+  const lightboxComprarTexto = document.getElementById('lightboxComprarTexto');
+  const lightboxNome = document.getElementById('lightboxNome');
+  const lightboxPreco = document.getElementById('lightboxPreco');
 
   function abrirLightbox(produto, categoria, src){
     lightboxImagem.src = src;
     lightboxImagem.alt = produto.nome;
+    // Nome completo e preço aqui também: no card o nome pode ter sido
+    // cortado em 2 linhas, e quem abre o zoom quer decidir sem voltar.
+    lightboxNome.textContent = produto.nome;
+    lightboxPreco.innerHTML = produto.precoPromocional
+      ? `<span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span>`
+      : `<span class="preco">R$ ${escaparHTML(produto.preco)}</span>`;
     lightboxDescricao.textContent = produto.descricao || '';
     montarCoresLightbox(produto, categoria);
     if(window.np3dTrack) np3dTrack('ver_produto', { produto: produto.nome, categoria: categoria });
@@ -1901,24 +1951,32 @@
     travarScroll();
   }
 
-  // O botão "Quero esse!" só aparece aqui dentro quando o produto tem
-  // cor pra escolher — sem isso, o botão do card já resolve, não
-  // precisa duplicar. Escolher uma cor atualiza o link na hora.
+  // O botão de pedir aparece sempre no zoom (antes ficava com link
+  // vazio em produto sem cor). Com cor pra escolher, escolher uma
+  // atualiza o link na hora; esgotado vira "Avise-me", sem cores.
   function montarCoresLightbox(produto, categoria){
-    if(!produto.cores || produto.cores.length === 0){
+    lightboxComprar.dataset.produto = produto.nome;
+    lightboxComprar.dataset.categoria = categoria;
+    delete lightboxComprar.dataset.cor;
+
+    if(produto.esgotado || !produto.cores || produto.cores.length === 0){
       lightboxCores.hidden = true;
       lightboxCores.innerHTML = '';
-      lightboxComprar.hidden = true;
+      lightboxComprar.classList.toggle('btn-esgotado', !!produto.esgotado);
+      lightboxComprar.href = produto.esgotado
+        ? linkAvisarQuandoVoltar(produto, categoria)
+        : linkWhatsapp(produto, categoria);
+      lightboxComprar.dataset.evento = produto.esgotado ? 'pedido_avise_me' : 'pedido_whatsapp';
+      lightboxComprarTexto.textContent = produto.esgotado ? 'Avise-me' : 'Quero esse!';
       return;
     }
 
     let corEscolhida = produto.cores[0];
+    lightboxComprar.classList.remove('btn-esgotado');
+    lightboxComprarTexto.textContent = 'Quero esse!';
     lightboxComprar.href = linkWhatsapp(produto, categoria, corEscolhida);
     lightboxComprar.dataset.evento = 'pedido_whatsapp';
-    lightboxComprar.dataset.produto = produto.nome;
-    lightboxComprar.dataset.categoria = categoria;
     lightboxComprar.dataset.cor = corEscolhida;
-    lightboxComprar.hidden = false;
 
     lightboxCores.innerHTML = `
       <p class="lightbox-cores-titulo">Cor</p>
@@ -2152,28 +2210,6 @@
     abrirModalInfo();
   });
 
-  function aplicarRolagemNosTitulos(){
-    // Duas passadas (mede tudo, só depois altera o DOM) pra não forçar
-    // o navegador a recalcular o layout a cada item do loop.
-    const medidas = Array.from(document.querySelectorAll('.produto h3, .card-vendido h3'), titulo => {
-      const span = titulo.querySelector('span');
-      return span ? { titulo, excesso: span.scrollWidth - titulo.clientWidth } : null;
-    });
-    medidas.forEach(medida => {
-      if(!medida) return;
-      const { titulo, excesso } = medida;
-      if(excesso > 4){
-        const distancia = excesso + 14; // pequena folga no final
-        const duracao = Math.max(4, distancia / 28); // velocidade constante de leitura
-        titulo.style.setProperty('--deslocamento', `-${distancia}px`);
-        titulo.style.setProperty('--duracao', `${duracao}s`);
-        titulo.classList.add('rolar');
-      }else{
-        titulo.classList.remove('rolar');
-      }
-    });
-  }
-
   function trocarTela(construir, rolarTopo = true, aposConstruir){
     conteudo.style.opacity = '0';
     conteudo.style.transform = 'translateY(6px)';
@@ -2184,7 +2220,6 @@
       if(rolarTopo){
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-      requestAnimationFrame(aplicarRolagemNosTitulos);
       if(aposConstruir) aposConstruir();
     }, 180);
   }
@@ -2366,7 +2401,6 @@
       grade.appendChild(criarCardProduto(item.produto, item.categoriaNome, quantidadeExibida + i, mostrarCategoria));
     });
     quantidadeExibida += proximos.length;
-    requestAnimationFrame(aplicarRolagemNosTitulos);
 
     if(quantidadeExibida >= listaFiltrada.length){
       desconectarObservadorScroll();
@@ -2459,12 +2493,14 @@
     if(!lista) return;
     lista.innerHTML = '';
 
-    const criarItem = (rotulo, nomeCategoria) => {
+    // Quantidade ao lado do nome: o cliente sabe o que vai encontrar
+    // antes de tocar (e não cai numa categoria com 1 peça sem saber).
+    const criarItem = (rotulo, nomeCategoria, quantidade) => {
       const item = document.createElement('button');
       item.type = 'button';
       item.className = 'folha-item' + (filtroAtivo === nomeCategoria ? ' ativo' : '');
       item.dataset.categoria = nomeCategoria || '';
-      item.innerHTML = `<span>${escaparHTML(rotulo)}</span><span class="folha-item-marca">✓</span>`;
+      item.innerHTML = `<span class="folha-item-nome">${escaparHTML(rotulo)}</span><span class="folha-item-quantidade">${quantidade}</span><span class="folha-item-marca">✓</span>`;
       item.addEventListener('click', () => {
         if(window.np3dTrack) np3dTrack('categoria_aberta', { categoria: nomeCategoria || 'Tudo por Aqui' });
         aplicarFiltro(categorias, nomeCategoria);
@@ -2473,9 +2509,12 @@
       return item;
     };
 
-    lista.appendChild(criarItem('Tudo por Aqui', null));
+    // "Lançamentos" é vitrine extra (o produto também está na categoria
+    // dele), então não entra na soma do total.
+    const total = categorias.reduce((soma, categoria) => soma + (categoria.virtual ? 0 : categoria.produtos.length), 0);
+    lista.appendChild(criarItem('Tudo por Aqui', null, total));
     categorias.forEach(categoria => {
-      lista.appendChild(criarItem(formatarNomeCategoria(categoria.nome), categoria.nome));
+      lista.appendChild(criarItem(formatarNomeCategoria(categoria.nome), categoria.nome, categoria.produtos.length));
     });
   }
 
@@ -2603,12 +2642,6 @@
     }
   }, { passive: true });
 
-  let tempoRedimensionar = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(tempoRedimensionar);
-    tempoRedimensionar = setTimeout(aplicarRolagemNosTitulos, 200);
-  });
-
   function renderManutencao(){
     document.querySelector('.busca').style.display = 'none';
     conteudo.innerHTML = `
@@ -2640,6 +2673,17 @@
         if(window.np3dTrack) np3dTrack('busca', { termo: termo.toLowerCase().slice(0, 40) });
       }
     }, 250);
+  });
+
+  // No celular o teclado cobre metade da tela: ao tocar na busca, o
+  // campo sobe pro topo pra os resultados aparecerem logo abaixo dele.
+  campoBusca.addEventListener('focus', () => {
+    if(!window.matchMedia('(pointer: coarse)').matches) return;
+    setTimeout(() => campoBusca.scrollIntoView({ block: 'start', behavior: 'smooth' }), 300);
+  });
+  // "Buscar" no teclado só fecha o teclado — a lista já atualiza sozinha.
+  campoBusca.addEventListener('keydown', (evento) => {
+    if(evento.key === 'Enter') campoBusca.blur();
   });
 
   // Cache curto por aba em sessionStorage — evita refazer as 10
