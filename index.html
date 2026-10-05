@@ -115,6 +115,16 @@
     overflow: hidden;
     pointer-events: none;
   }
+  /* Escurece o topo do cabeçalho até a cor da faixa de status do
+     celular (theme-color), pra não ficar uma emenda de tom em cima
+     da página antes de rolar. */
+  .cena-fundo::after{
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 72px;
+    background: linear-gradient(var(--bg), rgba(18, 14, 9, 0));
+  }
   .brilho-ambiente{
     position: absolute;
     top: 50%; left: 50%;
