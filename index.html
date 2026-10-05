@@ -325,17 +325,6 @@
     animation: surgir 0.5s var(--easing) backwards;
   }
 
-  @keyframes pulsarDestaque{
-    0%, 100%{ box-shadow: 0 0 0 1px rgba(227, 172, 93, 0.25); }
-    30%{ box-shadow: 0 0 0 5px rgba(227, 172, 93, 0.4); }
-  }
-  /* Destaque ao chegar no produto pelo carrossel "Os queridinhos":
-     anel dourado pulsando em volta da foto (o card não tem borda) */
-  .produto-destacado .foto{ animation: pulsarDestaque 1.8s var(--easing); }
-  @media (prefers-reduced-motion: reduce){
-    .produto-destacado .foto{ animation: none; box-shadow: 0 0 0 2px var(--gold); }
-  }
-
   .foto{
     width: 100%;
     aspect-ratio: 4 / 3;
@@ -2585,7 +2574,7 @@
     const trilha = document.createElement('div');
     trilha.className = 'carrossel-vendidos';
     itens.forEach(({ produto, categoriaNome }) => {
-      trilha.appendChild(criarCardVendido(produto, categoriaNome, categorias));
+      trilha.appendChild(criarCardVendido(produto, categoriaNome));
     });
     secao.appendChild(trilha);
     configurarAutoplayCarrossel(trilha);
@@ -2669,7 +2658,7 @@
     requestAnimationFrame(proximoQuadro);
   }
 
-  function criarCardVendido(produto, categoriaNome, categorias){
+  function criarCardVendido(produto, categoriaNome){
     // Carrossel é só vitrine: foto + nome, sem preço, descrição ou tag —
     // isso fica só na listagem completa, pra incentivar o clique.
     const card = document.createElement('button');
@@ -2686,7 +2675,7 @@
     anexarFotoProduto(card.querySelector('.foto'), produto, categoriaNome, false);
     card.addEventListener('click', () => {
       if(window.np3dTrack) np3dTrack('ver_mais_vendido', { produto: produto.nome, categoria: categoriaNome });
-      irParaProdutoNaListagem(categorias, categoriaNome, produto);
+      abrirProduto(produto, categoriaNome);
     });
     return card;
   }
@@ -2778,34 +2767,6 @@
     quantidadeExibida = 0;
     montarListaFiltrada(categorias);
     exibirMaisProdutos();
-  }
-
-  // Abre a categoria do produto clicado no carrossel, rola até o card
-  // dele na listagem e destaca a borda por um instante — dali o cliente
-  // adiciona à lista pelo "+" ou toca na foto pra ver o produto. Se o
-  // produto ainda não estiver no lote carregado, puxa mais lotes até
-  // achar (categorias são pequenas, então isso é rápido).
-  function irParaProdutoNaListagem(categorias, categoriaNome, produto){
-    aplicarFiltro(categorias, categoriaNome);
-
-    const seletor = produto.codigo
-      ? `.produto[data-codigo="${CSS.escape(produto.codigo)}"]`
-      : `.produto[data-nome="${CSS.escape(produto.nome)}"]`;
-
-    function tentarDestacar(){
-      const alvo = document.querySelector(seletor);
-      if(!alvo){
-        if(quantidadeExibida < listaFiltrada.length){
-          exibirMaisProdutos();
-          requestAnimationFrame(tentarDestacar);
-        }
-        return;
-      }
-      alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      alvo.classList.add('produto-destacado');
-      setTimeout(() => alvo.classList.remove('produto-destacado'), 1800);
-    }
-    tentarDestacar();
   }
 
   // Botão único que mostra a categoria atual e abre a folha (bottom
