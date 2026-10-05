@@ -41,6 +41,6 @@ Usado pelo `/conferir-site`, no celular e no desktop:
 3. Rolagem infinita: rolar até o fim de "Kids" (carrega de 6 em 6), trocar de categoria e rolar de novo. Já travou antes.
 4. Cards em 2 colunas: tag e botão sem vazar. Esgotados aparecem por último, com "Avise-me".
 5. Nenhuma foto quebrada. "Foto em breve" só para quem não tem foto; liste esses códigos.
-6. Zoom de um produto com `Cores`: as bolinhas trocam o botão "Quero esse!".
-7. Favoritos: adicionar 2 produtos, conferir a posição da bolinha de contagem e limpar tudo.
+6. Tela do produto (tocar na foto): num produto com `Cores`, escolher cor e quantidade; o valor do botão "Adicionar à lista" acompanha. "Pedir pelo WhatsApp" leva cor e quantidade na mensagem; no computador a tela abre em duas colunas, sem rolagem.
+7. Lista de pedido: tocar num card (ou em "Ver detalhes") abre a tela do produto; adicionar 2 produtos por lá, conferir o contador do botão da sacola, mudar quantidade, conferir total e a mensagem de "Enviar pedido no WhatsApp", e "Limpar lista".
 8. WhatsApp: conferir o `href` (`wa.me/5562993152843?text=...`) sem clicar.

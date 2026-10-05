@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#120E09">
+<meta name="theme-color" content="#120E09" id="corDoTopo">
 <title>Catálogo - NP3D</title>
 <meta name="description" content="Catálogo digital Nosso Projeto 3D — peças 3D personalizadas. Escolha, veja o preço e peça direto pelo WhatsApp.">
 <meta property="og:type" content="website">
@@ -68,7 +68,9 @@
     gap: 10px;
     padding: 14px 20px;
     padding-top: calc(14px + env(safe-area-inset-top, 0px));
-    background: rgba(18,14,9,0.82);
+    /* Sólida e igual ao theme-color: a faixa de status do celular (hora,
+       rede, bateria) usa essa mesma cor, sem emenda de tom ao rolar. */
+    background: var(--bg);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border-bottom: 1px solid transparent;
@@ -83,8 +85,6 @@
     visibility: visible;
     transform: translateY(0);
     pointer-events: auto;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--border);
   }
   .barra-fixa img{ width: 22px; height: 22px; object-fit: contain; }
@@ -224,7 +224,11 @@
     max-width: 1080px;
     margin: 0 auto;
     padding: 36px 20px 72px;
-    min-height: 45vh;
+    /* Altura da tela reservada desde o 1º desenho: sem isso o rodapé
+       aparece no meio enquanto a planilha carrega e depois "pula" pra
+       baixo quando os produtos chegam (layout shift). */
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   #conteudo{ animation: surgir 0.4s var(--easing) both; }
@@ -292,54 +296,44 @@
   .grade{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 24px 12px;
   }
   @media (min-width: 540px){
-    .grade{ grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grade{ grid-template-columns: repeat(3, 1fr); gap: 32px 20px; }
   }
   @media (min-width: 860px){
     .grade{ grid-template-columns: repeat(4, 1fr); }
   }
 
+  /* Card de produto editorial (referência Apple/Etsy): a foto é a
+     protagonista, sem moldura e sem nada por cima além de um selo
+     pequeno; nome e preço discretos embaixo, à esquerda. O card todo
+     abre a tela do produto, onde fica o fluxo de compra. */
   .produto{
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
+    position: relative;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 10px 30px -20px rgba(0,0,0,0.6);
-    transition: border-color 0.25s var(--easing), background 0.25s var(--easing), transform 0.25s var(--easing), box-shadow 0.25s var(--easing);
-    animation: surgir 0.5s var(--easing) both;
-  }
-  .produto-selo{
-    /* mantém a entrada normal do card (surgir) e soma o tremor logo
-       depois que ela termina, pra não brigar com o próprio translateY
-       da entrada — dispara sempre que o card tem algum selo (tag ou
-       promoção), não só quando tá em promoção */
-    animation: surgir 0.5s var(--easing) both, tremerCard 0.6s 0.5s ease-in-out both;
-  }
-  @keyframes tremerCard{
-    0%, 100%{ transform: translateX(0); }
-    20%{ transform: translateX(-7px); }
-    40%{ transform: translateX(6px); }
-    60%{ transform: translateX(-4px); }
-    80%{ transform: translateX(2px); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .produto-selo{ animation: surgir 0.5s var(--easing) both; }
+    transition: border-color 0.25s var(--easing), background 0.25s var(--easing), transform 0.35s cubic-bezier(0.22, 1.2, 0.36, 1), box-shadow 0.25s var(--easing);
+    /* backwards (e não both): depois da entrada a animação solta o
+       transform, senão o hover do card não consegue mexer nele */
+    animation: surgir 0.5s var(--easing) backwards;
   }
 
   @keyframes pulsarDestaque{
     0%, 100%{ box-shadow: 0 0 0 1px rgba(227, 172, 93, 0.25); }
     30%{ box-shadow: 0 0 0 5px rgba(227, 172, 93, 0.4); }
   }
-  .produto-destacado{
-    border-color: var(--gold);
-    animation: pulsarDestaque 1.8s var(--easing);
-  }
+  /* Destaque ao chegar no produto pelo carrossel "Os queridinhos":
+     anel dourado pulsando em volta da foto (o card não tem borda) */
+  .produto-destacado .foto{ animation: pulsarDestaque 1.8s var(--easing); }
   @media (prefers-reduced-motion: reduce){
-    .produto-destacado{ animation: none; }
+    .produto-destacado .foto{ animation: none; box-shadow: 0 0 0 2px var(--gold); }
   }
 
   .foto{
@@ -349,47 +343,37 @@
     display:flex; align-items:center; justify-content:center;
     overflow:hidden;
     position: relative;
-    cursor: zoom-in;
+    cursor: pointer;
   }
   .foto-conteudo{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
   .foto img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.5s var(--easing); }
-  .dica-zoom{
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-    z-index: 2;
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    background: rgba(18,14,9,0.65);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .produto .foto{ border-radius: 14px; }
+  .card-texto{ padding: 10px 2px 0; }
+  /* Texto só pra leitor de tela */
+  .so-leitor{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* .produto na frente pra vencer a regra antiga de h3 dos cards */
+  .produto .card-texto h3{
+    font-size: clamp(14px, 3.7vw, 16px);
+    line-height: 1.3;
+    min-height: 0;
     color: var(--text);
-    pointer-events: none;
+    transition: color 0.2s var(--easing);
   }
-  .dica-zoom svg{ width: 13px; height: 13px; }
-  .btn-favorito{
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-    z-index: 2;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: rgba(18,14,9,0.65);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text);
-    cursor: pointer;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s var(--easing), color 0.15s var(--easing);
+  .card-texto-preco{
+    margin: 3px 0 0;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
   }
-  .btn-favorito:active{ transform: scale(0.88); }
-  .btn-favorito.ativo{ color: var(--gold-light); }
-  .btn-favorito svg{ width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
-  .btn-favorito.ativo svg{ fill: var(--gold-light); }
+  /* Selos menores no card (a foto é o destaque) */
+  .produto .selo-produto{ top: 8px; font-size: 9.5px; letter-spacing: 0.5px; padding: 4px 8px; }
+  .produto .selo-tag{ left: 8px; }
+  .produto .selo-promocao{ right: 8px; }
+  @media (prefers-reduced-motion: reduce){
+    /* !important: o bloco de hover lá embaixo vem depois e venceria */
+    .produto:hover .foto img{ transform: none !important; }
+  }
+  .produto:focus-visible{ outline: 2px solid var(--gold); outline-offset: 3px; }
   .selo-produto{
     position: absolute;
     top: 10px;
@@ -439,100 +423,12 @@
     color: var(--text-secondary);
   }
 
-  /* Selo de tag: antes da foto carregar, o texto da tag "explode" grande
-     e centralizado no card (com um brilho por trás e uma leve rotação de
-     entrada), depois encolhe e desaparece enquanto o selinho pequeno (no
-     canto, igual aos outros selos) "pousa" no lugar dele com uma
-     pequena batida. Só anima transform/opacity/box-shadow (leve, não
-     força recálculo de layout a cada quadro — importante pra rodar bem
-     em celular mais simples). */
-  .capa-selo-tag{
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    background: var(--frame);
-    pointer-events: none;
-    animation: sumirCapaSelo 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  @keyframes sumirCapaSelo{
-    0%, 60%{ opacity: 1; }
-    100%{ opacity: 0; }
-  }
-  .explosao-brilho{
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    background: radial-gradient(circle, rgba(252, 212, 140, 0.55) 0%, rgba(227, 172, 93, 0) 70%);
-    opacity: 0;
-    transform: scale(0.3);
-    animation: brilharTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  @keyframes brilharTag{
-    0%{ opacity: 0; transform: scale(0.3); }
-    14%{ opacity: 0.9; transform: scale(1.1); }
-    45%{ opacity: 0.35; transform: scale(1.6); }
-    65%, 100%{ opacity: 0; transform: scale(1.9); }
-  }
-  .explosao-tag{
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 18px;
-    text-align: center;
-    pointer-events: none;
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--gold-light);
-    text-shadow: 0 0 22px rgba(227, 172, 93, 0.7);
-    font-size: clamp(19px, 7.5vw, 27px);
-    opacity: 0;
-    transform: scale(0.45) rotate(-6deg);
-    animation: explodirTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  /* Abaixo de 540px a grade vira 2 colunas (mesmo ponto de corte de
-     .grade) e o card fica bem mais estreito — o tamanho em vw acima
-     foi pensado pra largura cheia da tela, então nessa faixa o texto
-     no auge do efeito (escala 1.12x) estourava a foto e cortava a
-     primeira/última letra. Reduzido só aqui. */
-  @media (max-width: 539px){
-    .explosao-tag{ font-size: clamp(14px, 4.4vw, 20px); }
-  }
-  @keyframes explodirTag{
-    0%{ opacity: 0; transform: scale(0.45) rotate(-6deg); }
-    22%{ opacity: 1; transform: scale(1.12) rotate(2deg); }
-    32%, 60%{ opacity: 1; transform: scale(1) rotate(0deg); }
-    72%, 100%{ opacity: 0; transform: scale(1) rotate(0deg); }
-  }
+  /* Selo de tag (ex.: Lançamento): flag pequena e parada no canto */
   .selo-tag{
     left: 10px;
     background: rgba(18,14,9,0.8);
     border: 1px solid var(--gold);
     color: var(--gold-light);
-    transform-origin: top left;
-    opacity: 0;
-    transform: scale(0.5);
-    animation: aparecerSeloTag 1.8s cubic-bezier(0.22, 1, 0.36, 1) both, pulsoSeloTag 0.55s 1.6s ease-out both;
-  }
-  @keyframes aparecerSeloTag{
-    0%, 68%{ opacity: 0; transform: scale(0.5); }
-    85%{ opacity: 1; transform: scale(1.15); }
-    100%{ opacity: 1; transform: scale(1); }
-  }
-  @keyframes pulsoSeloTag{
-    0%{ box-shadow: 0 0 0 0 rgba(227, 172, 93, 0.55); }
-    100%{ box-shadow: 0 0 0 7px rgba(227, 172, 93, 0); }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .capa-selo-tag{ animation: none; opacity: 0; }
-    .explosao-brilho{ animation: none; opacity: 0; }
-    .explosao-tag{ animation: none; opacity: 0; }
-    .selo-tag{ animation: none; opacity: 1; transform: scale(1); }
   }
 
   /* Nome e preço ficam sobre a própria foto, com um gradiente escuro
@@ -575,11 +471,7 @@
   .card-vendido h3{ font-size: 15.5px; text-shadow: 0 1px 10px rgba(0,0,0,0.55); }
   .contagem{ font-size: 12.5px; color: var(--text-tertiary); margin:0; }
 
-  .info{ padding: 18px 18px 20px; display:flex; flex-direction: column; gap: 11px; flex: 1; }
   .preco{ font-family: 'Fraunces', serif; font-size: clamp(16px, 4vw, 18px); font-weight: 500; color: var(--gold-light); margin: 0; letter-spacing: 0.2px; }
-  .preco-linha{ display:flex; align-items:baseline; flex-wrap:wrap; gap: 8px; margin: 0; }
-  .preco-linha .preco{ margin: 0; }
-  .preco-riscado{ font-size: 13px; color: var(--text-footer); text-decoration: line-through; }
   .foto-vazia{ color: var(--text-footer); font-size: 12px; text-align: center; padding: 0 14px; }
 
   /* ---------- Carrossel de mais vendidos ---------- */
@@ -688,12 +580,22 @@
     transition: transform 0.3s var(--easing);
   }
   .folha.aberto .folha-painel{ transform: translateY(0); }
+  /* Alça: área de toque generosa (arrastar pra baixo fecha a folha),
+     com o tracinho visível desenhado no ::before. */
   .folha-alca{
+    display: flex; justify-content: center; align-items: center;
+    height: 26px;
+    margin: -6px -20px 8px;
+    cursor: grab;
+    touch-action: none;
+  }
+  .folha-alca::before{
+    content: "";
     width: 36px; height: 4px;
     background: var(--border-hover);
     border-radius: 100px;
-    margin: 4px auto 16px;
   }
+  .folha-painel.arrastando{ transition: none; }
   /* A partir daqui já tem espaço de sobra — em vez de "subir de baixo"
      (bom pro alcance do polegar no celular), vira um modal centralizado
      de verdade, senão fica um painel grudado no rodapé da tela. */
@@ -711,6 +613,7 @@
   .folha-fechar{
     position: absolute;
     top: 14px; right: 14px;
+    z-index: 3; /* acima da foto na tela do produto */
     width: 32px; height: 32px;
     border-radius: 50%;
     border: 1px solid var(--border-hover);
@@ -757,52 +660,99 @@
   .folha-item-marca{ color: var(--gold); opacity: 0; }
   .folha-item.ativo .folha-item-marca{ opacity: 1; }
 
-  /* ---------- Painel de favoritos ---------- */
-  .favoritos-lista{
-    display:flex; flex-direction: column; gap: 10px;
-    max-height: 46vh;
-    overflow-y: auto;
-    margin: 0 0 18px;
+  /* ---------- Lista de pedido ---------- */
+  .lista-itens{ display:flex; flex-direction: column; margin: 0 0 4px; }
+  .lista-item{
+    display:grid; grid-template-columns: 56px 1fr; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
   }
-  .favoritos-item{
-    display:flex; align-items:center; gap: 12px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 8px;
-  }
-  .favoritos-item-foto{
-    width: 52px; height: 52px;
-    flex-shrink: 0;
+  .lista-item-foto{
+    width: 56px; height: 56px;
     border-radius: 8px;
     overflow: hidden;
-    background: var(--frame);
+    background: var(--bg);
   }
-  .favoritos-item-foto img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .favoritos-item-info{ flex: 1; min-width: 0; }
-  .favoritos-item-nome{
+  .lista-item-foto img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .lista-item-info{ min-width: 0; }
+  .lista-item-nome{
     font-family: 'Fraunces', serif;
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.3;
     color: var(--text);
-    margin: 0 0 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin: 0;
   }
-  .favoritos-item-preco{ font-size: 12.5px; color: var(--gold-light); margin: 0; }
-  .favoritos-item-remover{
-    flex-shrink: 0;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: none;
+  .lista-item-detalhe{ font-size: 12.5px; color: var(--text-tertiary); margin: 2px 0 0; }
+  .lista-item-linha{ display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+  .lista-item-subtotal{ font-family: 'Fraunces', serif; font-size: 15px; color: var(--gold-light); font-variant-numeric: tabular-nums; }
+  .lista-total{
+    display:flex; align-items: baseline; justify-content: space-between;
+    padding: 16px 0 2px;
+    font-size: 14.5px; color: var(--text-secondary);
+  }
+  .lista-total strong{ font-family: 'Fraunces', serif; font-weight: 500; font-size: 22px; color: var(--gold-light); font-variant-numeric: tabular-nums; }
+  .lista-nota{ font-size: 12.5px; color: var(--text-tertiary); margin: 4px 0 18px; }
+  .lista-vazia{ text-align:center; color: var(--text-tertiary); font-size: 13.5px; padding: 24px 10px; margin: 0; }
+  .lista-limpar{
+    display: block; margin: 12px auto 0;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; color: var(--text-tertiary);
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+
+  /* Seletor de quantidade (lista e tela do produto) */
+  .qtd{
+    display: inline-flex; align-items: center;
+    border: 1px solid var(--border-hover);
+    border-radius: 100px;
+  }
+  .qtd button{
+    width: 36px; height: 36px;
+    border: none; background: none; border-radius: 50%;
+    color: var(--gold-light); font-family: inherit; font-size: 18px; line-height: 1;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .qtd button:disabled{ color: var(--border-hover); cursor: default; }
+  .qtd output{ min-width: 26px; text-align: center; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* Botão principal (dourado cheio) */
+  .btn-primario{
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+    background: var(--gold);
     border: none;
-    color: var(--text-tertiary);
-    display:flex; align-items:center; justify-content:center;
+    color: var(--bg);
+    font-family: inherit; font-weight: 600; font-size: 14.5px;
+    padding: 14px 20px;
+    border-radius: 100px;
+    text-decoration: none;
     cursor: pointer;
+    transition: background 0.2s var(--easing), transform 0.15s var(--easing);
   }
-  .favoritos-item-remover svg{ width: 14px; height: 14px; }
-  .favoritos-item-remover:active{ background: var(--card-hover); }
-  .favoritos-vazio{ text-align:center; color: var(--text-tertiary); font-size: 13.5px; padding: 24px 10px; margin: 0 0 4px; }
-  .favoritos-enviar{ width: 100%; }
+  .btn-primario:active{ transform: scale(0.98); }
+  .btn-primario svg{ width: 16px; height: 16px; flex-shrink: 0; }
+  .btn-primario .valor{ font-variant-numeric: tabular-nums; }
+
+  .foto-voando{
+    position: fixed;
+    z-index: 80;
+    object-fit: cover;
+    pointer-events: none;
+    box-shadow: 0 18px 40px -12px rgba(0,0,0,0.7);
+    will-change: transform;
+  }
+  .flutuante-lista.pulo{ animation: puloSacola 0.55s cubic-bezier(0.34, 1.6, 0.64, 1); }
+  @keyframes puloSacola{
+    0%{ transform: scale(1); }
+    35%{ transform: scale(1.28); }
+    65%{ transform: scale(0.92); }
+    100%{ transform: scale(1); }
+  }
+  /* Aviso "Adicionado à lista": fica só pra leitor de tela */
+  .aviso-lista{
+    position: fixed; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
 
   .btn-whats{
     display:flex; align-items:center; justify-content:center; gap: 6px;
@@ -858,92 +808,294 @@
     font-size: 14px;
   }
 
-  /* ---------- Zoom da foto ---------- */
-  .lightbox{
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    padding-top: calc(24px + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-    background: rgba(9, 7, 4, 0.88);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s var(--easing);
+  /* ---------- Tela do produto (folha que sobe ao tocar na foto) ---------- */
+  .folha-produto .folha-painel{
+    max-height: 92vh;
+    max-height: 92dvh;
+    padding-bottom: 0;
   }
-  .lightbox.aberto{ opacity: 1; pointer-events: auto; }
-  .lightbox-conteudo{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    max-width: 100%;
-    max-height: 100%;
-    overflow-y: auto;
+  .produto-tela-foto{
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg);
+    /* espaço pro "x" ficar acima da foto, não por cima dela */
+    margin-top: 34px;
   }
-  .lightbox-conteudo img{
-    display: block;
-    max-width: 100%;
-    max-height: 62vh; /* sobra espaço pra nome, preço e botão */
-    border-radius: 8px;
-    box-shadow: 0 24px 60px -12px rgba(0,0,0,0.6);
-    transform: scale(0.96);
-    transition: transform 0.25s var(--easing);
+  .produto-tela-foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .produto-tela-foto .foto-vazia{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); font-size: 13px; }
+  .produto-tela-categoria{ margin: 16px 0 0; }
+  .produto-tela-titulo{
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+    margin: 4px 0 0;
   }
-  .lightbox.aberto .lightbox-conteudo img{ transform: scale(1); }
-  .lightbox-descricao{
-    color: var(--text-secondary);
-    font-size: 14px;
-    line-height: 1.5;
-    text-align: center;
-    max-width: 480px;
-    margin: 0;
-    padding: 0 8px;
+  .produto-tela-titulo .produto-tela-nome{ flex: 1; min-width: 0; }
+  .produto-tela-preco{
+    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: flex-end;
+    margin: 4px 0 0;
+    line-height: 1.15;
   }
-  .lightbox-descricao:empty{ display: none; }
-  .lightbox-cabecalho{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    text-align: center;
-    max-width: 480px;
-    padding: 0 8px;
+  /* Promoção na página do produto: preço novo, antigo riscado e % */
+  .produto-tela-promo{ display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 8px 0 0; }
+  .produto-tela-promo-novo{ font-family: 'Fraunces', serif; font-size: 22px; font-weight: 500; color: var(--gold-light); font-variant-numeric: tabular-nums; }
+  .produto-tela-promo-antigo{ font-size: 14px; color: var(--text-tertiary); text-decoration: line-through; font-variant-numeric: tabular-nums; }
+  .produto-tela-promo-selo{
+    align-self: center;
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.4px;
+    padding: 3px 8px; border-radius: 100px;
+    background: var(--gold); color: var(--bg);
   }
-  .lightbox-nome{
+  .produto-tela-qtd-area{ flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .produto-tela-unitario{ font-size: 12px; color: var(--text-tertiary); }
+  .produto-tela-unitario[hidden]{ display: none; }
+  /* .folha-painel na frente: vence o h2 centralizado e dourado das outras folhas */
+  .folha-painel .produto-tela-nome{
     font-family: 'Fraunces', serif;
-    font-size: 19px;
-    line-height: 1.3;
+    font-weight: 400;
+    font-size: 23px;
+    line-height: 1.25;
+    letter-spacing: 0;
     color: var(--text);
+    text-align: left;
     margin: 0;
   }
-  .lightbox-preco{ justify-content: center; }
-  .lightbox-cores[hidden]{ display: none; }
-  .lightbox-cores{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  .lightbox-cores-titulo{
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
+  .produto-tela-preco .preco{ font-size: 20px; }
+  .produto-tela-descricao{ color: var(--text-secondary); font-size: 14.5px; line-height: 1.6; margin: 12px 0 0; }
+  .produto-tela-rotulo{
+    font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
     color: var(--text-tertiary);
-    margin: 0;
+    margin: 20px 0 10px;
   }
-  .lightbox-cores-lista{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    max-width: 420px;
+  .produto-tela-cores{ display: flex; flex-wrap: wrap; gap: 8px; }
+  /* Botões presos no rodapé da folha: sempre à mão, mesmo rolando a descrição */
+  .produto-tela-acoes{
+    position: sticky;
+    bottom: 0;
+    display: flex; flex-direction: column; gap: 10px;
+    margin: 20px -20px 0;
+    padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--frame);
+    border-top: 1px solid var(--border);
+  }
+  .produto-tela-acoes .btn-whats{ padding: 13px 20px; font-size: 14px; }
+  .produto-tela-acoes .btn-primario{ padding: 15px 20px; font-size: 15px; }
+  .produto-tela-acoes .btn-primario svg{ width: 17px; height: 17px; }
+  .btn-adicionar-lista{ width: 100%; font-family: inherit; cursor: pointer; }
+  .btn-adicionar-lista svg{ width: 16px; height: 16px; }
+  /* Rodapé no computador: quantidade + total, Pedir, Adicionar à lista */
+  .produto-tela-acoes{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: "pedir" "lista";
+    align-items: center;
+  }
+  .produto-tela-pedir{ grid-area: pedir; }
+  .produto-tela-acoes .btn-adicionar-lista{ grid-area: lista; }
+  .produto-tela-pedir{ justify-content: space-between !important; }
+  .produto-tela-pedir .rotulo-curto{ display: none; }
+  .produto-tela-pedir .rotulo-longo{ margin-right: auto; }
+  .produto-tela-pedir .valor{ font-variant-numeric: tabular-nums; }
+  .produto-tela-avise{ grid-column: 1 / -1; }
+
+  /* Peças da mesma categoria */
+  .produto-tela-parecidos{
+    display: flex; gap: 10px;
+    overflow-x: auto;
+    margin: 0 -20px;
+    padding: 0 20px 4px;
+    scroll-padding-inline: 20px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .produto-tela-parecidos::-webkit-scrollbar{ display: none; }
+  .parecidos-carrossel{ position: relative; }
+  .parecidos-seta{
+    position: absolute;
+    /* centro da foto: (largura do item 128px × 3/4) ÷ 2 */
+    top: 48px;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-hover);
+    background: rgba(18, 14, 9, 0.88);
+    color: var(--gold-light);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 16px -6px rgba(0,0,0,0.7);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .parecidos-seta[hidden]{ display: none; }
+  .parecidos-seta svg{ width: 18px; height: 18px; }
+  .parecidos-seta-anterior{ left: -6px; }
+  .parecidos-seta-proxima{ right: -6px; }
+  @media (hover: hover) and (pointer: fine){
+    .parecidos-seta:hover{ border-color: var(--gold); }
+  }
+  .parecido{
+    flex: 0 0 128px;
+    scroll-snap-align: start;
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 0; border: none; background: none;
+    text-align: left; font-family: inherit; cursor: pointer;
+    color: var(--text);
+  }
+  .parecido-foto{
+    aspect-ratio: 4 / 3;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg);
+    margin-bottom: 4px;
+  }
+  .parecido-foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .parecido-esgotado .parecido-foto img{ filter: grayscale(0.6) brightness(0.6); }
+  .parecido-nome{
+    font-family: 'Fraunces', serif; font-size: 13.5px; line-height: 1.3;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+  }
+  .parecido-preco{ font-size: 12.5px; color: var(--gold-light); }
+
+  /* Celular deitado (duas colunas estreitas): rótulo curto no Pedir */
+  @media (min-width: 640px) and (max-width: 1100px) and (max-height: 560px){
+    .produto-tela-pedir .rotulo-longo{ display: none; }
+    .produto-tela-pedir .rotulo-curto{ display: inline; margin-right: auto; }
+  }
+
+  /* Janela de uma coluna (640–899px, tela alta): foto com teto de
+     altura, pros botões presos no pé continuarem à vista */
+  @media (min-width: 640px) and (max-width: 899px) and (min-height: 561px){
+    .folha-produto .produto-tela-foto{ max-height: 45vh; }
+  }
+
+  /* Barra do topo da página do produto: só no celular */
+  .produto-tela-topo{ display: none; }
+
+  /* ---------- Celular: o produto vira uma página inteira ---------- */
+  @media (max-width: 639px){
+    .folha-produto{ background: var(--bg); }
+    .folha-produto .folha-painel{
+      max-width: none;
+      height: 100vh; height: 100dvh;
+      max-height: none;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+      transform: translateX(100%);
+    }
+    .folha-produto.aberto .folha-painel{ transform: none; }
+    /* Conteúdo curto: os botões ficam no pé da tela, não no meio */
+    .folha-produto .folha-painel{ display: flex; flex-direction: column; }
+    .folha-produto .produto-tela{ flex: 1 0 auto; display: flex; flex-direction: column; }
+    .folha-produto .produto-tela-lado{ flex: 1 0 auto; display: flex; flex-direction: column; }
+    .folha-produto .produto-tela-acoes{ margin-top: auto; }
+    .folha-produto .produto-tela-parecidos-area{ margin-bottom: 24px; }
+    .folha-produto .folha-alca, .folha-produto .folha-fechar{ display: none; }
+    .produto-tela-topo{
+      position: sticky; top: 0; z-index: 3;
+      display: flex; align-items: center; justify-content: flex-start;
+      height: calc(56px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 12px 0;
+      /* cor sólida, igual à da faixa de status do celular (theme-color) */
+      background: var(--frame);
+      border-bottom: 1px solid var(--border);
+    }
+    .produto-tela-voltar{
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: none; background: none;
+      color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .produto-tela-voltar svg{ width: 24px; height: 24px; }
+    /* max-height: em celular deitado/baixo a foto não pode ocupar a
+       tela toda, senão os botões presos no pé não aparecem */
+    .produto-tela-midia .produto-tela-foto{ margin: 0; border-radius: 0; max-height: 58vh; }
+    .produto-tela-lado{ padding: 0 20px; }
+    .produto-tela-categoria{ margin-top: 18px; }
+    .folha-painel .produto-tela-nome{ font-size: 22px; }
+    .produto-tela-preco .preco{ font-size: 20px; }
+    /* Rodapé: dois botões grandes lado a lado */
+    .produto-tela-acoes{
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas: "lista pedir";
+      gap: 10px;
+      margin-top: 24px;
+      padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+    .produto-tela-acoes .btn-adicionar-lista,
+    .produto-tela-pedir{
+      height: 52px;
+      padding: 0 12px !important;
+      border-radius: 100px;
+      font-size: 14px !important;
+      white-space: normal;
+      line-height: 1.15;
+    }
+    .produto-tela-acoes .btn-adicionar-lista svg{ width: 18px; height: 18px; }
+    .produto-tela-pedir{ justify-content: center !important; gap: 6px; }
+    .produto-tela-pedir .rotulo-longo{ display: none; }
+    .produto-tela-pedir .rotulo-curto{ display: inline; }
+    .produto-tela-pedir .valor{ font-weight: 700; }
+    .produto-tela-titulo{ align-items: center; }
+  }
+
+  /* Computador: duas colunas, foto à esquerda e informações à direita,
+     tudo à vista sem rolar a tela inteira. Se a descrição for longa,
+     só a coluna da direita rola; os botões ficam no pé dela.
+     Também vale pra tela larga e baixa (celular deitado): numa coluna
+     só, a foto passaria da altura da tela e empurraria os botões pra
+     fora dela. */
+  @media (min-width: 900px), (min-width: 640px) and (max-height: 560px){
+    .folha-produto .folha-painel{
+      max-width: 1040px;
+      width: calc(100vw - 96px);
+      height: min(640px, calc(100vh - 64px));
+      max-height: none;
+      padding: 0;
+      overflow: hidden;
+    }
+    .produto-tela{
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      height: 100%;
+    }
+    .produto-tela-midia{
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      padding: 28px;
+    }
+    .produto-tela-midia .produto-tela-foto{ width: 100%; margin: 0; }
+    .produto-tela-lado{
+      display: flex; flex-direction: column;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 32px 32px 0;
+    }
+    /* o "x" fica no canto da coluna de informações, longe da foto */
+    /* "x" leve e no canto da janela, alinhado à linha da categoria:
+       não empilha em cima do seletor de quantidade */
+    .folha-produto .folha-fechar{
+      top: 14px; right: 14px;
+      width: 36px; height: 36px;
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      transition: background 0.2s var(--easing), color 0.2s var(--easing);
+    }
+    .folha-produto .folha-fechar svg{ width: 18px; height: 18px; }
+    .folha-produto .folha-fechar:hover{ background: var(--card-hover); color: var(--text); }
+    .produto-tela-categoria{ margin-top: 0; padding-right: 40px; }
+    .folha-painel .produto-tela-nome{ font-size: 28px; }
+    .produto-tela-preco .preco{ font-size: 24px; }
+    .produto-tela-acoes{
+      margin: auto -32px 0;
+      padding: 18px 32px 28px;
+    }
   }
   .chip-cor{
     display: inline-flex;
@@ -967,20 +1119,6 @@
     flex-shrink: 0;
   }
   .chip-cor.ativo{ border-color: var(--gold); color: var(--gold-light); }
-  .lightbox-comprar{ margin-top: 4px; }
-  .lightbox-fechar{
-    position: absolute;
-    top: 18px; right: 18px;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: 1px solid var(--border-hover);
-    background: rgba(18,14,9,0.7);
-    color: var(--text);
-    display:flex; align-items:center; justify-content:center;
-    cursor: pointer;
-    top: calc(18px + env(safe-area-inset-top, 0px));
-  }
-  .lightbox-fechar svg{ width: 18px; height: 18px; }
 
   /* ---------- Modal de informações importantes ---------- */
   .modal-info{
@@ -1094,14 +1232,12 @@
     .flutuante::before{ animation: none; opacity: 0; }
   }
 
-  /* Botão flutuante dos favoritos: mesma base do de WhatsApp, mas em
-     estilo contorno (fundo transparente) pra não competir com ele —
-     o WhatsApp continua sendo a ação principal. Só aparece quando
-     tem pelo menos 1 favorito guardado.
-     Precisa do wrapper porque a bolinha de contagem é outro botão —
-     um <button> não pode conter outro <button> (HTML inválido faz o
-     navegador fechar o de fora cedo demais e desalinha a bolinha). */
-  .flutuante-favoritos-wrap{
+  /* Botão flutuante da lista de pedido: mesma base do de WhatsApp,
+     mas em versão "fantasma" (contorno dourado) e do lado esquerdo.
+     Só aparece quando tem pelo menos 1 item na lista.
+     O wrapper existe porque a bolinha de contagem fica por cima do
+     botão, como irmã dele (não dá pra pôr dentro do <button>). */
+  .flutuante-lista-wrap{
     position: fixed;
     left: 18px;
     bottom: calc(18px + env(safe-area-inset-bottom, 0px));
@@ -1111,12 +1247,12 @@
     transform: scale(0.85);
     transition: opacity 0.2s var(--easing), transform 0.2s var(--easing), visibility 0.2s;
   }
-  .flutuante-favoritos-wrap.visivel{
+  .flutuante-lista-wrap.visivel{
     opacity: 1;
     visibility: visible;
     transform: scale(1);
   }
-  .flutuante-favoritos{
+  .flutuante-lista{
     position: relative;
     left: auto; right: auto; bottom: auto;
     /* A base .flutuante tem z-index:30 (pra ficar acima do conteúdo da
@@ -1132,10 +1268,10 @@
     outline: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .flutuante-favoritos::before{ content: none; }
-  /* Bolinha com a quantidade — também funciona como "limpar tudo"
-     (mais rápido que desmarcar favorito por favorito). */
-  .favoritos-contador{
+  .flutuante-lista::before{ content: none; }
+  /* Bolinha com a quantidade de itens da lista (só informa; limpar
+     a lista fica dentro do painel, pra não apagar tudo sem querer). */
+  .lista-contador{
     position: absolute;
     top: -4px; right: -4px;
     z-index: 1;
@@ -1150,12 +1286,11 @@
     font-weight: 700;
     line-height: 20px;
     text-align: center;
-    cursor: pointer;
+    pointer-events: none;
     outline: none;
     -webkit-tap-highlight-color: transparent;
     transition: transform 0.15s var(--easing);
   }
-  .favoritos-contador:active{ transform: scale(0.85); }
 
   /* ---------- Toast de informações importantes (uma vez só) ---------- */
   .toast-info{
@@ -1302,13 +1437,9 @@
   @media (hover: hover) and (pointer: fine){
     header:hover .brilho-cursor{ opacity: 1; }
     .voltar:hover{ border-color: var(--gold); color: var(--gold-light); background: var(--card-hover); }
-    .produto:hover{
-      border-color: var(--border-hover);
-      background: var(--card-hover);
-      transform: translateY(-3px);
-      box-shadow: 0 14px 30px -12px rgba(0,0,0,0.55);
-    }
+    /* Só a foto aproxima ao passar o mouse; o texto fica parado */
     .produto:hover .foto img{ transform: scale(1.05); }
+    .produto:hover .card-texto h3{ color: var(--gold-light); }
     .card-vendido:hover{ border-color: var(--gold); transform: translateY(-2px); }
     .card-vendido:hover .foto img{ transform: scale(1.05); }
     .seletor-categoria:hover{ border-color: var(--gold-light); }
@@ -1316,9 +1447,7 @@
     .chip-cor:hover{ border-color: var(--gold); color: var(--gold-light); }
     .btn-whats:hover{ background: rgba(227, 172, 93, 0.1); border-color: var(--gold-light); color: var(--gold-light); }
     .flutuante:hover{ transform: scale(1.06); }
-    .btn-favorito:hover{ color: var(--gold-light); }
-    .favoritos-item-remover:hover{ background: var(--card-hover); color: var(--text); }
-    .favoritos-contador:hover{ background: var(--gold-light); }
+    .btn-primario:hover{ background: var(--gold-light); }
     .rodape-links a:hover{ color: var(--gold-light); }
     .link-rodape-base:hover{ color: var(--gold-light); }
   }
@@ -1356,22 +1485,24 @@
   <div id="conteudo"></div>
 </main>
 
-<div class="lightbox" id="lightbox">
-  <button class="lightbox-fechar" id="lightboxFechar" aria-label="Fechar">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-  </button>
-  <div class="lightbox-conteudo">
-    <img id="lightboxImagem" src="" alt="">
-    <div class="lightbox-cabecalho">
-      <p class="lightbox-nome" id="lightboxNome"></p>
-      <p class="preco-linha lightbox-preco" id="lightboxPreco"></p>
+<div class="folha folha-produto" id="folhaProduto">
+  <div class="folha-painel" role="dialog" aria-modal="true" aria-label="Produto" id="produtoTelaPainel">
+    <div class="folha-alca" aria-hidden="true"></div>
+    <button class="folha-fechar" id="folhaProdutoFechar" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div class="produto-tela-topo">
+      <button type="button" class="produto-tela-voltar" id="produtoTelaVoltar" aria-label="Voltar ao catálogo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+      </button>
     </div>
-    <p class="lightbox-descricao" id="lightboxDescricao"></p>
-    <div class="lightbox-cores" id="lightboxCores" hidden></div>
-    <a class="btn-whats lightbox-comprar" id="lightboxComprar" href="#" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
-      <span id="lightboxComprarTexto">Quero esse!</span>
-    </a>
+    <div class="produto-tela">
+      <div class="produto-tela-midia" id="produtoTelaMidia"></div>
+      <div class="produto-tela-lado">
+        <div id="produtoTelaConteudo"></div>
+        <div class="produto-tela-acoes" id="produtoTelaAcoes"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1411,26 +1542,24 @@
   </div>
 </div>
 
-<div class="folha" id="folhaFavoritos">
-  <div class="folha-painel">
-    <div class="folha-alca"></div>
-    <button class="folha-fechar" id="folhaFavoritosFechar" aria-label="Fechar">
+<div class="folha" id="folhaLista">
+  <div class="folha-painel" role="dialog" aria-modal="true" aria-labelledby="tituloLista">
+    <div class="folha-alca" aria-hidden="true"></div>
+    <button class="folha-fechar" id="folhaListaFechar" aria-label="Fechar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
-    <h2>Seus favoritos</h2>
-    <div class="favoritos-lista" id="favoritosLista"></div>
-    <a class="btn-whats btn-whats-grande favoritos-enviar" id="favoritosEnviar" href="#" target="_blank" rel="noopener" hidden>
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.25 8.24zm4.52-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.4-.12-.56.13-.17.24-.65.8-.79.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.24-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.24.24-.4.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14 0-.31-.02-.47-.02s-.43.06-.66.31c-.23.24-.86.85-.86 2.06 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
-      Enviar meus favoritos
-    </a>
+    <h2 id="tituloLista">Sua lista</h2>
+    <div id="listaConteudo"></div>
   </div>
 </div>
 
-<div class="flutuante-favoritos-wrap" id="favoritosWrap">
-  <button type="button" class="flutuante flutuante-favoritos" id="botaoFavoritosFlutuante" aria-label="Ver favoritos">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
+<div class="aviso-lista" id="avisoLista" role="status" aria-live="polite"></div>
+
+<div class="flutuante-lista-wrap" id="listaWrap">
+  <button type="button" class="flutuante flutuante-lista" id="botaoListaFlutuante" aria-label="Ver sua lista">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
   </button>
-  <button type="button" class="favoritos-contador" id="favoritosContador" aria-label="Limpar todos os favoritos" hidden>0</button>
+  <span class="lista-contador" id="listaContador" aria-hidden="true" hidden>0</span>
 </div>
 
 <a class="flutuante" id="botaoFlutuante" href="#" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
@@ -1664,23 +1793,34 @@
   document.getElementById('botaoFlutuante').href = linkWhatsappGeral();
   document.getElementById('linkRodapeWhats').href = linkWhatsappGeral();
 
-  function linkWhatsapp(produto, categoria, corEscolhida){
-    let mensagem = `Oi! Vi esse no catálogo de vocês e quero saber mais:\n\n`;
-    mensagem += `Categoria: ${categoria}\n`;
+  // Pedido de um produto só (botão "Pedir" da página do produto).
+  // Com mais de uma unidade, manda o valor de cada e o total.
+  function linkWhatsapp(produto, categoria, corEscolhida, quantidade = 1){
+    const unitario = precoUnitario(produto);
+    const promocao = produto.precoPromocional ? ` (promocional, de ${emReais(paraNumero(produto.preco))})` : '';
+    let mensagem = `Oi! Quero pedir este produto do catálogo:\n\n`;
     mensagem += `Produto: ${produto.nome}\n`;
-    if(corEscolhida) mensagem += `Cor: ${corEscolhida}\n`;
-    mensagem += produto.precoPromocional
-      ? `Valor: R$ ${produto.precoPromocional} (promocional, de R$ ${produto.preco})\n`
-      : `Valor: R$ ${produto.preco}\n`;
     if(produto.codigo) mensagem += `Código: ${produto.codigo}\n`;
+    mensagem += `Categoria: ${produto.categoriaOriginal || categoria}\n`;
+    if(corEscolhida) mensagem += `Cor: ${corEscolhida}\n`;
+    mensagem += `Quantidade: ${quantidade}\n`;
+    if(unitario <= 0){
+      mensagem += `Valor: a combinar\n`;
+    }else if(quantidade > 1){
+      mensagem += `Valor de cada: ${emReais(unitario)}${promocao}\n`;
+      mensagem += `Total: ${emReais(unitario * quantidade)}\n`;
+    }else{
+      mensagem += `Valor: ${emReais(unitario)}${promocao}\n`;
+    }
+    mensagem += `\nPode confirmar disponibilidade e prazo?`;
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
   }
 
   function linkAvisarQuandoVoltar(produto, categoria){
-    let mensagem = `Oi! Vi esse no catálogo de vocês, mas tá esgotado — pode me avisar quando voltar?\n\n`;
-    mensagem += `Categoria: ${categoria}\n`;
+    let mensagem = `Oi! Vi esse no catálogo de vocês, mas tá esgotado. Podem me avisar quando voltar?\n\n`;
     mensagem += `Produto: ${produto.nome}\n`;
     if(produto.codigo) mensagem += `Código: ${produto.codigo}\n`;
+    mensagem += `Categoria: ${produto.categoriaOriginal || categoria}`;
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
   }
 
@@ -1700,10 +1840,14 @@
     laranja: '#D9782D', cinza: '#8A8A85', dourado: '#C9A227',
     prateado: '#B8B8B2', prata: '#B8B8B2', marrom: '#6B4A34',
     bege: '#D9C7A3', turquesa: '#3FA9A0', vinho: '#5E2129',
+    areia: '#D8C3A0', creme: '#EFE6D2', nude: '#E3C4AE', grafite: '#3B3F45',
+    chumbo: '#55595E', madeira: '#A0714A',
     transparente: 'transparent'
   };
+  // Nome composto ("Verde Matte", "Azul Bebê") cai na primeira palavra.
   function corParaCss(nomeCor){
-    return MAPA_CORES[normalizarTexto(nomeCor)] || '#8B7A5F';
+    const nome = normalizarTexto(nomeCor);
+    return MAPA_CORES[nome] || MAPA_CORES[nome.split(/\s+/)[0]] || '#8B7A5F';
   }
 
   // Troca "-" (separando palavras) ou "/" por um ponto tipográfico, só
@@ -1776,16 +1920,6 @@
       const sonda = new Image();
       sonda.onload = () => {
         conteudo.innerHTML = `<img src="${candidata}" alt="${escaparHTML(produto.nome)}" decoding="async">`;
-        // Dica visual de que dá pra tocar a foto pra ampliar (e ver a
-        // descrição) — só aparece depois que uma foto de verdade
-        // carrega, e só nos cards que realmente abrem o zoom.
-        if(comZoom && !areaFoto.querySelector('.dica-zoom')){
-          areaFoto.insertAdjacentHTML('beforeend', `
-            <span class="dica-zoom" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
-            </span>
-          `);
-        }
       };
       sonda.onerror = tentarProximaFoto;
       sonda.src = candidata;
@@ -1793,12 +1927,7 @@
     tentarProximaFoto();
 
     if(comZoom){
-      areaFoto.addEventListener('click', () => {
-        const imagem = conteudo.querySelector('img');
-        if(imagem && imagem.complete && imagem.naturalWidth > 0){
-          abrirLightbox(produto, nomeCategoria, imagem.src);
-        }
-      });
+      areaFoto.addEventListener('click', () => abrirProduto(produto, nomeCategoria));
     }
   }
 
@@ -1818,94 +1947,144 @@
   }
 
 
-  // ---------- Favoritos (guardados no navegador, sem conta/servidor) ----------
-  const CHAVE_FAVORITOS = 'np3d_favoritos';
-  let favoritos = [];
+  // ---------- Lista de pedido (guardada no navegador, sem conta/servidor) ----------
+  // Substitui os antigos favoritos: além de guardar o produto, guarda
+  // quantidade e cor, e manda tudo numa mensagem só com o total.
+  // Cada item: { chave, quantidade, cor }.
+  const CHAVE_LISTA = 'np3d_lista';
+  let lista = [];
   try{
-    const salvos = JSON.parse(localStorage.getItem(CHAVE_FAVORITOS) || '[]');
-    if(Array.isArray(salvos)) favoritos = salvos;
+    const salva = JSON.parse(localStorage.getItem(CHAVE_LISTA) || 'null');
+    if(Array.isArray(salva)){
+      lista = salva.filter(item => item && item.chave && item.quantidade > 0);
+    }else{
+      // Quem já tinha favoritos guardados não perde nada: viram itens da lista.
+      const favoritosAntigos = JSON.parse(localStorage.getItem('np3d_favoritos') || '[]');
+      if(Array.isArray(favoritosAntigos)) lista = favoritosAntigos.map(chave => ({ chave, quantidade: 1, cor: '' }));
+    }
   }catch(erro){ /* modo privado etc. */ }
+
+  function salvarLista(){
+    try{ localStorage.setItem(CHAVE_LISTA, JSON.stringify(lista)); }catch(erro){ /* modo privado etc. */ }
+  }
 
   // Código do produto identifica melhor; sem código, cai pro par
   // categoria+nome (só pra não colidir com outro produto de mesmo
-  // nome numa categoria diferente).
+  // nome numa categoria diferente). Usa a categoria de verdade do
+  // produto, pra ele ter a mesma chave também dentro de "Lançamentos".
   function chaveProduto(nomeCategoria, produto){
-    return produto.codigo ? `codigo:${produto.codigo}` : `nome:${nomeCategoria}::${produto.nome}`;
+    return produto.codigo ? `codigo:${produto.codigo}` : `nome:${produto.categoriaOriginal || nomeCategoria}::${produto.nome}`;
   }
 
-  function sincronizarBotoesFavorito(){
-    document.querySelectorAll('.btn-favorito').forEach(botao => {
-      const ativo = favoritos.includes(botao.dataset.chave);
-      botao.classList.toggle('ativo', ativo);
-      botao.setAttribute('aria-pressed', String(ativo));
-      botao.setAttribute('aria-label', ativo ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
-    });
+  // "1.234,56" -> 1234.56 (a planilha usa vírgula decimal)
+  function paraNumero(valor){
+    return Number(String(valor).replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, '')) || 0;
+  }
+  function emReais(numero){
+    return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  function precoUnitario(produto){
+    return paraNumero(produto.precoPromocional || produto.preco);
+  }
+  // Preço zerado/vazio na planilha = valor a combinar, não "R$ 0,00"
+  function textoPreco(valor){
+    return valor > 0 ? emReais(valor) : 'Sob consulta';
   }
 
-  function alternarFavorito(nomeCategoria, produto){
+  function quantidadeNaLista(chave){
+    return lista.filter(item => item.chave === chave).reduce((soma, item) => soma + item.quantidade, 0);
+  }
+
+
+
+  // Os cards não têm mais botão de lista (a compra acontece na tela do
+  // produto); mantido como ponto único caso algum botão volte a existir.
+  function sincronizarBotoesLista(){}
+
+  function adicionarNaLista(nomeCategoria, produto, quantidade = 1, cor = ''){
     const chave = chaveProduto(nomeCategoria, produto);
-    const indice = favoritos.indexOf(chave);
-    if(indice === -1) favoritos.push(chave); else favoritos.splice(indice, 1);
-    if(indice === -1 && window.np3dTrack) np3dTrack('favorito_adicionado', { produto: produto.nome, categoria: nomeCategoria });
-    try{ localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos)); }catch(erro){ /* modo privado etc. */ }
-    atualizarBotaoFavoritosFlutuante();
-    sincronizarBotoesFavorito();
+    const existente = lista.find(item => item.chave === chave && item.cor === cor);
+    if(existente) existente.quantidade += quantidade;
+    else lista.push({ chave, quantidade, cor });
+    salvarLista();
+    if(window.np3dTrack) np3dTrack('lista_adicionado', { produto: produto.nome, categoria: nomeCategoria });
+    atualizarLista();
+    mostrarAviso(quantidade > 1 ? `${quantidade} adicionados à lista` : 'Adicionado à lista');
   }
 
-  function criarCardProduto(produto, nomeCategoria, indice, mostrarCategoria){
-    const temSelo = !!(produto.tag || produto.precoPromocional);
+  // Uma cópia da foto voa até o botão da lista (canto de baixo) e o
+  // botão dá um pulinho: mostra pro cliente onde a lista fica.
+  function voarParaLista(foto, origem){
+    const botao = document.getElementById('botaoListaFlutuante');
+    const pular = () => {
+      botao.classList.remove('pulo');
+      void botao.offsetWidth; // reinicia a animação
+      botao.classList.add('pulo');
+    };
+    const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!foto || !origem || semMovimento || !botao.animate){ pular(); return; }
+    const destino = botao.getBoundingClientRect();
+    const copia = foto.cloneNode();
+    copia.className = 'foto-voando';
+    copia.removeAttribute('alt');
+    copia.setAttribute('aria-hidden', 'true');
+    Object.assign(copia.style, {
+      left: origem.left + 'px', top: origem.top + 'px',
+      width: origem.width + 'px', height: origem.height + 'px'
+    });
+    document.body.appendChild(copia);
+    const dx = destino.left + destino.width / 2 - (origem.left + origem.width / 2);
+    const dy = destino.top + destino.height / 2 - (origem.top + origem.height / 2);
+    const escala = Math.max(0.08, destino.width / origem.width * 0.8);
+    const voo = copia.animate([
+      { transform: 'translate(0, 0) scale(1)', borderRadius: '14px', opacity: 1 },
+      { transform: `translate(${dx * 0.35}px, ${dy * 0.55 - 60}px) scale(0.55)`, borderRadius: '24px', opacity: 1, offset: 0.45 },
+      { transform: `translate(${dx}px, ${dy}px) scale(${escala})`, borderRadius: '50%', opacity: 0.4 }
+    ], { duration: 750, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'forwards' });
+    voo.onfinish = () => { copia.remove(); pular(); };
+  }
+
+  // Aviso só pra leitor de tela (quem enxerga vê a foto voando até a lista)
+  let tempoAviso = null;
+  function mostrarAviso(texto){
+    const aviso = document.getElementById('avisoLista');
+    aviso.textContent = texto;
+    aviso.classList.add('visivel');
+    clearTimeout(tempoAviso);
+    tempoAviso = setTimeout(() => aviso.classList.remove('visivel'), 1600);
+  }
+
+  function criarCardProduto(produto, nomeCategoria, indice){
     const card = document.createElement('div');
-    card.className = 'produto'
-      + (temSelo ? ' produto-selo' : '')
-      + (produto.esgotado ? ' produto-esgotado' : '');
+    card.className = 'produto' + (produto.esgotado ? ' produto-esgotado' : '');
     card.dataset.nome = produto.nome;
     if(produto.codigo) card.dataset.codigo = produto.codigo;
-    const atraso = (indice || 0) * 0.05;
-    // Card com tag ou promoção tem 2 animações (entrada + tremor); o
-    // tremor precisa do seu próprio atraso (0.5s a mais) pra só começar
-    // depois que a entrada terminar, senão os dois "transform" brigam
-    // entre si.
-    card.style.animationDelay = temSelo
-      ? `${atraso}s, ${atraso + 0.5}s`
-      : `${atraso}s`;
-    const chaveFavorito = chaveProduto(nomeCategoria, produto);
-    const favoritoAtivo = favoritos.includes(chaveFavorito);
+    card.style.animationDelay = `${(indice || 0) * 0.05}s`;
     card.innerHTML = `
       <div class="foto">
         <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
-        ${produto.tag ? `<div class="capa-selo-tag"></div><div class="explosao-brilho"></div><div class="explosao-tag">${escaparHTML(produto.tag)}</div><span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
+        ${produto.tag ? `<span class="selo-produto selo-tag">${escaparHTML(produto.tag)}</span>` : ''}
         ${produto.precoPromocional ? `<span class="selo-produto selo-promocao">${calcularSeloPromocao(produto)}</span>` : ''}
         ${produto.esgotado ? `<div class="veu-esgotado"><span class="selo-esgotado">Esgotado</span></div>` : ''}
-        ${produto.esgotado ? '' : `
-        <button type="button" class="btn-favorito${favoritoAtivo ? ' ativo' : ''}" data-chave="${escaparHTML(chaveFavorito)}" aria-pressed="${favoritoAtivo}" aria-label="${favoritoAtivo ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
-          <svg viewBox="0 0 24 24"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 10 1.4 6.4 4.4 4.9c2.4-1.2 5-.4 6.6 1.7.4.5 1 .5 1.4 0 1.6-2.1 4.2-2.9 6.6-1.7 3 1.5 3.6 5.1 1.7 7.9C18.7 16.65 12 21 12 21z"/></svg>
-        </button>
-        `}
       </div>
-      <div class="info">
-        ${mostrarCategoria ? `<p class="contagem">${escaparHTML(formatarNomeCategoria(nomeCategoria))}</p>` : ''}
-        <h3><span>${escaparHTML(produto.nome)}</span></h3>
-        ${produto.precoPromocional
-          ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
-          : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
-        ${produto.esgotado
-          ? `<a class="btn-whats btn-esgotado" href="${linkAvisarQuandoVoltar(produto, nomeCategoria)}" target="_blank" rel="noopener" data-evento="pedido_avise_me" data-produto="${escaparHTML(produto.nome)}" data-categoria="${escaparHTML(nomeCategoria)}">
-              ${iconeWhats} Avise-me
-            </a>`
-          : `<a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener" data-evento="pedido_whatsapp" data-produto="${escaparHTML(produto.nome)}" data-categoria="${escaparHTML(nomeCategoria)}">
-              ${iconeWhats} Quero esse!
-            </a>`}
+      <div class="card-texto">
+        <h3>${escaparHTML(produto.nome)}</h3>
+        <p class="card-texto-preco">${textoPreco(precoUnitario(produto))}</p>
+        <span class="so-leitor">${produto.esgotado ? 'Esgotado. ' : ''}Ver detalhes</span>
       </div>
     `;
+    // Sem botão no card: ele mesmo é o botão (teclado e leitor de tela).
+    // O nome lido é o próprio texto do card (selo, nome, preço) + "Ver detalhes".
+    card.setAttribute('role', 'button');
+    card.tabIndex = 0;
+    card.addEventListener('keydown', (evento) => {
+      if(evento.key === 'Enter' || evento.key === ' '){ evento.preventDefault(); abrirProduto(produto, nomeCategoria); }
+    });
 
-    anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, true);
-    const botaoFavorito = card.querySelector('.btn-favorito');
-    if(botaoFavorito){
-      botaoFavorito.addEventListener('click', (evento) => {
-        evento.stopPropagation();
-        alternarFavorito(nomeCategoria, produto);
-      });
-    }
+    // false: a foto não precisa do próprio clique, o card inteiro já abre
+    anexarFotoProduto(card.querySelector('.foto'), produto, nomeCategoria, false);
+    // O card inteiro abre a tela do produto
+    card.addEventListener('click', () => abrirProduto(produto, nomeCategoria));
 
     return card;
   }
@@ -1925,93 +2104,240 @@
     if(travasDeScrollAbertas === 0) document.body.style.overflow = '';
   }
 
-  // ---------- Zoom da foto (vira um "mini detalhes" quando tem cor) ----------
-  const lightbox = document.getElementById('lightbox');
-  const lightboxImagem = document.getElementById('lightboxImagem');
-  const lightboxDescricao = document.getElementById('lightboxDescricao');
-  const lightboxCores = document.getElementById('lightboxCores');
-  const lightboxComprar = document.getElementById('lightboxComprar');
-  const lightboxComprarTexto = document.getElementById('lightboxComprarTexto');
-  const lightboxNome = document.getElementById('lightboxNome');
-  const lightboxPreco = document.getElementById('lightboxPreco');
+  // ---------- Tela do produto (folha que sobe ao tocar na foto) ----------
+  const folhaProduto = document.getElementById('folhaProduto');
+  const produtoTelaMidia = document.getElementById('produtoTelaMidia');
+  const produtoTelaConteudo = document.getElementById('produtoTelaConteudo');
+  const produtoTelaAcoes = document.getElementById('produtoTelaAcoes');
 
-  function abrirLightbox(produto, categoria, src){
-    lightboxImagem.src = src;
-    lightboxImagem.alt = produto.nome;
-    // Nome completo e preço aqui também: no card o nome pode ter sido
-    // cortado em 2 linhas, e quem abre o zoom quer decidir sem voltar.
-    lightboxNome.textContent = produto.nome;
-    lightboxPreco.innerHTML = produto.precoPromocional
-      ? `<span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span>`
-      : `<span class="preco">R$ ${escaparHTML(produto.preco)}</span>`;
-    lightboxDescricao.textContent = produto.descricao || '';
-    montarCoresLightbox(produto, categoria);
-    if(window.np3dTrack) np3dTrack('ver_produto', { produto: produto.nome, categoria: categoria });
-    lightbox.classList.add('aberto');
-    travarScroll();
-  }
+  function abrirProduto(produto, nomeCategoria){
+    const temCores = !produto.esgotado && produto.cores && produto.cores.length > 0;
+    let corEscolhida = temCores ? produto.cores[0] : '';
+    let quantidade = 1;
 
-  // O botão de pedir aparece sempre no zoom (antes ficava com link
-  // vazio em produto sem cor). Com cor pra escolher, escolher uma
-  // atualiza o link na hora; esgotado vira "Avise-me", sem cores.
-  function montarCoresLightbox(produto, categoria){
-    lightboxComprar.dataset.produto = produto.nome;
-    lightboxComprar.dataset.categoria = categoria;
-    delete lightboxComprar.dataset.cor;
+    produtoTelaMidia.innerHTML = `
+      <div class="produto-tela-foto">
+        <div class="foto-conteudo"><div class="foto-vazia">Foto em breve</div></div>
+        ${produto.esgotado ? '<div class="veu-esgotado"><span class="selo-esgotado">Esgotado</span></div>' : ''}
+      </div>`;
+    const nomeCategoriaReal = produto.categoriaOriginal || nomeCategoria;
+    // Linha pequena (categoria e código) em cima; nome e preço lado a
+    // lado; depois descrição, cores e peças da mesma categoria. A
+    // quantidade fica no rodapé, junto dos botões.
+    produtoTelaConteudo.innerHTML = `
+      <p class="contagem produto-tela-categoria">${escaparHTML(formatarNomeCategoria(nomeCategoriaReal))}${produto.codigo ? ` · ${escaparHTML(produto.codigo)}` : ''}</p>
+      <div class="produto-tela-titulo">
+        <h2 class="produto-tela-nome" id="produtoTelaNome">${escaparHTML(produto.nome)}</h2>
+        ${produto.esgotado
+          ? `<p class="produto-tela-preco"><span class="preco">${textoPreco(precoUnitario(produto))}</span></p>`
+          : `<div class="produto-tela-qtd-area">
+              <div class="qtd produto-tela-qtd" role="group" aria-label="Quantidade">
+                <button type="button" data-menos aria-label="Diminuir" disabled>−</button><output aria-live="polite">1</output><button type="button" data-mais aria-label="Aumentar">+</button>
+              </div>
+              <span class="produto-tela-unitario" hidden>${emReais(precoUnitario(produto))} cada</span>
+            </div>`}
+      </div>
+      ${produto.precoPromocional && precoUnitario(produto) > 0 ? `
+        <p class="produto-tela-promo">
+          <span class="produto-tela-promo-novo">${emReais(precoUnitario(produto))}</span>
+          <span class="produto-tela-promo-antigo">${emReais(paraNumero(produto.preco))}</span>
+          <span class="produto-tela-promo-selo">${calcularSeloPromocao(produto)}</span>
+        </p>` : ''}
+      ${produto.descricao ? `<p class="produto-tela-descricao">${escaparHTML(produto.descricao)}</p>` : ''}
+      ${temCores ? '<p class="produto-tela-rotulo" id="rotuloCor">Cor</p><div class="produto-tela-cores" role="radiogroup" aria-labelledby="rotuloCor"></div>' : ''}
+      <div class="produto-tela-parecidos-area"></div>
+    `;
+    montarParecidos(produto, nomeCategoriaReal);
+    const areaQtd = produtoTelaConteudo.querySelector('.produto-tela-qtd-area');
+    if(areaQtd){
+      const saida = areaQtd.querySelector('output');
+      const menos = areaQtd.querySelector('[data-menos]');
+      const unitario = areaQtd.querySelector('.produto-tela-unitario');
+      const mudar = passo => {
+        quantidade = Math.max(1, Math.min(20, quantidade + passo));
+        saida.textContent = quantidade;
+        menos.disabled = quantidade === 1;
+        unitario.hidden = quantidade === 1 || precoUnitario(produto) <= 0;
+        montarAcoes();
+      };
+      menos.addEventListener('click', () => mudar(-1));
+      areaQtd.querySelector('[data-mais]').addEventListener('click', () => mudar(1));
+    }
+    anexarFotoProduto(produtoTelaMidia.querySelector('.produto-tela-foto'), produto, nomeCategoria, false);
 
-    if(produto.esgotado || !produto.cores || produto.cores.length === 0){
-      lightboxCores.hidden = true;
-      lightboxCores.innerHTML = '';
-      lightboxComprar.classList.toggle('btn-esgotado', !!produto.esgotado);
-      lightboxComprar.href = produto.esgotado
-        ? linkAvisarQuandoVoltar(produto, categoria)
-        : linkWhatsapp(produto, categoria);
-      lightboxComprar.dataset.evento = produto.esgotado ? 'pedido_avise_me' : 'pedido_whatsapp';
-      lightboxComprarTexto.textContent = produto.esgotado ? 'Avise-me' : 'Quero esse!';
-      return;
+    const listaCores = produtoTelaConteudo.querySelector('.produto-tela-cores');
+    if(listaCores){
+      produto.cores.forEach(cor => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip-cor' + (cor === corEscolhida ? ' ativo' : '');
+        chip.setAttribute('role', 'radio');
+        chip.setAttribute('aria-checked', String(cor === corEscolhida));
+        chip.innerHTML = `<span class="chip-cor-bolinha" style="background:${corParaCss(cor)}"></span>${escaparHTML(cor)}`;
+        chip.addEventListener('click', () => {
+          corEscolhida = cor;
+          listaCores.querySelectorAll('.chip-cor').forEach(item => {
+            item.classList.toggle('ativo', item === chip);
+            item.setAttribute('aria-checked', String(item === chip));
+          });
+          if(window.np3dTrack) np3dTrack('cor_escolhida', { produto: produto.nome, cor: corEscolhida });
+          montarAcoes();
+        });
+        listaCores.appendChild(chip);
+      });
     }
 
-    let corEscolhida = produto.cores[0];
-    lightboxComprar.classList.remove('btn-esgotado');
-    lightboxComprarTexto.textContent = 'Quero esse!';
-    lightboxComprar.href = linkWhatsapp(produto, categoria, corEscolhida);
-    lightboxComprar.dataset.evento = 'pedido_whatsapp';
-    lightboxComprar.dataset.cor = corEscolhida;
-
-    lightboxCores.innerHTML = `
-      <p class="lightbox-cores-titulo">Cor</p>
-      <div class="lightbox-cores-lista"></div>
-    `;
-    const lista = lightboxCores.querySelector('.lightbox-cores-lista');
-    produto.cores.forEach(cor => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'chip-cor' + (cor === corEscolhida ? ' ativo' : '');
-      chip.innerHTML = `<span class="chip-cor-bolinha" style="background:${corParaCss(cor)}"></span>${escaparHTML(cor)}`;
-      chip.addEventListener('click', () => {
-        corEscolhida = cor;
-        lista.querySelectorAll('.chip-cor').forEach(item => item.classList.remove('ativo'));
-        chip.classList.add('ativo');
-        lightboxComprar.href = linkWhatsapp(produto, categoria, corEscolhida);
-        lightboxComprar.dataset.cor = corEscolhida;
-        if(window.np3dTrack) np3dTrack('cor_escolhida', { produto: produto.nome, cor: corEscolhida });
+    function montarAcoes(){
+      if(produto.esgotado){
+        produtoTelaAcoes.innerHTML = `
+          <a class="btn-whats btn-esgotado produto-tela-avise" href="${linkAvisarQuandoVoltar(produto, nomeCategoria)}" target="_blank" rel="noopener" data-evento="pedido_avise_me" data-produto="${escaparHTML(produto.nome)}" data-categoria="${escaparHTML(nomeCategoria)}">
+            ${iconeWhats} Avise-me quando voltar
+          </a>`;
+        return;
+      }
+      // Rodapé: "Adicionar à lista" e "Pedir" com o valor total (o único
+      // lugar onde o valor aparece, pra não repetir a mesma informação).
+      // Celular: lado a lado. Computador: Pedir em cima, lista embaixo.
+      const total = precoUnitario(produto) > 0 ? emReais(precoUnitario(produto) * quantidade) : 'a combinar';
+      produtoTelaAcoes.innerHTML = `
+        <button type="button" class="btn-whats btn-adicionar-lista" data-adicionar>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 12H3"></path><path d="M16 6H3"></path><path d="M16 18H3"></path><path d="M18 9v6"></path><path d="M21 12h-6"></path></svg>
+          <span>Adicionar à lista</span>
+        </button>
+        <a class="btn-primario produto-tela-pedir" href="${linkWhatsapp(produto, nomeCategoria, corEscolhida, quantidade)}" target="_blank" rel="noopener" data-evento="pedido_whatsapp" data-produto="${escaparHTML(produto.nome)}" data-categoria="${escaparHTML(nomeCategoria)}"${corEscolhida ? ` data-cor="${escaparHTML(corEscolhida)}"` : ''}>
+          ${iconeWhats}<span class="rotulo-longo">Pedir pelo WhatsApp</span><span class="rotulo-curto">Pedir</span><span class="valor">${total}</span>
+        </a>`;
+      produtoTelaAcoes.querySelector('[data-adicionar]').addEventListener('click', () => {
+        const foto = produtoTelaMidia.querySelector('.produto-tela-foto img');
+        const origem = foto ? foto.getBoundingClientRect() : null;
+        adicionarNaLista(nomeCategoria, produto, quantidade, corEscolhida);
+        voarParaLista(foto, origem);
+        voltarDoProduto();
       });
-      lista.appendChild(chip);
-    });
-    lightboxCores.hidden = false;
+    }
+    montarAcoes();
+
+    if(window.np3dTrack) np3dTrack('ver_produto', { produto: produto.nome, categoria: nomeCategoria });
+    const painel = document.getElementById('produtoTelaPainel');
+    painel.setAttribute('aria-label', produto.nome);
+    painel.scrollTop = 0;
+    folhaProduto.querySelector('.produto-tela-lado').scrollTop = 0;
+    // Trocando de produto com a tela já aberta (peças parecidas), não
+    // trava o scroll de novo nem cria outra entrada no histórico.
+    if(folhaProduto.classList.contains('aberto')) return;
+    folhaProduto.classList.add('aberto');
+    travarScroll();
+    // No celular a página do produto tem outro fundo: a faixa de status
+    // acompanha a barra de cima dela.
+    if(window.matchMedia('(max-width: 639px)').matches) definirCorDoTopo('#17130D');
+    // Uma entrada no histórico: o botão "voltar" do celular fecha a
+    // tela do produto em vez de sair do catálogo.
+    try{ history.pushState({ telaProduto: true }, ''); }catch(erro){}
   }
-  function fecharLightbox(){
-    if(!lightbox.classList.contains('aberto')) return;
-    lightbox.classList.remove('aberto');
+  function fecharFolhaProduto(){
+    if(!folhaProduto.classList.contains('aberto')) return;
+    folhaProduto.classList.remove('aberto');
     destravarScroll();
+    definirCorDoTopo('#120E09');
   }
-  document.getElementById('lightboxFechar').addEventListener('click', fecharLightbox);
-  lightbox.addEventListener('click', (evento) => {
-    if(evento.target === lightbox) fecharLightbox();
+  function definirCorDoTopo(cor){
+    const meta = document.getElementById('corDoTopo');
+    if(meta) meta.setAttribute('content', cor);
+  }
+  // Fechar pela interface: volta no histórico (que dispara o fechamento),
+  // pra não deixar uma entrada sobrando.
+  function voltarDoProduto(){
+    if(history.state && history.state.telaProduto) history.back();
+    else fecharFolhaProduto();
+  }
+  window.addEventListener('popstate', () => fecharFolhaProduto());
+
+  // Peças da mesma categoria no fim da tela (sem a atual; esgotadas por último)
+  function montarParecidos(produtoAtual, nomeCategoriaReal){
+    const area = produtoTelaConteudo.querySelector('.produto-tela-parecidos-area');
+    const categoria = categoriasCarregadas.find(c => !c.virtual && c.nome === nomeCategoriaReal);
+    if(!area || !categoria) return;
+    const parecidos = categoria.produtos.filter(p => p !== produtoAtual).slice(0, 10);
+    if(parecidos.length === 0) return;
+    area.innerHTML = `
+      <p class="produto-tela-rotulo">Da mesma categoria</p>
+      <div class="parecidos-carrossel">
+        <div class="produto-tela-parecidos"></div>
+        <button type="button" class="parecidos-seta parecidos-seta-anterior" data-direcao="-1" aria-label="Peças anteriores" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+        <button type="button" class="parecidos-seta parecidos-seta-proxima" data-direcao="1" aria-label="Próximas peças" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+        </button>
+      </div>`;
+    const trilha = area.querySelector('.produto-tela-parecidos');
+    // Setas nas laterais da fileira, na altura das fotos: avisam que dá
+    // pra rolar e rolam de duas em duas peças. Cada uma some quando
+    // chega no começo/fim (e as duas somem se tudo couber).
+    const setas = area.querySelectorAll('.parecidos-seta');
+    const atualizarSetas = () => {
+      const maximo = trilha.scrollWidth - trilha.clientWidth;
+      setas[0].hidden = trilha.scrollLeft <= 2;
+      setas[1].hidden = trilha.scrollLeft >= maximo - 2;
+    };
+    setas.forEach(seta => seta.addEventListener('click', () => {
+      const passo = (trilha.querySelector('.parecido')?.offsetWidth || 128) + 10;
+      trilha.scrollBy({ left: Number(seta.dataset.direcao) * passo * 2, behavior: 'smooth' });
+    }));
+    trilha.addEventListener('scroll', atualizarSetas, { passive: true });
+    requestAnimationFrame(atualizarSetas);
+    parecidos.forEach(p => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'parecido' + (p.esgotado ? ' parecido-esgotado' : '');
+      item.innerHTML = `
+        <div class="parecido-foto"><div class="foto-conteudo"></div></div>
+        <span class="parecido-nome">${escaparHTML(p.nome)}</span>
+        <span class="parecido-preco">${textoPreco(precoUnitario(p))}</span>`;
+      anexarFotoProduto(item.querySelector('.parecido-foto'), p, nomeCategoriaReal, false);
+      item.addEventListener('click', () => abrirProduto(p, nomeCategoriaReal));
+      trilha.appendChild(item);
+    });
+  }
+
+  document.getElementById('folhaProdutoFechar').addEventListener('click', voltarDoProduto);
+  document.getElementById('produtoTelaVoltar').addEventListener('click', voltarDoProduto);
+  folhaProduto.addEventListener('click', (evento) => {
+    if(evento.target === folhaProduto) voltarDoProduto();
   });
   document.addEventListener('keydown', (evento) => {
-    if(evento.key === 'Escape'){ fecharLightbox(); fecharModalInfo(); fecharFolhaCategorias(); fecharFolhaFavoritos(); }
+    if(evento.key === 'Escape'){
+      if(folhaProduto.classList.contains('aberto')) voltarDoProduto();
+      fecharModalInfo(); fecharFolhaCategorias(); fecharFolhaLista();
+    }
   });
+
+  // Arrastar a alça pra baixo fecha a folha, como nos apps do celular.
+  function ativarArrastarParaFechar(folha, fechar){
+    const painel = folha.querySelector('.folha-painel');
+    const alca = folha.querySelector('.folha-alca');
+    if(!painel || !alca) return;
+    let inicioY = null;
+    alca.addEventListener('pointerdown', (evento) => {
+      inicioY = evento.clientY;
+      painel.classList.add('arrastando');
+      alca.setPointerCapture(evento.pointerId);
+    });
+    alca.addEventListener('pointermove', (evento) => {
+      if(inicioY === null) return;
+      painel.style.transform = `translateY(${Math.max(0, evento.clientY - inicioY)}px)`;
+    });
+    const soltar = (evento) => {
+      if(inicioY === null) return;
+      const distancia = evento.clientY - inicioY;
+      inicioY = null;
+      painel.classList.remove('arrastando');
+      painel.style.transform = '';
+      if(distancia > 90) fechar();
+    };
+    alca.addEventListener('pointerup', soltar);
+    alca.addEventListener('pointercancel', soltar);
+  }
 
   // ---------- Modal de informações importantes ----------
   const modalInfo = document.getElementById('modalInfo');
@@ -2052,139 +2378,150 @@
     if(evento.target === folhaCategorias) fecharFolhaCategorias();
   });
 
-  // ---------- Painel de favoritos ----------
-  const folhaFavoritos = document.getElementById('folhaFavoritos');
-  const favoritosLista = document.getElementById('favoritosLista');
-  const favoritosEnviar = document.getElementById('favoritosEnviar');
-  const favoritosWrap = document.getElementById('favoritosWrap');
-  const botaoFavoritosFlutuante = document.getElementById('botaoFavoritosFlutuante');
-  const favoritosContador = document.getElementById('favoritosContador');
+  // ---------- Painel da lista ----------
+  const folhaLista = document.getElementById('folhaLista');
+  const listaConteudo = document.getElementById('listaConteudo');
+  const listaWrap = document.getElementById('listaWrap');
+  const listaContador = document.getElementById('listaContador');
 
-  function atualizarBotaoFavoritosFlutuante(){
-    const quantidade = favoritos.length;
-    favoritosWrap.classList.toggle('visivel', quantidade > 0);
-    favoritosContador.hidden = quantidade === 0;
-    favoritosContador.textContent = quantidade;
-  }
-  atualizarBotaoFavoritosFlutuante();
-
-  // Esvazia tudo de uma vez — usado pelo "x" no cantinho do botão
-  // flutuante (mais rápido que remover favorito por favorito).
-  function limparFavoritos(){
-    if(favoritos.length === 0) return;
-    favoritos = [];
-    try{ localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos)); }catch(erro){ /* modo privado etc. */ }
-    atualizarBotaoFavoritosFlutuante();
-    sincronizarBotoesFavorito();
-    if(folhaFavoritos.classList.contains('aberto')) construirListaFavoritos();
-  }
-  favoritosContador.addEventListener('click', (evento) => {
-    evento.stopPropagation();
-    limparFavoritos();
-  });
-
-  // Produto esgotado não entra na lista (nem no link do WhatsApp) —
-  // se ele foi favoritado antes e esgotou depois, some sozinho daqui
-  // sem precisar de ação do cliente (mas o coração ainda pode ter
-  // ficado marcado num card antigo, então limpa do armazenamento
-  // também). Só faz essa limpeza quando a planilha já carregou de
-  // verdade — categoriasCarregadas vazio (ainda carregando, ou
-  // manutenção) não pode ser confundido com "nenhum favorito válido".
-  function resolverItensFavoritos(){
-    const itens = [];
-    if(categoriasCarregadas.length === 0) return itens;
-
-    const chavesValidas = new Set();
+  // Junta cada item com o produto da planilha. Produto que saiu da
+  // planilha ou esgotou some da lista sozinho — mas só depois que a
+  // planilha carregou de verdade (categoriasCarregadas vazio pode ser
+  // "ainda carregando" ou manutenção, não "nenhum item válido").
+  function resolverItensLista(){
+    if(!planilhaCarregada) return [];
+    const porChave = new Map();
     categoriasCarregadas.forEach(categoria => {
+      if(categoria.virtual) return;
       categoria.produtos.forEach(produto => {
-        if(produto.esgotado) return;
-        const chave = chaveProduto(categoria.nome, produto);
-        if(favoritos.includes(chave)){
-          itens.push({ produto, categoriaNome: categoria.nome });
-          chavesValidas.add(chave);
-        }
+        if(!produto.esgotado) porChave.set(chaveProduto(categoria.nome, produto), { produto, categoriaNome: categoria.nome });
       });
     });
-
-    const favoritosValidos = favoritos.filter(chave => chavesValidas.has(chave));
-    if(favoritosValidos.length !== favoritos.length){
-      favoritos = favoritosValidos;
-      try{ localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos)); }catch(erro){ /* modo privado etc. */ }
-      atualizarBotaoFavoritosFlutuante();
+    const validos = lista.filter(item => porChave.has(item.chave));
+    if(validos.length !== lista.length){
+      lista = validos;
+      salvarLista();
     }
-
-    return itens;
+    return lista.map(item => ({ item, ...porChave.get(item.chave) }));
   }
 
-  // Uma mensagem só, com todos os favoritos listados — em vez do
-  // cliente ter que mandar uma mensagem separada pra cada produto.
-  function linkWhatsappFavoritos(itens){
-    let mensagem = `Oi! Separei esses favoritos no catálogo de vocês:\n\n`;
-    itens.forEach(({ produto, categoriaNome }, indice) => {
-      const valor = produto.precoPromocional || produto.preco;
-      mensagem += `${indice + 1}) ${produto.nome} — R$ ${valor}`;
-      if(produto.esgotado) mensagem += ' (esgotado — avisar quando voltar)';
-      mensagem += `\n`;
-      mensagem += `   Categoria: ${categoriaNome}\n`;
+  // Vira true quando a planilha carrega (ver carregarCatalogo). Antes
+  // disso o contador usa o que está salvo no aparelho, sem conferir.
+  let planilhaCarregada = false;
+  function atualizarLista(){
+    if(planilhaCarregada) resolverItensLista();
+    const quantidade = lista.reduce((soma, item) => soma + item.quantidade, 0);
+    listaWrap.classList.toggle('visivel', quantidade > 0);
+    listaContador.hidden = quantidade === 0;
+    listaContador.textContent = quantidade;
+    document.getElementById('botaoListaFlutuante').setAttribute('aria-label', `Ver sua lista (${quantidade} ${quantidade === 1 ? 'item' : 'itens'})`);
+    sincronizarBotoesLista();
+    if(folhaLista.classList.contains('aberto')) construirLista();
+  }
+
+  // Uma mensagem só, com quantidade, cor, código e total — o cliente
+  // não precisa digitar nada, e a gente recebe o pedido organizado.
+  function linkWhatsappLista(itens){
+    let mensagem = `Oi! Quero fazer um pedido pelo catálogo:\n\n`;
+    let total = 0;
+    let temValorACombinar = false;
+    itens.forEach(({ item, produto, categoriaNome }, indice) => {
+      const unitario = precoUnitario(produto);
+      mensagem += `${indice + 1}) ${item.quantidade}x ${produto.nome}`;
+      if(unitario > 0){
+        total += unitario * item.quantidade;
+        mensagem += ` — ${emReais(unitario * item.quantidade)}\n`;
+        if(item.quantidade > 1 || produto.precoPromocional){
+          mensagem += `   ${emReais(unitario)} cada${produto.precoPromocional ? ` (promocional, de ${emReais(paraNumero(produto.preco))})` : ''}\n`;
+        }
+      }else{
+        temValorACombinar = true;
+        mensagem += ` — valor a combinar\n`;
+      }
+      if(item.cor) mensagem += `   Cor: ${item.cor}\n`;
       if(produto.codigo) mensagem += `   Código: ${produto.codigo}\n`;
+      mensagem += `   Categoria: ${categoriaNome}\n`;
     });
-    mensagem += `\nPodem me ajudar com esses?`;
+    mensagem += `\nTotal: ${emReais(total)}${temValorACombinar ? ' (sem os itens com valor a combinar)' : ''}\n\nPode confirmar disponibilidade e prazo?`;
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
   }
 
-  function construirListaFavoritos(){
-    const itens = resolverItensFavoritos();
-    favoritosLista.innerHTML = '';
-
+  function construirLista(){
+    const itens = resolverItensLista();
     if(itens.length === 0){
-      favoritosLista.innerHTML = '<p class="favoritos-vazio">Nenhum favorito ainda — toque no coração de um produto pra guardar aqui.</p>';
-      favoritosEnviar.hidden = true;
+      listaConteudo.innerHTML = '<p class="lista-vazia">Sua lista está vazia. Toque no + de um produto pra adicionar.</p>';
       return;
     }
-
-    favoritosEnviar.hidden = false;
-    favoritosEnviar.href = linkWhatsappFavoritos(itens);
-    favoritosEnviar.dataset.evento = 'pedido_favoritos';
-    favoritosEnviar.dataset.itens = itens.length;
-
-    itens.forEach(({ produto, categoriaNome }) => {
-      const valor = produto.precoPromocional || produto.preco;
+    const total = itens.reduce((soma, { item, produto }) => soma + precoUnitario(produto) * item.quantidade, 0);
+    const quantidadeTotal = itens.reduce((soma, { item }) => soma + item.quantidade, 0);
+    listaConteudo.innerHTML = `
+      <div class="lista-itens"></div>
+      <div class="lista-total"><span>Total</span><strong>${emReais(total)}</strong></div>
+      <p class="lista-nota">${itens.some(({ produto }) => precoUnitario(produto) <= 0) ? 'Itens com valor a combinar não entram no total. ' : ''}Pagamento, prazo e entrega a gente combina pelo WhatsApp.</p>
+      <a class="btn-primario" href="${linkWhatsappLista(itens)}" target="_blank" rel="noopener" data-evento="pedido_lista" data-itens="${quantidadeTotal}">
+        ${iconeWhats} Enviar pedido no WhatsApp
+      </a>
+      <button type="button" class="lista-limpar">Limpar lista</button>
+    `;
+    const container = listaConteudo.querySelector('.lista-itens');
+    itens.forEach(({ item, produto, categoriaNome }) => {
+      const unitario = precoUnitario(produto);
       const linha = document.createElement('div');
-      linha.className = 'favoritos-item';
+      linha.className = 'lista-item';
       linha.innerHTML = `
-        <div class="favoritos-item-foto"></div>
-        <div class="favoritos-item-info">
-          <p class="favoritos-item-nome">${escaparHTML(produto.nome)}</p>
-          <p class="favoritos-item-preco">R$ ${escaparHTML(valor)}</p>
+        <div class="lista-item-foto"></div>
+        <div class="lista-item-info">
+          <p class="lista-item-nome">${escaparHTML(produto.nome)}</p>
+          <p class="lista-item-detalhe">${item.cor ? `Cor ${escaparHTML(item.cor)}, ` : ''}${unitario > 0 ? `${emReais(unitario)} cada` : 'valor a combinar'}</p>
+          <div class="lista-item-linha">
+            <div class="qtd" role="group" aria-label="Quantidade de ${escaparHTML(produto.nome)}">
+              <button type="button" data-menos aria-label="${item.quantidade === 1 ? 'Remover da lista' : 'Diminuir'}">${item.quantidade === 1 ? '×' : '−'}</button><output>${item.quantidade}</output><button type="button" data-mais aria-label="Aumentar">+</button>
+            </div>
+            <span class="lista-item-subtotal">${textoPreco(unitario * item.quantidade)}</span>
+          </div>
         </div>
-        <button type="button" class="favoritos-item-remover" aria-label="Remover dos favoritos">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
       `;
-      anexarFotoProduto(linha.querySelector('.favoritos-item-foto'), produto, categoriaNome, false);
-      linha.querySelector('.favoritos-item-remover').addEventListener('click', () => {
-        alternarFavorito(categoriaNome, produto);
-        construirListaFavoritos();
+      anexarFotoProduto(linha.querySelector('.lista-item-foto'), produto, categoriaNome, false);
+      linha.querySelector('[data-menos]').addEventListener('click', () => {
+        item.quantidade--;
+        if(item.quantidade <= 0) lista.splice(lista.indexOf(item), 1);
+        salvarLista();
+        atualizarLista();
       });
-      favoritosLista.appendChild(linha);
+      linha.querySelector('[data-mais]').addEventListener('click', () => {
+        item.quantidade++;
+        salvarLista();
+        atualizarLista();
+      });
+      container.appendChild(linha);
+    });
+    listaConteudo.querySelector('.lista-limpar').addEventListener('click', () => {
+      lista = [];
+      salvarLista();
+      atualizarLista();
     });
   }
 
-  function abrirFolhaFavoritos(){
-    construirListaFavoritos();
-    folhaFavoritos.classList.add('aberto');
+  function abrirFolhaLista(){
+    construirLista();
+    folhaLista.classList.add('aberto');
     travarScroll();
   }
-  function fecharFolhaFavoritos(){
-    if(!folhaFavoritos.classList.contains('aberto')) return;
-    folhaFavoritos.classList.remove('aberto');
+  function fecharFolhaLista(){
+    if(!folhaLista.classList.contains('aberto')) return;
+    folhaLista.classList.remove('aberto');
     destravarScroll();
   }
-  botaoFavoritosFlutuante.addEventListener('click', abrirFolhaFavoritos);
-  document.getElementById('folhaFavoritosFechar').addEventListener('click', fecharFolhaFavoritos);
-  folhaFavoritos.addEventListener('click', (evento) => {
-    if(evento.target === folhaFavoritos) fecharFolhaFavoritos();
+  document.getElementById('botaoListaFlutuante').addEventListener('click', abrirFolhaLista);
+  document.getElementById('folhaListaFechar').addEventListener('click', fecharFolhaLista);
+  folhaLista.addEventListener('click', (evento) => {
+    if(evento.target === folhaLista) fecharFolhaLista();
   });
+  atualizarLista();
+
+  ativarArrastarParaFechar(folhaProduto, voltarDoProduto);
+  ativarArrastarParaFechar(folhaLista, fecharFolhaLista);
+  ativarArrastarParaFechar(folhaCategorias, fecharFolhaCategorias);
 
   // ---------- Toast de informações importantes (aparece uma vez só) ----------
   const CHAVE_TOAST_INFO = 'np3d_viu_toast_info';
@@ -2395,10 +2732,9 @@
       return;
     }
 
-    const mostrarCategoria = filtroAtivo === null;
     const proximos = listaFiltrada.slice(quantidadeExibida, quantidadeExibida + TAMANHO_LOTE);
     proximos.forEach((item, i) => {
-      grade.appendChild(criarCardProduto(item.produto, item.categoriaNome, quantidadeExibida + i, mostrarCategoria));
+      grade.appendChild(criarCardProduto(item.produto, item.categoriaNome, quantidadeExibida + i));
     });
     quantidadeExibida += proximos.length;
 
@@ -2445,8 +2781,8 @@
   }
 
   // Abre a categoria do produto clicado no carrossel, rola até o card
-  // dele na listagem e destaca a borda por um instante — o pedido em
-  // si é feito pelo botão "Quero esse!" que já existe no card. Se o
+  // dele na listagem e destaca a borda por um instante — dali o cliente
+  // adiciona à lista pelo "+" ou toca na foto pra ver o produto. Se o
   // produto ainda não estiver no lote carregado, puxa mais lotes até
   // achar (categorias são pequenas, então isso é rápido).
   function irParaProdutoNaListagem(categorias, categoriaNome, produto){
@@ -2603,7 +2939,7 @@
       const grade = document.createElement('div');
       grade.className = 'grade';
       resultados.forEach((resultado, indice) => {
-        grade.appendChild(criarCardProduto(resultado.produto, resultado.categoria, indice, true));
+        grade.appendChild(criarCardProduto(resultado.produto, resultado.categoria, indice));
       });
       conteudo.appendChild(grade);
     }, false);
@@ -2743,6 +3079,8 @@
         const categoriasComProdutos = categorias.filter(categoria => categoria.produtos.length > 0);
         categoriasCarregadas = finalizarCategorias(categoriasComProdutos);
         renderCatalogo(categoriasCarregadas);
+        planilhaCarregada = true;
+        atualizarLista();
       })
       .catch(() => {
         if(tentativasRestantes > 0){
