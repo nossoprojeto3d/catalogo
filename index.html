@@ -1286,6 +1286,7 @@
     .link-rodape-base:hover{ color: var(--gold-light); }
   }
 </style>
+<script src="medicao.js" defer></script>
 </head>
 <body>
 
@@ -1804,6 +1805,7 @@
     const chave = chaveProduto(nomeCategoria, produto);
     const indice = favoritos.indexOf(chave);
     if(indice === -1) favoritos.push(chave); else favoritos.splice(indice, 1);
+    if(indice === -1 && window.np3dTrack) np3dTrack('favorito_adicionado', { produto: produto.nome, categoria: nomeCategoria });
     try{ localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(favoritos)); }catch(erro){ /* modo privado etc. */ }
     atualizarBotaoFavoritosFlutuante();
     sincronizarBotoesFavorito();
@@ -1846,10 +1848,10 @@
           ? `<p class="preco-linha"><span class="preco-riscado">R$ ${escaparHTML(produto.preco)}</span><span class="preco">R$ ${escaparHTML(produto.precoPromocional)}</span></p>`
           : `<p class="preco">R$ ${escaparHTML(produto.preco)}</p>`}
         ${produto.esgotado
-          ? `<a class="btn-whats btn-esgotado" href="${linkAvisarQuandoVoltar(produto, nomeCategoria)}" target="_blank" rel="noopener">
+          ? `<a class="btn-whats btn-esgotado" href="${linkAvisarQuandoVoltar(produto, nomeCategoria)}" target="_blank" rel="noopener" data-evento="pedido_avise_me" data-produto="${escaparHTML(produto.nome)}" data-categoria="${escaparHTML(nomeCategoria)}">
               ${iconeWhats} Avise-me
             </a>`
-          : `<a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener">
+          : `<a class="btn-whats" href="${linkWhatsapp(produto, nomeCategoria)}" target="_blank" rel="noopener" data-evento="pedido_whatsapp" data-produto="${escaparHTML(produto.nome)}" data-categoria="${escaparHTML(nomeCategoria)}">
               ${iconeWhats} Quero esse!
             </a>`}
       </div>
@@ -1894,6 +1896,7 @@
     lightboxImagem.alt = produto.nome;
     lightboxDescricao.textContent = produto.descricao || '';
     montarCoresLightbox(produto, categoria);
+    if(window.np3dTrack) np3dTrack('ver_produto', { produto: produto.nome, categoria: categoria });
     lightbox.classList.add('aberto');
     travarScroll();
   }
@@ -1911,6 +1914,10 @@
 
     let corEscolhida = produto.cores[0];
     lightboxComprar.href = linkWhatsapp(produto, categoria, corEscolhida);
+    lightboxComprar.dataset.evento = 'pedido_whatsapp';
+    lightboxComprar.dataset.produto = produto.nome;
+    lightboxComprar.dataset.categoria = categoria;
+    lightboxComprar.dataset.cor = corEscolhida;
     lightboxComprar.hidden = false;
 
     lightboxCores.innerHTML = `
@@ -1928,6 +1935,8 @@
         lista.querySelectorAll('.chip-cor').forEach(item => item.classList.remove('ativo'));
         chip.classList.add('ativo');
         lightboxComprar.href = linkWhatsapp(produto, categoria, corEscolhida);
+        lightboxComprar.dataset.cor = corEscolhida;
+        if(window.np3dTrack) np3dTrack('cor_escolhida', { produto: produto.nome, cor: corEscolhida });
       });
       lista.appendChild(chip);
     });
@@ -2077,6 +2086,8 @@
 
     favoritosEnviar.hidden = false;
     favoritosEnviar.href = linkWhatsappFavoritos(itens);
+    favoritosEnviar.dataset.evento = 'pedido_favoritos';
+    favoritosEnviar.dataset.itens = itens.length;
 
     itens.forEach(({ produto, categoriaNome }) => {
       const valor = produto.precoPromocional || produto.preco;
@@ -2301,7 +2312,10 @@
       </div>
     `;
     anexarFotoProduto(card.querySelector('.foto'), produto, categoriaNome, false);
-    card.addEventListener('click', () => irParaProdutoNaListagem(categorias, categoriaNome, produto));
+    card.addEventListener('click', () => {
+      if(window.np3dTrack) np3dTrack('ver_mais_vendido', { produto: produto.nome, categoria: categoriaNome });
+      irParaProdutoNaListagem(categorias, categoriaNome, produto);
+    });
     return card;
   }
 
@@ -2452,6 +2466,7 @@
       item.dataset.categoria = nomeCategoria || '';
       item.innerHTML = `<span>${escaparHTML(rotulo)}</span><span class="folha-item-marca">✓</span>`;
       item.addEventListener('click', () => {
+        if(window.np3dTrack) np3dTrack('categoria_aberta', { categoria: nomeCategoria || 'Tudo por Aqui' });
         aplicarFiltro(categorias, nomeCategoria);
         fecharFolhaCategorias();
       });
@@ -2620,7 +2635,10 @@
     tempoBusca = setTimeout(() => {
       const termo = campoBusca.value.trim();
       if(termo.length === 0){ renderCatalogo(categoriasCarregadas); }
-      else{ renderBusca(categoriasCarregadas, termo); }
+      else{
+        renderBusca(categoriasCarregadas, termo);
+        if(window.np3dTrack) np3dTrack('busca', { termo: termo.toLowerCase().slice(0, 40) });
+      }
     }, 250);
   });
 
