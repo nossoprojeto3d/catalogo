@@ -1,7 +1,7 @@
 # Catálogo Nosso Projeto 3D
 
 Site estático publicado no GitHub Pages: https://nossoprojeto3d.github.io/catalogo/
-Todo push na `main` vai direto pro ar. Não tem build, nem `package.json`, nem lib externa.
+Todo push na `main` vai direto pro ar. Hoje não tem build, nem `package.json`, nem lib externa, mas libs e frameworks gratuitos podem entrar.
 
 ## Arquivos
 
@@ -21,7 +21,7 @@ Todo push na `main` vai direto pro ar. Não tem build, nem `package.json`, nem l
 
 ## Regras
 
-- HTML, CSS e JS puros: sem lib, framework nem build.
+- Hoje é HTML, CSS e JS puros. Lib ou framework gratuito pode entrar; pago só com autorização.
 - O card em 2 colunas no celular (~375px) é onde os bugs de layout costumam aparecer (tag e botão vazando).
 
 ## Imagens
