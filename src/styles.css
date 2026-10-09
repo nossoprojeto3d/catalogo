@@ -1,0 +1,162 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource-variable/geist-mono';
+
+/* =====================================================================
+   Catálogo v3: "Filamento". Grafite quase preto, texto cor de osso e um
+   único acento verde-limão (a cor do filamento). Tema escuro na página
+   toda, sem seção invertida.
+   Forma: botões e campos em pílula; cards com 24px por fora e 18px por
+   dentro (moldura dupla); fotos com 18px.
+   ===================================================================== */
+@theme {
+  --color-fundo: #0c0d0b;
+  --color-superficie: #151713;
+  --color-superficie-2: #1d201a;
+  --color-linha: #2a2e26;
+  --color-texto: #eeeee6;
+  --color-suave: #a3a69b;
+  --color-acento: #c6f432;
+  --color-acento-forte: #b2e01c;
+  --color-acento-suave: #2a3310;
+
+  --font-display: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+
+  --ease-mola: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-saida: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --shadow-flutua: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px -20px rgb(0 0 0 / 0.7);
+  --shadow-suave: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 10px 30px -16px rgb(0 0 0 / 0.6);
+  --shadow-acento: 0 14px 40px -14px rgb(198 244 50 / 0.45);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-fundo);
+    color-scheme: dark;
+  }
+  body {
+    background: var(--color-fundo);
+    color: var(--color-texto);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--color-acento);
+    color: var(--color-fundo);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-acento);
+    outline-offset: 3px;
+  }
+  /* Gaveta e modal recebem foco ao abrir: sem contorno neles. */
+  [data-vaul-drawer]:focus-visible,
+  [role='dialog']:focus-visible { outline: none; }
+  button { cursor: pointer; }
+}
+
+/* Títulos: Archivo expandida (eixo de largura) */
+.titulo {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+}
+
+/* Lenis (rolagem suave) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: clip; }
+
+/* Grão: fixo e sem eventos, nunca dentro de área que rola */
+.grao::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Malha técnica de pontos, para áreas vazias */
+.pontos {
+  background-image: radial-gradient(rgb(238 238 230 / 0.09) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.sem-barra { scrollbar-width: none; }
+.sem-barra::-webkit-scrollbar { display: none; }
+
+/* Esqueleto de carregamento com brilho que passa */
+.esqueleto {
+  background: linear-gradient(100deg, var(--color-superficie-2) 40%, #262a22 50%, var(--color-superficie-2) 60%);
+  background-size: 300% 100%;
+  animation: brilho 1.6s var(--ease-mola) infinite;
+}
+@keyframes brilho { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* Faixa de categorias que corre (a única da página). Não pausa no hover nem
+   no toque: só o clique numa categoria faz algo. */
+.faixa { animation: faixa 38s linear infinite; }
+@keyframes faixa { to { transform: translateX(-50%); } }
+
+/* Card com borda que acende sob o cursor (só com mouse) */
+.holofote { position: relative; isolation: isolate; }
+.holofote::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, -40%), rgb(198 244 50 / 0.6), transparent 60%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-mola);
+}
+@media (hover: hover) { .holofote:hover::before { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto, .faixa { animation: none; }
+  *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
+
+/* vaul: painel do produto e da lista */
+[data-vaul-overlay] { background: rgb(0 0 0 / 0.6); }
+
+/* Aviso de cookies do medicao.js (arquivo compartilhado entre os projetos,
+   não mexer nele): só as cores são trocadas aqui, para a paleta do catálogo. */
+html body #np3d-cookies {
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  border: 0;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-flutua);
+  outline: 1px solid rgb(238 238 230 / 0.08);
+  font-family: var(--font-sans);
+}
+html body #np3d-cookies p { color: var(--color-suave); }
+html body #np3d-cookies button {
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-texto);
+  border-color: rgb(238 238 230 / 0.2);
+}
+html body #np3d-cookies button[data-acao=aceitar] {
+  background: var(--color-acento);
+  border-color: var(--color-acento);
+  color: var(--color-fundo);
+}
+html body #np3d-cookies button:focus-visible { outline-color: var(--color-acento); }
