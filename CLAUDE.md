@@ -3,12 +3,13 @@
 Site publicado no GitHub Pages: https://nossoprojeto3d.github.io/catalogo/
 Todo push na `main` vai pro ar pelo GitHub Action `.github/workflows/publicar.yml` (testes, build e publicação).
 
-No ar: versão 3 (React + Vite + Tailwind v4), na branch `main`.
-Em desenvolvimento: versão 4, na branch `v4`. Push na `v4` não publica nada; o site só muda com merge na `main`. Este arquivo descreve a v4.
+No ar: versão 4 (React + Vite + Tailwind v4), na branch `main`, publicada em 05/11/2026. O usuário vai testá-la por alguns dias.
+A branch `v4` guarda o desenvolvimento dela; push na `v4` não publica nada. Este arquivo descreve a v4.
 
 ## Versões e backups
 
-- `v3.0.0`: versão 3 no ar. `v2.0.0`: versão 2 (HTML único). Tags de versão são permanentes.
+- `backup-v3-20261105`: branch com a versão 3 como estava no ar. Não apagar sem o usuário pedir. Para voltar, reverter os commits na `main` sem `push --force`.
+- `v3.0.0`: versão 3. `v2.0.0`: versão 2 (HTML único). Tags de versão são permanentes.
 - `backup-oficial-AAAAMMDD`: último backup oficial. Só o mais recente fica, então não use essa tag como referência fixa.
 - Voltar para a v2 não é só reverter o código: o Action publica `dist/`, que a v2 não tem. Em Settings > Pages, a origem precisa continuar "GitHub Actions" para a v3 funcionar.
 
@@ -71,7 +72,7 @@ Em desenvolvimento: versão 4, na branch `v4`. Push na `v4` não publica nada; o
 Usado pelo `/conferir-site`, no celular e no desktop (`npm run build && npm run preview`):
 
 1. Início: banners trocam e levam à página certa; "Para você ou para presentear" e "Brindes para seus clientes" abrem e têm "Voltar". Produtos carregam sem a tela "Estamos ajustando o catálogo". Sem erros no console.
-2. Trocar 3 categorias: no computador pelo menu "Categorias" e pelas pílulas; no celular pela barra de baixo, que abre a gaveta.
+2. Trocar 3 categorias: no computador pelo menu "Categorias" e pelas pílulas; no celular pelo botão "Categoria" da página de produtos e pela barra de baixo, que abrem a mesma gaveta.
 3. Rolagem infinita: rolar até o fim de "Kids" (6 em 6), trocar de categoria e rolar de novo.
 4. Cards em 2 colunas sem vazar. Esgotados por último, com "Avise-me quando voltar" na tela do produto.
 5. Nenhuma foto quebrada. "Foto em breve" só para quem não tem foto; liste esses códigos.
