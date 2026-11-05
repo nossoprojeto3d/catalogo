@@ -1,7 +1,7 @@
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { buscar, categoriasDeVarejo, chaveProduto } from '../lib/catalogo';
+import { buscar, chaveProduto } from '../lib/catalogo';
 import { medir } from '../lib/medicao';
 import { precoUnitario, textoPreco } from '../lib/preco';
 import { useUI } from '../store/ui';
@@ -63,7 +63,7 @@ export function Busca() {
             )}
             {!adiado.trim() && (
               <div className="mt-4 flex flex-wrap gap-2">
-                {categoriasDeVarejo(categorias).map((c) => (
+                {categorias.map((c) => (
                   <button key={c.nome} type="button" onClick={() => setTermo(c.nome)} className="min-h-11 rounded-full bg-superficie px-4 text-[14px] font-medium ring-1 ring-linha">
                     {c.nome}
                   </button>

@@ -54,6 +54,9 @@ describe('planilha real', () => {
   it('busca ignora acento e maiúscula', () => {
     expect(buscar([kids], 'dragao').map((p) => p.codigo)).toEqual(['SEN-05']);
     expect(buscar([kids], 'kid-0').length).toBe(9);
+    const brindes = montarCategoria('Brindes', [['Produto', 'Codigo', 'Preco'], ['Bandeja Porta-Joias', 'BRI-01', '10']]);
+    expect(buscar([kids, brindes], 'bandeja').map((p) => p.codigo)).toEqual(['BRI-01']);
+    expect(buscar([kids, brindes], 'brindes').map((p) => p.codigo)).toEqual(['BRI-01']);
   });
 });
 
