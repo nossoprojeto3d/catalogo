@@ -1,4 +1,4 @@
-import { ArrowLeft, Gift, ShoppingBag } from '@phosphor-icons/react';
+import { ArrowLeft, CaretDown, Gift, ShoppingBag } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { categoriasDeVarejo, ordenarPor, queridinhos, type Categoria, type Ordem, type Produto } from '../lib/catalogo';
 import { ABAS_BRINDES, TAMANHO_LOTE } from '../lib/config';
@@ -180,6 +180,8 @@ export function PaginaProdutos({ categoria }: { categoria?: string }) {
     const base = categoria ? todas.find((c) => c.nome === categoria)?.produtos ?? [] : categorias.flatMap((c) => c.produtos);
     return ordenarPor(base, ordem);
   }, [todas, categorias, categoria, ordem]);
+  const setMenu = useUI((s) => s.setMenuAberto);
+  const textoPecas = `${produtos.length} ${produtos.length === 1 ? 'peça' : 'peças'}`;
   const chip = (ativo: boolean) => `shrink-0 rounded-full px-4 py-2.5 text-[14px] font-medium ring-1 ${ativo ? 'bg-acento text-sobre-acento ring-acento-forte' : 'bg-superficie ring-linha'}`;
 
   return (
@@ -187,21 +189,28 @@ export function PaginaProdutos({ categoria }: { categoria?: string }) {
       <Voltar />
       <h1 className="titulo mt-1 text-[28px] md:text-[40px]">{categoria ?? 'Para você ou para presentear'}</h1>
       {!categoria && <p className="mt-2 text-[15px] leading-relaxed text-suave md:text-[17px]">Escolha uma ou várias e feche o pedido no WhatsApp.</p>}
-      <ul className="sem-barra -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
+      {/* No celular a categoria é escolhida pelo botão abaixo, que abre a gaveta. */}
+      <ul className="mt-4 hidden flex-wrap gap-2 md:flex">
         <li><a href="#produtos" className={`block ${chip(!categoria)}`} aria-current={!categoria ? 'page' : undefined}>Todas</a></li>
         {categorias.map((c) => (
           <li key={c.nome}><a href={`#categoria/${encodeURIComponent(c.nome)}`} className={`block whitespace-nowrap ${chip(c.nome === categoria)}`} aria-current={c.nome === categoria ? 'page' : undefined}>{c.nome}</a></li>
         ))}
       </ul>
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <p className="text-[14px] text-suave">{produtos.length} {produtos.length === 1 ? 'peça' : 'peças'}</p>
-        <label className="flex items-center gap-2 text-[14px] text-suave">
-          Ordenar
-          <select value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)} className="h-11 rounded-full bg-superficie px-3 text-[14px] font-medium text-texto ring-1 ring-linha">
+      <div className="mt-4 flex items-center gap-2 md:justify-between md:gap-3">
+        <button type="button" onClick={() => setMenu(true)} aria-haspopup="dialog" className="flex h-11 min-w-0 flex-1 items-center justify-between gap-1.5 rounded-full bg-superficie px-4 text-[15px] font-medium ring-1 ring-linha md:hidden">
+          <span className="truncate">{categoria ?? 'Categoria: Todas'}</span>
+          <CaretDown size={16} className="shrink-0" aria-hidden />
+        </button>
+        <p className="hidden text-[14px] text-suave md:block">{textoPecas}</p>
+        <label className="flex shrink-0 items-center gap-2 text-[14px] text-suave">
+          <span className="sr-only md:not-sr-only">Ordenar</span>
+          {/* 16px no celular: com menos, o iPhone dá zoom ao abrir o seletor. */}
+          <select value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)} className="h-11 rounded-full bg-superficie px-3 text-[16px] font-medium text-texto ring-1 ring-linha md:text-[14px]">
             {ORDENS.map((o) => <option key={o.valor} value={o.valor}>{o.rotulo}</option>)}
           </select>
         </label>
       </div>
+      <p className="mt-3 text-[14px] text-suave md:hidden">{textoPecas}</p>
       <Grade produtos={produtos} chave={`${categoria ?? 'todas'}-${ordem}`} />
     </section>
   );
