@@ -21,21 +21,24 @@ A branch `v4` guarda o desenvolvimento dela; push na `v4` não publica nada. Est
 
 ## Arquivos
 
-- `src/lib/config.ts`: número do WhatsApp, ID da planilha, `ABAS_CATEGORIAS`, `ABAS_BRINDES`, `QUANTIDADES_COMBO`, cache e tamanho do lote.
-- `src/lib/catalogo.ts`: leitura do CSV, montagem das categorias, combos, ordenação, queridinhos, busca.
+- `src/lib/config.ts`: número do WhatsApp, `ABAS_BRINDES`, `QUANTIDADES_COMBO`, descontos e tamanho do lote.
+- `src/lib/catalogo.ts`: leitura de `catalogo.json`, montagem das categorias, combos, ordenação, queridinhos, busca. O leitor de CSV continua aqui para a importação e os testes.
+- `src/painel/`: `Painel` (telas e salvamento), `Acesso` (configurar e senha), `Lista`, `Ficha`, `github.ts` (gravação), `chaveLocal.ts` (chave cifrada), `foto.ts` (foto em 1200×900 no aparelho), `pecas.ts` (regras, testadas em `painel.test.ts`).
 - `src/lib/whatsapp.ts`: texto das mensagens. O formato foi aprovado pelo usuário em 08/10/2026; não mudar sem pedir. A única adição é a linha de combo (`Combo de 10 = R$ 129`), que só aparece em combos.
 - `src/lib/preco.ts` (combo em valor inteiro, unidade com centavos), `cores.ts`, `fotos.ts`, `medicao.ts` e `efeitos.ts` (foto voando até a sacola).
 - `src/hooks/`: `useRota` (rotas por hash: `#inicio`, `#produtos`, `#categoria/<nome>`, `#brindes`, `#produto/<CODIGO>`) e `useTela` (consultas de tela e movimento reduzido).
 - `src/store/`: lista de pedido (zustand, chave `np3d_lista` no localStorage, compatível com a v2) e estado da interface.
 - `src/components/`: `Paginas` (início, produtos e brindes), `Banners` (carrossel de produtos: Natal, religiosos e criançada; os públicos ficam nos cartões logo abaixo), `Navegacao` (no celular, topo e barra de baixo), `Menu` (gaveta de categorias), `Escolhas` (cor, quantidade e combos), `CompraRapida` (painel do botão de sacola no card, quando há cor para escolher), `ListaPedido` (sacola). `TelaProduto` é tela cheia no celular (entra da direita, com "Voltar") e modal de duas colunas no computador. Garantia e cuidados ficam numa gaveta aberta por um único link, para a tela não precisar rolar.
-- `scripts/`: `recolorir-logo.mjs` (logo dourada original -> limão), `vetorizar-logo.mjs` (logo -> `public/logo.svg`), `plugin-fotos.ts` (lista de fotos no build), `plugin-compartilhar.ts` (página `p/<codigo>/` de cada foto, com a prévia do link: o robô do WhatsApp não enxerga o `#`. Nome lido da planilha no build; para testar num link temporário, `URL_DO_SITE=https://.../catalogo/ npm run build`), `padronizar-fotos.mjs` (leva foto fora do padrão a 1200×900 sem cortar o produto), `molde-foto.mjs` (gera o molde em `docs/`).
+- `scripts/`: `recolorir-logo.mjs` (logo dourada original -> limão), `vetorizar-logo.mjs` (logo -> `public/logo.svg`), `plugin-fotos.ts` (lista de fotos no build), `plugin-compartilhar.ts` (página `p/<codigo>/` de cada foto, com a prévia do link: o robô do WhatsApp não enxerga o `#`. Nome lido de `catalogo.json` no build; para testar num link temporário, `URL_DO_SITE=https://.../catalogo/ npm run build`), `padronizar-fotos.mjs` (leva foto fora do padrão a 1200×900 sem cortar o produto), `molde-foto.mjs` (gera o molde em `docs/`).
 - `public/`: `imagens/`, `logo.png` (limão), `logo.svg`, `og-image.jpg` (imagem do link compartilhado), ícones e `medicao.js`.
 - `medicao.js`: Google Analytics 4 com aviso de cookies. É o mesmo arquivo em todos os projetos do domínio; se mudar aqui, avisar que precisa copiar pros outros. As cores do aviso são trocadas só pelo CSS do catálogo (`src/styles.css`), que também esconde o botão flutuante do WhatsApp no celular enquanto o aviso está aberto.
 
 ## Como os dados chegam
 
-- Produtos vêm da planilha do Google Sheets, lida em CSV (`gviz/tq?tqx=out:csv`). Cada aba é uma categoria; aba nova só aparece se entrar em `ABAS_CATEGORIAS`.
-- Cada aba fica 5 minutos em cache no `sessionStorage`.
+- Produtos ficam em `public/catalogo.json`, lido pelo site a cada visita e editado pelo painel. Categoria vazia não aparece no site. A planilha foi importada uma vez por `scripts/importar-planilha.mjs`; rodar de novo apaga o que foi feito no painel.
+- Painel em `/catalogo/painel/` (`src/painel/`), página à parte, sem Analytics. Grava direto no GitHub, num commit só, com a chave do aparelho; o Action publica em 1 a 2 minutos. Só o site oficial grava na `main`; em qualquer outro endereço grava na `v4`, com aviso de modo de teste.
+- Acesso: uma chave do GitHub por aparelho (Contents: Read and write, só neste repositório), guardada cifrada com a senha do painel (`chaveLocal.ts`). A chave nunca entra no código nem no chat. Depois que o painel estiver no ar, commits da `main` chegam também por ele: dê `git pull` antes de mexer.
+- Se duas pessoas salvam peças diferentes, as duas alterações ficam. Se for a mesma peça, o painel avisa e não grava por cima.
 - Pedido pelo WhatsApp. Não tem carrinho, pagamento nem cadastro.
 - Coluna `Tag` não é usada (sem selo e sem categoria "Lançamentos").
 - A aba `Brindes` alimenta a página "Brindes para seus clientes" e fica fora das categorias comuns. `Personalizados` é venda comum, sem combo. A aba `Natal`, quando tem peças, vira categoria e destino do banner de Natal; vazia, o banner vai para o Cantinho da Fé.

@@ -1,0 +1,772 @@
+{
+  "categorias": [
+    {
+      "nome": "Natal",
+      "produtos": []
+    },
+    {
+      "nome": "Brindes",
+      "produtos": [
+        {
+          "nome": "Bandeja Orgânica Porta-Joias",
+          "codigo": "BRI-01",
+          "descricao": "",
+          "preco": "10",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        }
+      ]
+    },
+    {
+      "nome": "Kids",
+      "produtos": [
+        {
+          "nome": "Azeite Sensorial",
+          "codigo": "KID-21",
+          "descricao": "",
+          "preco": "32,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Banana Articulada",
+          "codigo": "KID-02",
+          "descricao": "",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Cilindro Infinito",
+          "codigo": "KID-12",
+          "descricao": "",
+          "preco": "22,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Código da Garrafinha",
+          "codigo": "KID-10",
+          "descricao": "",
+          "preco": "54,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Coxa de Frango",
+          "codigo": "KID-04",
+          "descricao": "",
+          "preco": "16,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Cubo Infinito",
+          "codigo": "SEN-03",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "24,90",
+          "precoPromocional": "19,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Cubo Infinito Estelar",
+          "codigo": "SEN-02",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "24,90",
+          "precoPromocional": "19,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Dinossauros do Equilíbrio",
+          "codigo": "KID-07",
+          "descricao": "",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Dragão Articulado",
+          "codigo": "SEN-05",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Estrela Sensorial",
+          "codigo": "SEN-01",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "29,90",
+          "precoPromocional": "24,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Frigideira + Espatula",
+          "codigo": "KID-05",
+          "descricao": "",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Gira Gira",
+          "codigo": "KID-11",
+          "descricao": "",
+          "preco": "24,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Jogo da Memória",
+          "codigo": "KID-06",
+          "descricao": "",
+          "preco": "59,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Jogo do Pontinho",
+          "codigo": "KID-08",
+          "descricao": "",
+          "preco": "169,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Friturinha",
+          "codigo": "KID-15",
+          "descricao": "Kitzinho pronto",
+          "preco": "45,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Massas",
+          "codigo": "KID-19",
+          "descricao": "Kitzinho pronto",
+          "preco": "99,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Massas Premium",
+          "codigo": "KID-17",
+          "descricao": "Kitzinho pronto",
+          "preco": "144,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Verutas",
+          "codigo": "KID-16",
+          "descricao": "Kitzinho pronto",
+          "preco": "84,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false
+        },
+        {
+          "nome": "Milho Sensorial",
+          "codigo": "KID-01",
+          "descricao": "",
+          "preco": "39,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Molho de Pimenta",
+          "codigo": "KID-20",
+          "descricao": "",
+          "preco": "32,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Ovo com Casca",
+          "codigo": "KID-03",
+          "descricao": "",
+          "preco": "19,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Ovo Mágico",
+          "codigo": "SEN-04",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "34,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false
+        },
+        {
+          "nome": "Pegador de Comidinha",
+          "codigo": "KID-14",
+          "descricao": "",
+          "preco": "9,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Pote de Massa de Tomate",
+          "codigo": "KID-18",
+          "descricao": "Com experiencia",
+          "preco": "28,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Pote de Tempero",
+          "codigo": "KID-13",
+          "descricao": "Com barulhinho",
+          "preco": "14,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Tic Tac Toe",
+          "codigo": "KID-09",
+          "descricao": "",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Tomate Sensorial",
+          "codigo": "KID-23",
+          "descricao": "",
+          "preco": "24,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Xicara de café supresa",
+          "codigo": "KID-22",
+          "descricao": "",
+          "preco": "0,00",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": true
+        }
+      ]
+    },
+    {
+      "nome": "Pros Fãs",
+      "produtos": [
+        {
+          "nome": "Chaveiro Harry Potter",
+          "codigo": "HP-05",
+          "descricao": "",
+          "preco": "14,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Marcador de Pagina Harry Potter",
+          "codigo": "HP-06",
+          "descricao": "Kit com 4",
+          "preco": "14,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Óculos Harry Potter",
+          "codigo": "HP-02",
+          "descricao": "Peça decorativa temática.",
+          "preco": "9,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Pomo de Ouro c/ Suporte",
+          "codigo": "HP-01",
+          "descricao": "Réplica com suporte de exibição.",
+          "preco": "39,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Varinha Harry Potter",
+          "codigo": "HP-04",
+          "descricao": "",
+          "preco": "24,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Vassoura Harry Potter",
+          "codigo": "HP-03",
+          "descricao": "Peça decorativa temática.",
+          "preco": "49,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        }
+      ]
+    },
+    {
+      "nome": "Organizadores",
+      "produtos": [
+        {
+          "nome": "Organizador Cabo iPhone",
+          "codigo": "ORG-05",
+          "descricao": "",
+          "preco": "9,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Porta Papel Toalha",
+          "codigo": "ORG-04",
+          "descricao": "",
+          "preco": "59,90",
+          "precoPromocional": "49,90",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Suporte Papel Higiênico",
+          "codigo": "ORG-01",
+          "descricao": "",
+          "preco": "24,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        }
+      ]
+    },
+    {
+      "nome": "Setup dos Sonhos",
+      "produtos": [
+        {
+          "nome": "Bandeja Organizadora",
+          "codigo": "ORG-03",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "16,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Mesa Com Canetas",
+          "codigo": "ORG-07",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "47,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Organizador de Mesa",
+          "codigo": "ORG-06",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "59,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Porta Canetas",
+          "codigo": "ORG-02",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "19,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Suporte Celular",
+          "codigo": "CEL-05",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "18,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Suporte Fone",
+          "codigo": "FON-04",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "28,99",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [
+            "Branco",
+            "Preto",
+            "Areia",
+            "Verde Matte"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        }
+      ]
+    },
+    {
+      "nome": "Personalizados",
+      "produtos": [
+        {
+          "nome": "Chaveiro Nome",
+          "codigo": "PER-03",
+          "descricao": "Aproximadamente 5cm",
+          "preco": "12,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Mini Microfone",
+          "codigo": "PER-02",
+          "descricao": "",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false
+        },
+        {
+          "nome": "Porta Anel",
+          "codigo": "PER-01",
+          "descricao": "",
+          "preco": "15,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        }
+      ]
+    },
+    {
+      "nome": "Cantinho da Fé",
+      "produtos": [
+        {
+          "nome": "Anjinho Iluminado G",
+          "codigo": "DEC-03",
+          "descricao": "Acompanha vela artificial",
+          "preco": "34,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Anjinho Iluminado M",
+          "codigo": "DEC-02",
+          "descricao": "Acompanha vela artificial",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Anjinho Iluminado P",
+          "codigo": "DEC-01",
+          "descricao": "Acompanha vela artificial",
+          "preco": "24,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit 3 Anjinhos",
+          "codigo": "DEC-05",
+          "descricao": "Kit completo: P, M e G.",
+          "preco": "79,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Anjinho P e M",
+          "codigo": "DEC-04",
+          "descricao": "Kit com os tamanhos P e M.",
+          "preco": "49,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Kit Fé",
+          "codigo": "DEC-07",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "69,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false
+        },
+        {
+          "nome": "Letreiro Ore e Confie",
+          "codigo": "DEC-06",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "24,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Mini Jesus",
+          "codigo": "MIN-01",
+          "descricao": "Aproximadamente 4cm",
+          "preco": "17,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        },
+        {
+          "nome": "Mini Maria",
+          "codigo": "MIN-02",
+          "descricao": "Aproximadamente 4cm",
+          "preco": "19,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        }
+      ]
+    },
+    {
+      "nome": "Profissões",
+      "produtos": [
+        {
+          "nome": "Organizador de Esmaltes",
+          "codigo": "MAN-01",
+          "descricao": "Medidas 18x18x10cm",
+          "preco": "74,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false
+        }
+      ]
+    }
+  ]
+}

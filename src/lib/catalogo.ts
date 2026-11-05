@@ -1,4 +1,4 @@
-import { ABAS_CATEGORIAS, DURACAO_CACHE_ABA_MS, SHEET_ID, ABAS_BRINDES } from './config';
+import { ABAS_BRINDES } from './config';
 import { paraNumero, precoUnitario } from './preco';
 
 export type Produto = {
@@ -158,47 +158,25 @@ export function buscar(categorias: Categoria[], termo: string): Produto[] {
   );
 }
 
-/* ---------- Busca na planilha ---------- */
+/* ---------- Arquivo do catálogo (public/catalogo.json, editado pelo painel) ---------- */
 
-function urlDaAba(aba: string): string {
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(aba)}&_=${Date.now()}`;
-}
+export type Peca = Omit<Produto, 'categoria'>;
+export type ArquivoCatalogo = { categorias: { nome: string; produtos: Peca[] }[] };
 
-function lerCache(aba: string): string | null {
-  try {
-    const bruto = sessionStorage.getItem(`np3d_cache_aba_${aba}`);
-    if (!bruto) return null;
-    const { texto, ts } = JSON.parse(bruto);
-    if (typeof texto !== 'string' || Date.now() - ts > DURACAO_CACHE_ABA_MS) return null;
-    return texto;
-  } catch {
-    return null;
-  }
-}
-
-function salvarCache(aba: string, texto: string) {
-  try {
-    sessionStorage.setItem(`np3d_cache_aba_${aba}`, JSON.stringify({ texto, ts: Date.now() }));
-  } catch {
-    /* aba anônima ou cota cheia: segue sem cache */
-  }
-}
-
-async function buscarAba(aba: string): Promise<Categoria> {
-  const emCache = lerCache(aba);
-  if (emCache !== null) return montarCategoria(aba, interpretarCSV(emCache));
-  const resposta = await fetch(urlDaAba(aba), { cache: 'no-store' });
-  if (!resposta.ok) throw new Error(`Não foi possível acessar a aba ${aba}.`);
-  const texto = await resposta.text();
-  salvarCache(aba, texto);
-  return montarCategoria(aba, interpretarCSV(texto));
+export function categoriasDoArquivo(arquivo: ArquivoCatalogo): Categoria[] {
+  return ordenarCategorias(arquivo.categorias.map((c) => ({
+    nome: c.nome,
+    produtos: ordenarProdutos(c.produtos.map((p) => ({ ...p, categoria: c.nome }))),
+  })));
 }
 
 // Uma tentativa extra antes de desistir: falha passageira de rede é
 // comum no celular e não deve levar à tela de manutenção.
 export async function carregarCatalogo(tentativas = 2): Promise<Categoria[]> {
   try {
-    return ordenarCategorias(await Promise.all(ABAS_CATEGORIAS.map(buscarAba)));
+    const resposta = await fetch(`${import.meta.env.BASE_URL}catalogo.json?v=${Date.now()}`, { cache: 'no-store' });
+    if (!resposta.ok) throw new Error(`Não foi possível ler o catálogo: ${resposta.status}.`);
+    return categoriasDoArquivo(await resposta.json());
   } catch (erro) {
     if (tentativas <= 1) throw erro;
     await new Promise((ok) => setTimeout(ok, 1500));

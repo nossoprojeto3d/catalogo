@@ -1,7 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { env } from 'node:process';
 import type { Plugin } from 'vite';
-import { interpretarCSV, montarCategoria, normalizar } from '../src/lib/catalogo';
-import { ABAS_CATEGORIAS, SHEET_ID } from '../src/lib/config';
+import { normalizar, type ArquivoCatalogo } from '../src/lib/catalogo';
 import { listarFotos } from './plugin-fotos';
 
 // O robô que monta a prévia do link (WhatsApp e outros) não roda o site nem
@@ -42,31 +42,18 @@ export function paginaDoProduto({ site, caminho, foto, codigo, nome }: { site: s
 `;
 }
 
-// Sem a planilha, a página sai sem o nome da peça, e o build não para por isso.
-async function nomesDasPecas(avisar: (texto: string) => void) {
-  const nomes = new Map<string, string>();
-  await Promise.all(ABAS_CATEGORIAS.map(async (aba) => {
-    try {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(aba)}`;
-      const resposta = await fetch(url, { signal: AbortSignal.timeout(15000) });
-      if (!resposta.ok) throw new Error(String(resposta.status));
-      for (const p of montarCategoria(aba, interpretarCSV(await resposta.text())).produtos) {
-        if (p.codigo) nomes.set(normalizar(p.codigo), p.nome);
-      }
-    } catch (erro) {
-      avisar(`Aba ${aba} não lida para as prévias de link: ${String(erro)}`);
-    }
-  }));
-  return nomes;
+function nomesDasPecas() {
+  const arquivo: ArquivoCatalogo = JSON.parse(readFileSync('public/catalogo.json', 'utf8'));
+  return new Map(arquivo.categorias.flatMap((c) => c.produtos).filter((p) => p.codigo).map((p) => [normalizar(p.codigo), p.nome]));
 }
 
 export function pluginCompartilhar(caminho: string): Plugin {
   return {
     name: 'np3d-compartilhar',
     apply: 'build',
-    async generateBundle() {
+    generateBundle() {
       const site = env.URL_DO_SITE || URL_PADRAO;
-      const nomes = await nomesDasPecas((texto) => this.warn(texto));
+      const nomes = nomesDasPecas();
       for (const foto of listarFotos()) {
         const codigo = foto.split('/').pop()!.replace(/\.[^.]+$/, '');
         this.emitFile({

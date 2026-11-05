@@ -9,7 +9,12 @@ import { pluginFotos } from './scripts/plugin-fotos.ts';
 export default defineConfig({
   base: '/catalogo/',
   plugins: [react(), tailwindcss(), pluginFotos(), pluginCompartilhar('/catalogo/')],
-  build: { target: 'es2022', chunkSizeWarningLimit: 1200 },
+  build: {
+    target: 'es2022',
+    chunkSizeWarningLimit: 1200,
+    // O painel é uma página à parte: o cliente não baixa o código dele.
+    rollupOptions: { input: { main: 'index.html', painel: 'painel/index.html' } },
+  },
   // Libera links temporários do túnel do Cloudflare (cloudflared tunnel --url http://localhost:5181).
   preview: { allowedHosts: ['.trycloudflare.com'] },
   test: { environment: 'node' },
