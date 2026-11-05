@@ -2,7 +2,7 @@
 
 Toda foto de produto do catálogo segue este padrão. Assim ela aparece bem em
 todos os lugares: na tela do produto aparece inteira e nos cards do catálogo é
-recortada em retrato (3:4).
+recortada em quadrado (1:1).
 
 Molde visual com as áreas: [molde-foto-1200x900.png](molde-foto-1200x900.png)
 

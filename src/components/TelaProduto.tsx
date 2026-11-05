@@ -30,7 +30,7 @@ function Parecidos({ produto }: { produto: Produto }) {
         {lista.map((p) => (
           <li key={chaveProduto(p)} className="w-28 shrink-0">
             <button type="button" onClick={() => abrir(p)} className="block w-full text-left">
-              <div className="aspect-[3/4] overflow-hidden rounded-xl bg-superficie-2"><FotoProduto decorativa produto={p} tamanhos="112px" /></div>
+              <div className="aspect-square overflow-hidden rounded-xl bg-superficie-2"><FotoProduto decorativa produto={p} tamanhos="112px" /></div>
               <p className="mt-1.5 truncate text-[13px] font-medium">{p.nome}</p>
             </button>
           </li>

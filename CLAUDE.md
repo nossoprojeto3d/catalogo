@@ -26,7 +26,7 @@ Em desenvolvimento: versão 4, na branch `v4`. Push na `v4` não publica nada; o
 - `src/lib/preco.ts` (combo em valor inteiro, unidade com centavos), `cores.ts`, `fotos.ts`, `medicao.ts` e `efeitos.ts` (foto voando até a sacola).
 - `src/hooks/`: `useRota` (rotas por hash: `#inicio`, `#produtos`, `#categoria/<nome>`, `#brindes`, `#produto/<CODIGO>`) e `useTela` (consultas de tela e movimento reduzido).
 - `src/store/`: lista de pedido (zustand, chave `np3d_lista` no localStorage, compatível com a v2) e estado da interface.
-- `src/components/`: `Paginas` (início, produtos e brindes), `Banners` (carrossel de Natal, varejo e brindes), `Navegacao` (no celular, topo e barra de baixo), `Menu` (gaveta de categorias), `Escolhas` (cor, quantidade e combos), `CompraRapida` (painel do botão de sacola no card, quando há cor para escolher), `ListaPedido` (sacola). `TelaProduto` é tela cheia no celular (entra da direita, com "Voltar") e modal de duas colunas no computador.
+- `src/components/`: `Paginas` (início, produtos e brindes), `Banners` (carrossel de produtos: Natal, religiosos e criançada; os públicos ficam nos cartões logo abaixo), `Navegacao` (no celular, topo e barra de baixo), `Menu` (gaveta de categorias), `Escolhas` (cor, quantidade e combos), `CompraRapida` (painel do botão de sacola no card, quando há cor para escolher), `ListaPedido` (sacola). `TelaProduto` é tela cheia no celular (entra da direita, com "Voltar") e modal de duas colunas no computador.
 - `scripts/`: `recolorir-logo.mjs` (logo dourada original -> limão), `vetorizar-logo.mjs` (logo -> `public/logo.svg`), `plugin-fotos.ts` (lista de fotos no build), `padronizar-fotos.mjs` (leva foto fora do padrão a 1200×900 sem cortar o produto), `molde-foto.mjs` (gera o molde em `docs/`).
 - `public/`: `imagens/`, `logo.png` (limão), `logo.svg`, `og-image.jpg` (imagem do link compartilhado), ícones e `medicao.js`.
 - `medicao.js`: Google Analytics 4 com aviso de cookies. É o mesmo arquivo em todos os projetos do domínio; se mudar aqui, avisar que precisa copiar pros outros. As cores do aviso são trocadas só pelo CSS do catálogo (`src/styles.css`), que também esconde o botão flutuante do WhatsApp no celular enquanto o aviso está aberto.
@@ -57,7 +57,7 @@ Em desenvolvimento: versão 4, na branch `v4`. Push na `v4` não publica nada; o
 ## Imagens
 
 - Fotos em `public/imagens/<CODIGO>.jpg`, com o código em maiúsculo igual à coluna `Codigo` (`KID-01.jpg`).
-- 1200×900 (4:3), JPEG, média ~120KB, nunca acima de 400KB. Produto inteiro dentro da faixa central de 675px (zona segura): o card recorta em 3:4. Padrão completo, molde e prompt pra IA de imagens em `docs/padrao-fotos.md`.
+- 1200×900 (4:3), JPEG, média ~120KB, nunca acima de 400KB. Produto inteiro dentro da faixa central de 675px (zona segura): o card recorta em quadrado (1:1), mostrando os 900px centrais. Padrão completo, molde e prompt pra IA de imagens em `docs/padrao-fotos.md`.
 - A tela do produto mostra a foto sempre inteira (`FotoProduto inteira`), com a própria foto desfocada preenchendo a sobra. Hoje KID-06, 08, 12 e 14 estão fora do 1200×900 e precisam de foto nova, porque o `padronizar-fotos.mjs` deixa borrão visível nelas. KID-22 e HP-06 não têm foto.
 - A página acha a foto pelo código (lista gerada no build). A coluna `Foto` da planilha fica vazia. Lembre o usuário disso.
 - Foto nova só aparece depois do push (o build refaz a lista). No `npm run dev`, reinicie o servidor.

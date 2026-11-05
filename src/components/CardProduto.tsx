@@ -40,7 +40,7 @@ export function CardProduto({ produto, brindes = false, prioridade = false }: { 
   return (
     <li className="relative min-w-0">
       <button type="button" onClick={() => abrir(produto)} className="group block w-full text-left" aria-label={`${produto.esgotado ? 'Esgotado. ' : ''}${produto.nome}, ${textoPreco(precoUnitario(produto))}`}>
-        <div ref={foto} className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-superficie-2">
+        <div ref={foto} className="relative aspect-square overflow-hidden rounded-2xl bg-superficie-2">
           <FotoProduto decorativa prioridade={prioridade} produto={produto} className="transition-transform duration-500 ease-(--ease-saida) group-hover:scale-[1.03]" />
           {desconto > 0 && !produto.esgotado && (
             <span className="absolute left-2 top-2 rounded-full bg-acento px-2 py-1 text-[12px] font-semibold leading-none text-sobre-acento">-{desconto}%</span>
@@ -80,7 +80,7 @@ export function CardProduto({ produto, brindes = false, prioridade = false }: { 
 export function CardEsqueleto() {
   return (
     <li aria-hidden>
-      <div className="esqueleto aspect-[3/4] rounded-2xl" />
+      <div className="esqueleto aspect-square rounded-2xl" />
       <div className="esqueleto mt-3 h-3.5 w-4/5 rounded-full" />
       <div className="esqueleto mt-2 h-3.5 w-2/5 rounded-full" />
     </li>
