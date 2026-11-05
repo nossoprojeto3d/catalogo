@@ -1,24 +1,20 @@
-import { AnimatePresence, motion } from 'motion/react';
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { WhatsappLogo } from '@phosphor-icons/react';
+import { useEffect } from 'react';
 import { Toaster, toast } from 'sonner';
 import { carregarCatalogo } from './lib/catalogo';
 import { MENSAGEM_GERAL, linkWhatsapp } from './lib/whatsapp';
-import { useRolagemSuave } from './hooks/useRolagemSuave';
+import { useRota } from './hooks/useRota';
 import { useLista } from './store/lista';
 import { useAlgumPainelAberto, useUI } from './store/ui';
-import { Abertura } from './components/Abertura';
 import { AntesDePedir } from './components/AntesDePedir';
 import { Busca } from './components/Busca';
-import { Catalogo } from './components/Catalogo';
-import { FaixaCategorias } from './components/FaixaCategorias';
-import { IconeWhats } from './components/Botoes';
+import { CompraRapida } from './components/CompraRapida';
 import { ListaPedido } from './components/ListaPedido';
+import { Menu } from './components/Menu';
 import { Navegacao } from './components/Navegacao';
-import { Queridinhos } from './components/Queridinhos';
+import { PaginaBrindes, PaginaInicio, PaginaProdutos } from './components/Paginas';
 import { Rodape } from './components/Rodape';
 import { TelaProduto, useProdutoNaUrl } from './components/TelaProduto';
-
-const ComoPedir = lazy(() => import('./components/ComoPedir'));
 
 function useCarregarPlanilha() {
   const setCatalogo = useUI((s) => s.setCatalogo);
@@ -27,11 +23,11 @@ function useCarregarPlanilha() {
     carregarCatalogo()
       .then((categorias) => {
         setCatalogo(categorias);
-        // Item da lista que esgotou ou saiu da planilha sai da lista com aviso.
+        // Item da sacola que esgotou ou saiu da planilha sai com aviso.
         const removidos = useLista.getState().conferir(categorias);
         if (removidos.length > 0) {
-          toast('Sua lista foi atualizada', {
-            description: `${removidos.join(', ')} ${removidos.length === 1 ? 'esgotou e saiu' : 'esgotaram e saíram'} da lista.`,
+          toast('Sua sacola foi atualizada', {
+            description: `${removidos.join(', ')} ${removidos.length === 1 ? 'esgotou e saiu' : 'esgotaram e saíram'} da sacola.`,
           });
         }
       })
@@ -39,74 +35,55 @@ function useCarregarPlanilha() {
   }, [setCatalogo, setErro]);
 }
 
-// Botão flutuante de dúvida: aparece depois que a abertura sai da tela.
-function DuvidaFlutuante({ abertura }: { abertura: React.RefObject<HTMLDivElement | null> }) {
-  const [visivel, setVisivel] = useState(false);
+function DuvidaFlutuante() {
   const painelAberto = useAlgumPainelAberto();
-  useEffect(() => {
-    if (!abertura.current) return;
-    // Só depois que a abertura passou pra cima (não antes de chegar nela).
-    const obs = new IntersectionObserver(([e]) => setVisivel(!e.isIntersecting && e.boundingClientRect.top < 0), { threshold: 0 });
-    obs.observe(abertura.current);
-    return () => obs.disconnect();
-  }, [abertura]);
+  if (painelAberto) return null;
   return (
-    <AnimatePresence>
-      {visivel && !painelAberto && (
-        <motion.a
-          href={linkWhatsapp(MENSAGEM_GERAL)}
-          target="_blank"
-          rel="noopener"
-          aria-label="Tirar uma dúvida no WhatsApp"
-          data-evento="duvida_whatsapp"
-          data-link="flutuante"
-          initial={{ opacity: 0, scale: 0.6, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.6, y: 20 }}
-          transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-          className="fixed bottom-[max(16px,env(safe-area-inset-bottom))] right-4 z-40 grid size-14 place-items-center rounded-full bg-acento text-fundo shadow-(--shadow-acento) active:scale-95"
-        >
-          <IconeWhats size={24} />
-        </motion.a>
-      )}
-    </AnimatePresence>
+    <a
+      href={linkWhatsapp(MENSAGEM_GERAL)}
+      target="_blank"
+      rel="noopener"
+      aria-label="Tirar uma dúvida no WhatsApp"
+      data-evento="duvida_whatsapp"
+      data-link="flutuante"
+      className="fixed bottom-[calc(72px+env(safe-area-inset-bottom))] right-3 z-30 grid size-12 place-items-center rounded-full bg-white/30 text-sobre-acento ring-1 ring-sobre-acento/20 backdrop-blur-md active:scale-95 md:bottom-6 md:right-6"
+    >
+      <WhatsappLogo size={24} />
+    </a>
   );
 }
 
 export default function App() {
-  useRolagemSuave();
+  useRota();
   useCarregarPlanilha();
   useProdutoNaUrl();
-  const sentinelaAbertura = useRef<HTMLDivElement>(null);
+  const pagina = useUI((s) => s.pagina);
 
   return (
-    <div className="grao">
+    <div className="flex min-h-dvh flex-col bg-fundo">
       <Navegacao />
-      <main>
-        <Abertura />
-        <div ref={sentinelaAbertura} aria-hidden />
-        <FaixaCategorias />
-        <Queridinhos />
-        <Catalogo />
-        <Suspense fallback={<div className="min-h-[60svh]" />}>
-          <ComoPedir />
-        </Suspense>
+      <main className="flex-1">
+        {pagina.tipo === 'inicio' && <PaginaInicio />}
+        {pagina.tipo === 'produtos' && <PaginaProdutos categoria={pagina.categoria} />}
+        {pagina.tipo === 'brindes' && <PaginaBrindes />}
         <AntesDePedir />
       </main>
       <Rodape />
-      <DuvidaFlutuante abertura={sentinelaAbertura} />
+      <DuvidaFlutuante />
       <TelaProduto />
+      <CompraRapida />
       <ListaPedido />
+      <Menu />
       <Busca />
       <Toaster
         position="top-center"
-        offset={84}
-        mobileOffset={{ top: 84 }}
+        offset={16}
+        mobileOffset={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
         toastOptions={{
           classNames: {
-            toast: '!rounded-[1.25rem] !bg-superficie-2 !text-texto !border !border-texto/10 !shadow-(--shadow-flutua) !font-sans',
+            toast: '!rounded-2xl !bg-superficie !text-texto !border !border-linha !shadow-(--shadow-flutua) !font-sans',
             description: '!text-suave',
-            actionButton: '!bg-acento !text-fundo !rounded-full !px-3 !font-medium',
+            actionButton: '!bg-acento !text-sobre-acento !rounded-full !px-3 !font-semibold',
           },
         }}
       />

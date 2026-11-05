@@ -59,7 +59,8 @@ export function voarParaSacola(origem: HTMLElement | null): Promise<void> {
     top: `${de.top}px`,
     width: `${de.width}px`,
     height: `${de.height}px`,
-    objectFit: 'contain',
+    // cover: o formato do card é diferente do da foto, e contain deixaria faixas vazias.
+    objectFit: 'cover',
     borderRadius: '24px',
     pointerEvents: 'none',
     zIndex: '70',
@@ -81,7 +82,7 @@ export function voarParaSacola(origem: HTMLElement | null): Promise<void> {
         // A curva de cada quadro vale pro trecho que começa nele.
         { transform: 'translate(0, 0) scale(1)', opacity: 1, borderRadius: '24px', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
         { transform: `translate(${dx * 0.3}px, ${dy * 0.3 + arco}px) scale(0.38)`, opacity: 1, borderRadius: '48px', offset: 0.4, easing: 'cubic-bezier(0.55, 0, 1, 0.45)' },
-        { transform: `translate(${dx}px, ${dy}px) scale(${escalaFinal})`, opacity: 0.4, borderRadius: '999px' },
+        { transform: `translate(${dx}px, ${dy}px) scale(${escalaFinal})`, opacity: 1, borderRadius: '999px' },
       ],
       { duration: 760, fill: 'forwards' },
     )

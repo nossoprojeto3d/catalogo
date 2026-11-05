@@ -1,65 +1,77 @@
-import { MagnifyingGlass, ShoppingBagOpen } from '@phosphor-icons/react';
-import { AnimatePresence, motion } from 'motion/react';
+import { House, List, MagnifyingGlass, ShoppingBag } from '@phosphor-icons/react';
+import type { ReactNode } from 'react';
+import { ID_SACOLA } from '../lib/efeitos';
+import { irPara } from '../hooks/useRota';
+import { useDesktop } from '../hooks/useTela';
 import { totalDeItens, useLista } from '../store/lista';
 import { useUI } from '../store/ui';
-import { ID_SACOLA } from '../lib/efeitos';
-import { BotaoIcone } from './Botoes';
-import { rolarAte } from '../hooks/useRolagemSuave';
+import { Logo } from './Botoes';
 
-const LOGO = `${import.meta.env.BASE_URL}logo.png`;
+function Contador({ valor }: { valor: number }) {
+  if (valor <= 0) return null;
+  return (
+    <span aria-hidden className="absolute -right-2 -top-1.5 grid min-w-5 place-items-center rounded-full bg-texto px-1 text-[11px] font-semibold leading-5 text-fundo ring-2 ring-barra">
+      {valor}
+    </span>
+  );
+}
 
-// Ilha flutuante: solta do topo, com vidro fosco (só em elemento fixo).
+function ItemBarra({ rotulo, icone, ativo, onClick, id, aria }: { rotulo: string; icone: ReactNode; ativo?: boolean; onClick: () => void; id?: string; aria?: string }) {
+  return (
+    <button id={id} type="button" onClick={onClick} aria-label={aria} aria-current={ativo ? 'page' : undefined} className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[12px] font-medium">
+      <span className="relative">{icone}</span>
+      {rotulo}
+    </button>
+  );
+}
+
 export function Navegacao() {
+  const desktop = useDesktop();
   const quantidade = useLista((s) => totalDeItens(s.itens));
+  const pagina = useUI((s) => s.pagina.tipo);
   const setBusca = useUI((s) => s.setBuscaAberta);
   const setLista = useUI((s) => s.setListaAberta);
+  const setMenu = useUI((s) => s.setMenuAberto);
+  const ariaSacola = `Abrir sacola (${quantidade} ${quantidade === 1 ? 'item' : 'itens'})`;
+  const marca = (
+    <a href="#inicio" className="flex items-center gap-2.5 py-2">
+      <Logo className="h-9" />
+      <span className="titulo whitespace-nowrap text-[17px]">Nosso Projeto 3D</span>
+    </a>
+  );
 
+  if (!desktop) {
+    return (
+      <>
+        <header className="sticky top-0 z-40 flex justify-center bg-barra px-4 pt-[env(safe-area-inset-top)] text-sobre-barra">{marca}</header>
+        <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-barra-linha bg-barra pb-[env(safe-area-inset-bottom)] text-sobre-barra">
+          <ItemBarra rotulo="Início" icone={<House size={24} weight={pagina === 'inicio' ? 'fill' : 'regular'} />} ativo={pagina === 'inicio'} onClick={() => irPara({ tipo: 'inicio' })} />
+          <ItemBarra rotulo="Categorias" icone={<List size={24} />} onClick={() => setMenu(true)} />
+          <ItemBarra rotulo="Buscar" icone={<MagnifyingGlass size={24} />} onClick={() => setBusca(true)} />
+          <ItemBarra id={ID_SACOLA} rotulo="Sacola" aria={ariaSacola} icone={<><ShoppingBag size={24} /><Contador valor={quantidade} /></>} onClick={() => setLista(true)} />
+        </nav>
+      </>
+    );
+  }
+
+  const link = 'whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium transition-colors hover:bg-sobre-barra/10 lg:px-4';
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-3 pt-[max(12px,env(safe-area-inset-top))]">
-      <motion.nav
-        initial={{ y: -24, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-        className="pointer-events-auto flex w-full max-w-xl items-center justify-between gap-2 rounded-full bg-superficie/72 py-1.5 pl-2 pr-1.5 shadow-(--shadow-flutua) ring-1 ring-texto/6 backdrop-blur-xl backdrop-saturate-150"
-        aria-label="Principal"
-      >
-        <a
-          href="#topo"
-          onClick={(e) => { e.preventDefault(); rolarAte('#topo', 0); }}
-          className="flex items-center gap-2.5 rounded-full py-1 pl-1.5 pr-3"
-        >
-          <img src={LOGO} alt="" className="h-8 w-auto" width={28} height={33} />
-          <span className="titulo text-[13px] tracking-[-0.02em]">Nosso Projeto 3D</span>
-        </a>
-        <div className="flex items-center gap-0.5">
-          <BotaoIcone aria-label="Buscar produtos" onClick={() => setBusca(true)}>
-            <MagnifyingGlass size={21} weight="light" />
-          </BotaoIcone>
-          <BotaoIcone
-            id={ID_SACOLA}
-            aria-label={`Ver sua lista (${quantidade} ${quantidade === 1 ? 'item' : 'itens'})`}
-            onClick={() => setLista(true)}
-            className="bg-texto text-fundo hover:bg-white"
-          >
-            <ShoppingBagOpen size={21} weight="light" />
-            <AnimatePresence>
-              {quantidade > 0 && (
-                <motion.span
-                  key={quantidade}
-                  initial={{ scale: 0.4, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.4, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 520, damping: 22 }}
-                  className="absolute -right-0.5 -top-0.5 grid min-w-5 place-items-center rounded-full bg-acento px-1 font-mono text-[11px] font-medium leading-5 text-fundo ring-2 ring-superficie"
-                  aria-hidden
-                >
-                  {quantidade}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </BotaoIcone>
-        </div>
-      </motion.nav>
+    <header className="sticky top-0 z-40 border-b border-barra-linha bg-barra text-sobre-barra">
+      <div className="mx-auto flex max-w-[1240px] items-center gap-2 px-6 lg:gap-6">
+        {marca}
+        <nav aria-label="Principal" className="flex items-center gap-1">
+          <a href="#produtos" className={link}>Para você</a>
+          <a href="#brindes" className={link}>Brindes</a>
+          <button type="button" onClick={() => setMenu(true)} className={link}>Categorias</button>
+        </nav>
+        <button type="button" onClick={() => setBusca(true)} aria-label="Buscar peça" className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-superficie text-[15px] text-suave ring-1 ring-texto/10 lg:w-64 lg:justify-start lg:px-4">
+          <MagnifyingGlass size={18} /> <span className="hidden lg:inline">Buscar peça</span>
+        </button>
+        <button id={ID_SACOLA} type="button" onClick={() => setLista(true)} aria-label={ariaSacola} className="relative flex h-11 items-center gap-2 rounded-full px-3 text-[15px] font-medium transition-colors hover:bg-sobre-barra/10">
+          <span className="relative"><ShoppingBag size={24} /><Contador valor={quantidade} /></span>
+          <span className="ml-1 hidden lg:inline">Sacola</span>
+        </button>
+      </div>
     </header>
   );
 }

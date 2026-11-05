@@ -24,14 +24,14 @@ export const ITENS_ANTES_DE_PEDIR = [
 ];
 
 export function AntesDePedir() {
-  const [aberto, setAberto] = useState<number | null>(0);
+  const [aberto, setAberto] = useState<number | null>(null);
   return (
-    <section id="antes-de-pedir" className="mx-auto grid max-w-[1400px] gap-10 px-4 pb-24 md:grid-cols-[0.8fr_1.2fr] md:gap-16 md:px-10 md:pb-36 lg:px-16">
+    <section id="antes-de-pedir" className="mx-auto mt-12 max-w-[1240px] px-4 md:mt-16 md:px-6">
       <div>
-        <h2 className="titulo text-[clamp(2.2rem,8vw,5rem)]">Antes de pedir</h2>
-        <p className="mt-4 max-w-[34ch] text-suave">Um papo rápido sobre garantia, cuidados e cores.</p>
+        <h2 className="titulo text-[24px] md:text-[32px]">Antes de pedir</h2>
+        <p className="mt-1 text-[15px] text-suave">Garantia, cuidados e cores.</p>
       </div>
-      <ul className="divide-y divide-texto/8 border-y border-texto/8">
+      <ul className="mt-3 divide-y divide-linha border-y border-linha">
         {ITENS_ANTES_DE_PEDIR.map((item, i) => {
           const estaAberto = aberto === i;
           return (
@@ -40,10 +40,10 @@ export function AntesDePedir() {
                 type="button"
                 aria-expanded={estaAberto}
                 onClick={() => setAberto(estaAberto ? null : i)}
-                className="flex w-full items-center justify-between gap-4 py-5 text-left text-[17px] font-medium"
+                className="flex w-full items-center justify-between gap-4 py-3.5 text-left text-[16px] font-medium"
               >
                 {item.titulo}
-                <span className={`grid size-9 shrink-0 place-items-center rounded-full ring-1 ring-texto/10 transition-transform duration-500 ease-(--ease-mola) ${estaAberto ? 'rotate-45 bg-texto text-fundo' : ''}`}>
+                <span className={`grid size-9 shrink-0 place-items-center rounded-full transition-transform duration-300 ${estaAberto ? 'rotate-45' : ''}`}>
                   <Plus size={16} />
                 </span>
               </button>

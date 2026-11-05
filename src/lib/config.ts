@@ -20,6 +20,10 @@ export const ABAS_CATEGORIAS = [
   'Lembrancinhas',
 ];
 
+// Abas mostradas em "Brindes para seus clientes", com os atalhos de quantidade.
+export const ABAS_BRINDES = ['Personalizados', 'Lembrancinhas'];
+export const QUANTIDADES_COMBO = [10, 20, 30];
+
 // Cada aba fica 5 minutos no sessionStorage: trocar de categoria ou
 // voltar à página não refaz as 10 buscas, e preço/estoque seguem atuais.
 export const DURACAO_CACHE_ABA_MS = 5 * 60 * 1000;

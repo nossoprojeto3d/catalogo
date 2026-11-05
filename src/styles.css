@@ -1,47 +1,51 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/archivo/wdth.css';
 @import '@fontsource-variable/instrument-sans';
-@import '@fontsource-variable/geist-mono';
 
 /* =====================================================================
-   Catálogo v3: "Filamento". Grafite quase preto, texto cor de osso e um
-   único acento verde-limão (a cor do filamento). Tema escuro na página
-   toda, sem seção invertida.
-   Forma: botões e campos em pílula; cards com 24px por fora e 18px por
-   dentro (moldura dupla); fotos com 18px.
+   Catálogo v4: claro e direto. Fundo quase branco, texto grafite e o limão
+   da marca como cor de destaque. Limão não vira texto em fundo claro (não
+   dá contraste): para texto verde, use acento-escuro. Texto sobre o limão
+   é sempre text-sobre-acento.
    ===================================================================== */
 @theme {
-  --color-fundo: #0c0d0b;
-  --color-superficie: #151713;
-  --color-superficie-2: #1d201a;
-  --color-linha: #2a2e26;
-  --color-texto: #eeeee6;
-  --color-suave: #a3a69b;
+  --color-fundo: #f8f9f4;
+  --color-superficie: #ffffff;
+  --color-superficie-2: #eef0e7;
+  --color-linha: #dfe2d5;
+  --color-texto: #23261c;
+  --color-suave: #5f6456;
   --color-acento: #c6f432;
   --color-acento-forte: #b2e01c;
-  --color-acento-suave: #2a3310;
+  --color-acento-escuro: #4a6400;
+  --color-sobre-acento: #23261c;
+
+  /* Topo, barra de baixo e rodapé */
+  --color-barra: #c6f432;
+  --color-sobre-barra: #23261c;
+  --color-barra-linha: #a9d41f;
 
   --font-display: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
 
   --ease-mola: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-saida: cubic-bezier(0.16, 1, 0.3, 1);
 
-  --shadow-flutua: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px -20px rgb(0 0 0 / 0.7);
-  --shadow-suave: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 10px 30px -16px rgb(0 0 0 / 0.6);
-  --shadow-acento: 0 14px 40px -14px rgb(198 244 50 / 0.45);
+  --shadow-flutua: 0 18px 50px -18px rgb(35 38 28 / 0.32);
+  --shadow-suave: 0 6px 18px -10px rgb(35 38 28 / 0.28);
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
-    background: var(--color-fundo);
-    color-scheme: dark;
+    /* Limão atrás de tudo: é o que o celular mostra na faixa do relógio e ao
+       puxar a página além do começo ou do fim. O conteúdo tem fundo próprio. */
+    background: var(--color-barra);
+    color-scheme: light;
   }
   body {
-    background: var(--color-fundo);
+    background: var(--color-barra);
     color: var(--color-texto);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -49,11 +53,11 @@
   }
   ::selection {
     background: var(--color-acento);
-    color: var(--color-fundo);
+    color: var(--color-sobre-acento);
   }
   :focus-visible {
-    outline: 2px solid var(--color-acento);
-    outline-offset: 3px;
+    outline: 2px solid var(--color-acento-escuro);
+    outline-offset: 2px;
   }
   /* Gaveta e modal recebem foco ao abrir: sem contorno neles. */
   [data-vaul-drawer]:focus-visible,
@@ -61,90 +65,64 @@
   button { cursor: pointer; }
 }
 
-/* Títulos: Archivo expandida (eixo de largura) */
 .titulo {
   font-family: var(--font-display);
-  font-stretch: 125%;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 0.92;
+  font-stretch: 112%;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
-/* Lenis (rolagem suave) */
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-stopped { overflow: clip; }
-
-/* Grão: fixo e sem eventos, nunca dentro de área que rola */
-.grao::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.06;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* Malha técnica de pontos, para áreas vazias */
 .pontos {
-  background-image: radial-gradient(rgb(238 238 230 / 0.09) 1px, transparent 1px);
+  background-image: radial-gradient(rgb(35 38 28 / 0.1) 1px, transparent 1px);
   background-size: 18px 18px;
+}
+
+/* Assinatura da marca: linhas finas que lembram as camadas de uma peça
+   impressa, formando um degrau no canto. A cor vem de currentColor. */
+.camadas {
+  position: absolute;
+  right: 0;
+  width: 112px;
+  height: 112px;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(to bottom, currentColor 0 1.5px, transparent 1.5px 7px);
+}
+.camadas-baixo { bottom: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.camadas-cima { top: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+@media (max-width: 767px) {
+  .camadas-curta { width: 72px; height: 72px; } /* não encosta no título do banner */
+}
+@media (min-width: 768px) {
+  .camadas { width: 200px; height: 200px; }
 }
 
 .sem-barra { scrollbar-width: none; }
 .sem-barra::-webkit-scrollbar { display: none; }
 
-/* Esqueleto de carregamento com brilho que passa */
 .esqueleto {
-  background: linear-gradient(100deg, var(--color-superficie-2) 40%, #262a22 50%, var(--color-superficie-2) 60%);
+  background: linear-gradient(100deg, var(--color-superficie-2) 40%, #f6f7f0 50%, var(--color-superficie-2) 60%);
   background-size: 300% 100%;
   animation: brilho 1.6s var(--ease-mola) infinite;
 }
 @keyframes brilho { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
-/* Faixa de categorias que corre (a única da página). Não pausa no hover nem
-   no toque: só o clique numa categoria faz algo. */
-.faixa { animation: faixa 38s linear infinite; }
-@keyframes faixa { to { transform: translateX(-50%); } }
-
-/* Card com borda que acende sob o cursor (só com mouse) */
-.holofote { position: relative; isolation: isolate; }
-.holofote::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: inherit;
-  padding: 1px;
-  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, -40%), rgb(198 244 50 / 0.6), transparent 60%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s var(--ease-mola);
-}
-@media (hover: hover) { .holofote:hover::before { opacity: 1; } }
-
 @media (prefers-reduced-motion: reduce) {
-  .esqueleto, .faixa { animation: none; }
+  .esqueleto { animation: none; }
   *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
 }
 
-/* vaul: painel do produto e da lista */
-[data-vaul-overlay] { background: rgb(0 0 0 / 0.6); }
+[data-vaul-overlay] { background: rgb(35 38 28 / 0.4); }
 
 /* Aviso de cookies do medicao.js (arquivo compartilhado entre os projetos,
-   não mexer nele): só as cores são trocadas aqui, para a paleta do catálogo. */
+   não mexer nele): só cor e posição são trocadas aqui. */
 html body #np3d-cookies {
   background: var(--color-superficie);
   color: var(--color-texto);
   border: 0;
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   box-shadow: var(--shadow-flutua);
-  outline: 1px solid rgb(238 238 230 / 0.08);
+  outline: 1px solid var(--color-linha);
   font-family: var(--font-sans);
 }
 html body #np3d-cookies p { color: var(--color-suave); }
@@ -152,11 +130,16 @@ html body #np3d-cookies button {
   border-radius: 999px;
   background: transparent;
   color: var(--color-texto);
-  border-color: rgb(238 238 230 / 0.2);
+  border-color: var(--color-linha);
 }
 html body #np3d-cookies button[data-acao=aceitar] {
   background: var(--color-acento);
   border-color: var(--color-acento);
-  color: var(--color-fundo);
+  color: var(--color-sobre-acento);
 }
-html body #np3d-cookies button:focus-visible { outline-color: var(--color-acento); }
+html body #np3d-cookies button:focus-visible { outline-color: var(--color-acento-escuro); }
+@media (max-width: 767px) {
+  html body #np3d-cookies { bottom: calc(76px + env(safe-area-inset-bottom)); }
+  /* O aviso ocupa a mesma altura do botão do WhatsApp: esconde o botão até a resposta. */
+  body:has(#np3d-cookies) a[data-link='flutuante'] { visibility: hidden; }
+}

@@ -1,4 +1,5 @@
 import { ABAS_CATEGORIAS, DURACAO_CACHE_ABA_MS, SHEET_ID } from './config';
+import { paraNumero, precoUnitario } from './preco';
 
 export type Produto = {
   nome: string;
@@ -8,6 +9,8 @@ export type Produto = {
   precoPromocional: string;
   foto: string;
   cores: string[];
+  // Preço fechado por quantidade (coluna Combos): { 10: 119, 20: 220 }
+  combos: Record<number, number>;
   maisVendido: number | null;
   esgotado: boolean;
   categoria: string;
@@ -40,6 +43,16 @@ export function interpretarCSV(texto: string): string[][] {
   return linhas.filter((l) => l.some((v) => v.trim() !== ''));
 }
 
+// Coluna Combos: "10=119,00; 20=220,00". O que não seguir o formato é ignorado.
+export function lerCombos(texto: string): Record<number, number> {
+  const combos: Record<number, number> = {};
+  for (const [, quantidade, valor] of texto.matchAll(/(\d+)\s*[=:]\s*([\d.,]+)/g)) {
+    const preco = paraNumero(valor);
+    if (preco > 0) combos[Number(quantidade)] = preco;
+  }
+  return combos;
+}
+
 // Uma aba vira uma categoria. As colunas são achadas pelo nome do
 // cabeçalho, então a ordem delas na planilha não importa.
 export function montarCategoria(nomeAba: string, linhas: string[][]): Categoria {
@@ -66,6 +79,7 @@ export function montarCategoria(nomeAba: string, linhas: string[][]): Categoria 
       precoPromocional: ler(linha, 'precopromocional'),
       foto: ler(linha, 'foto'),
       cores: coresTexto ? coresTexto.split(',').map((c) => c.trim()).filter(Boolean) : [],
+      combos: lerCombos(ler(linha, 'combos')),
       maisVendido,
       esgotado: !!ler(linha, 'esgotado'),
       categoria: nomeAba,
@@ -79,6 +93,22 @@ export function ordenarProdutos(produtos: Produto[]): Produto[] {
   return [...produtos]
     .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
     .sort((a, b) => Number(a.esgotado) - Number(b.esgotado));
+}
+
+export type Ordem = 'pedidos' | 'menor' | 'maior' | 'nome';
+
+// Ordem escolhida pelo cliente, com esgotados sempre por último.
+export function ordenarPor(produtos: Produto[], ordem: Ordem): Produto[] {
+  const base = ordenarProdutos(produtos);
+  const comparar: Record<Ordem, ((a: Produto, b: Produto) => number) | null> = {
+    nome: null,
+    pedidos: (a, b) => (a.maisVendido ?? Infinity) - (b.maisVendido ?? Infinity),
+    menor: (a, b) => precoUnitario(a) - precoUnitario(b),
+    maior: (a, b) => precoUnitario(b) - precoUnitario(a),
+  };
+  const regra = comparar[ordem];
+  const ordenados = regra ? [...base].sort((a, b) => (a.maisVendido === b.maisVendido && ordem === 'pedidos' ? 0 : regra(a, b))) : base;
+  return ordenados.sort((a, b) => Number(a.esgotado) - Number(b.esgotado));
 }
 
 export function ordenarCategorias(categorias: Categoria[]): Categoria[] {

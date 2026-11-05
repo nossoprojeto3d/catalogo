@@ -1,9 +1,8 @@
 # Padrão das fotos de produto
 
 Toda foto de produto do catálogo segue este padrão. Assim ela aparece bem em
-todos os lugares: no anel da abertura e na tela do produto aparece inteira,
-nos cards do catálogo é recortada em quadrado e em "Os queridinhos" é
-recortada em retrato.
+todos os lugares: na tela do produto aparece inteira e nos cards do catálogo é
+recortada em retrato (3:4).
 
 Molde visual com as áreas: [molde-foto-1200x900.png](molde-foto-1200x900.png)
 

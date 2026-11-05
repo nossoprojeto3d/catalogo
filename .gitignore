@@ -9,3 +9,5 @@ previa-fotos/
 .claude-flow/
 .swarm/
 ruvector.db
+agentdb.rvf
+agentdb.rvf.idmap.json
