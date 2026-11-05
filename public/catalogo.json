@@ -37,18 +37,6 @@
           "esgotado": false
         },
         {
-          "nome": "Banana Articulada",
-          "codigo": "KID-02",
-          "descricao": "",
-          "preco": "29,90",
-          "precoPromocional": "",
-          "foto": "",
-          "cores": [],
-          "combos": {},
-          "maisVendido": null,
-          "esgotado": false
-        },
-        {
           "nome": "Cilindro Infinito",
           "codigo": "KID-12",
           "descricao": "",
@@ -676,6 +664,18 @@
           "combos": {},
           "maisVendido": null,
           "esgotado": false
+        },
+        {
+          "nome": "Banana Articulada",
+          "descricao": "",
+          "preco": "29,90",
+          "precoPromocional": "",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "KID-02"
         },
         {
           "nome": "Kit 3 Anjinhos",
