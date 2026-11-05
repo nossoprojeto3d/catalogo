@@ -4,7 +4,7 @@ import type { Produto } from '../lib/catalogo';
 import { QUANTIDADES_COMBO } from '../lib/config';
 import { corDaBolinha } from '../lib/cores';
 import { medir } from '../lib/medicao';
-import { textoDoItem, totalDoItem } from '../lib/preco';
+import { temCombos, textoDoItem, totalDoItem } from '../lib/preco';
 
 // Compacta: para a sacola. O visual tem 32px, e o toque vai além para cima e para baixo.
 export function Quantidade({ valor, mudar, rotulo, compacta }: { valor: number; mudar: (n: number) => void; rotulo: string; compacta?: boolean }) {
@@ -82,28 +82,34 @@ export function SeletorQuantidade({ produto, escolha }: { produto: Produto; esco
         <span className="text-[15px] font-semibold">Quantidade</span>
         <Quantidade valor={quantidade} mudar={(n) => setQuantidade(Math.max(1, Math.min(99, n)))} rotulo="Quantidade" />
       </div>
-      <p className="mt-4 text-[15px] font-semibold">Para brindes</p>
-      <div className="mt-2 grid grid-cols-3 gap-2">
-        {QUANTIDADES_COMBO.map((n) => {
-          const ativo = quantidade === n;
-          const valor = totalDoItem(produto, n);
-          return (
-            <button
-              key={n}
-              type="button"
-              aria-pressed={ativo}
-              onClick={() => { setQuantidade(n); medir('combo_escolhido', { produto: produto.nome, quantidade: n }); }}
-              className={`rounded-2xl px-1 py-2.5 text-center ring-1 transition-colors ${ativo ? 'bg-acento text-sobre-acento ring-acento-forte' : 'bg-superficie ring-texto/20'}`}
-            >
-              <span className="block text-[15px] font-semibold">{n} unidades</span>
-              <span className={`block text-[13px] tabular-nums ${ativo ? 'text-sobre-acento' : 'text-suave'}`}>{valor > 0 ? textoDoItem(produto, n) : 'a combinar'}</span>
-            </button>
-          );
-        })}
-      </div>
-      <p className="mt-2 text-[13px] leading-snug text-suave">
-        Precisa de outra quantidade? Combine com a gente no WhatsApp.
-      </p>
+      {temCombos(produto) ? (
+        <>
+          <p className="mt-4 text-[15px] font-semibold">Para brindes</p>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {QUANTIDADES_COMBO.map((n) => {
+              const ativo = quantidade === n;
+              const valor = totalDoItem(produto, n);
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  aria-pressed={ativo}
+                  onClick={() => { setQuantidade(n); medir('combo_escolhido', { produto: produto.nome, quantidade: n }); }}
+                  className={`rounded-2xl px-1 py-2.5 text-center ring-1 transition-colors ${ativo ? 'bg-acento text-sobre-acento ring-acento-forte' : 'bg-superficie ring-texto/20'}`}
+                >
+                  <span className="block text-[15px] font-semibold">{n} unidades</span>
+                  <span className={`block text-[13px] tabular-nums ${ativo ? 'text-sobre-acento' : 'text-suave'}`}>{valor > 0 ? textoDoItem(produto, n) : 'a combinar'}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[13px] leading-snug text-suave">
+            Precisa de outra quantidade? Combine com a gente no WhatsApp.
+          </p>
+        </>
+      ) : (
+        <p className="mt-2 text-[13px] leading-snug text-suave">Para comprar em quantidade, combine com a gente no WhatsApp.</p>
+      )}
     </div>
   );
 }

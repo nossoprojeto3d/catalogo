@@ -37,6 +37,7 @@ Em desenvolvimento: versão 4, na branch `v4`. Push na `v4` não publica nada; o
 - Cada aba fica 5 minutos em cache no `sessionStorage`.
 - Pedido pelo WhatsApp. Não tem carrinho, pagamento nem cadastro.
 - Coluna `Tag` não é usada (sem selo e sem categoria "Lançamentos").
+- Combos de 10, 20 e 30 só existem nas abas de `ABAS_BRINDES`. Nas outras, a quantidade é só quantidade, com centavos e sem "Combo" na mensagem.
 - Coluna opcional `Combos` define preço fechado (`10=99,00; 20=180,00; 30=250,00`). Sem ela, o combo multiplica o preço da unidade.
 - Brindes são as abas de `ABAS_BRINDES`. Termos: "Para você ou para presentear" e "Brindes para seus clientes", sem "lembrancinhas" nem "evento" no texto visível.
 - Produto com `Cores` exige escolher a cor antes de pedir ou pôr na lista.
@@ -72,7 +73,7 @@ Usado pelo `/conferir-site`, no celular e no desktop (`npm run build && npm run 
 3. Rolagem infinita: rolar até o fim de "Kids" (6 em 6), trocar de categoria e rolar de novo.
 4. Cards em 2 colunas sem vazar. Esgotados por último, com "Avise-me quando voltar" na tela do produto.
 5. Nenhuma foto quebrada. "Foto em breve" só para quem não tem foto; liste esses códigos.
-6. Tela do produto: num produto com `Cores`, "Pedir" sem cor pede a cor; escolher cor e quantidade e conferir o valor no botão e a mensagem. Em brindes, conferir os combos de 10, 20 e 30 em valor inteiro. No computador, duas colunas, com "Sacola" e "Pedir" sempre visíveis.
+6. Tela do produto: num produto com `Cores`, "Pedir" sem cor pede a cor; escolher cor e quantidade e conferir o valor no botão e a mensagem. Em peças das abas de brindes, conferir os combos de 10, 20 e 30 em valor inteiro; nas outras, sem botões de combo. No computador, duas colunas, com "Sacola" e "Pedir" sempre visíveis.
 7. Card: botão de sacola adiciona direto com a foto voando, sem parte transparente; com `Cores`, abre a compra rápida.
 8. Sacola: adicionar 2 produtos, conferir contador, mudar quantidade, total, mensagem de "Enviar pedido no WhatsApp" e "Limpar sacola" (dois toques).
 9. WhatsApp: conferir o `href` (`wa.me/5562993152843?text=...`) sem clicar.

@@ -1,5 +1,5 @@
 import type { Produto } from './catalogo';
-import { QUANTIDADES_COMBO } from './config';
+import { ABAS_BRINDES, QUANTIDADES_COMBO } from './config';
 
 // "1.234,56" -> 1234.56 (a planilha usa vírgula decimal)
 export function paraNumero(valor: string): number {
@@ -22,9 +22,15 @@ export function precoUnitario(p: Produto): number {
   return emPromocao(p) ? paraNumero(p.precoPromocional) : paraNumero(p.preco);
 }
 
+// Só as abas de brindes têm combo. Nas outras, 10 unidades são 10 unidades.
+export function temCombos(p: Produto): boolean {
+  return ABAS_BRINDES.includes(p.categoria);
+}
+
 // Combo: preço fechado da coluna Combos ou, sem ele, 10, 20 ou 30 vezes o
 // preço da unidade. O valor do combo é sempre inteiro: os centavos caem.
 export function emCombo(p: Produto, quantidade: number): boolean {
+  if (!temCombos(p)) return false;
   if ((p.combos[quantidade] ?? 0) > 0) return true;
   return QUANTIDADES_COMBO.includes(quantidade) && precoUnitario(p) > 0;
 }
