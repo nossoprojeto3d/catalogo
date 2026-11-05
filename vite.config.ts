@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { pluginFotos } from './scripts/plugin-fotos';
+import { pluginFotos } from './scripts/plugin-fotos.ts';
 
 // GitHub Pages publica em https://nossoprojeto3d.github.io/catalogo/
 export default defineConfig({

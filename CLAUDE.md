@@ -3,7 +3,13 @@
 Site publicado no GitHub Pages: https://nossoprojeto3d.github.io/catalogo/
 Todo push na `main` vai pro ar pelo GitHub Action `.github/workflows/publicar.yml` (testes, build e publicação).
 
-Versão 3 (branch `v3`): React + Vite + Tailwind v4. A versão 2 (HTML único) está na tag `backup-oficial-*`.
+No ar: versão 3 (React + Vite + Tailwind v4), na branch `main`.
+
+## Versões e backups
+
+- `v3.0.0`: versão 3 no ar. `v2.0.0`: versão 2 (HTML único). Tags de versão são permanentes.
+- `backup-oficial-AAAAMMDD`: último backup oficial. Só o mais recente fica, então não use essa tag como referência fixa.
+- Voltar para a v2 não é só reverter o código: o Action publica `dist/`, que a v2 não tem. Em Settings > Pages, a origem precisa continuar "GitHub Actions" para a v3 funcionar.
 
 ## Rodar local
 
@@ -16,11 +22,12 @@ Versão 3 (branch `v3`): React + Vite + Tailwind v4. A versão 2 (HTML único) e
 - `src/lib/config.ts`: número do WhatsApp, ID da planilha, `ABAS_CATEGORIAS`, cache e tamanho do lote.
 - `src/lib/catalogo.ts`: leitura do CSV, montagem das categorias, ordenação, queridinhos, busca.
 - `src/lib/whatsapp.ts`: texto das mensagens. O formato foi aprovado pelo usuário em 08/10/2026; não mudar sem pedir.
-- `src/lib/preco.ts`, `cores.ts`, `fotos.ts`, `medicao.ts`.
+- `src/lib/preco.ts`, `cores.ts`, `fotos.ts`, `medicao.ts` e `efeitos.ts` (foto voando até a sacola).
+- `src/hooks/`: `useRolagemSuave` (Lenis, só mouse e trackpad) e `useTela` (consultas de tela e movimento reduzido).
 - `src/store/`: lista de pedido (zustand, chave `np3d_lista` no localStorage, compatível com a v2) e estado da interface.
 - `src/components/`: uma seção por arquivo. `TelaProduto` é tela cheia no celular (entra da direita, com "Voltar") e modal de duas colunas no computador.
 - `src/three/Vitrine.tsx`: abertura 3D (Three.js / react-three-fiber), carregada com `lazy()`. Anel giratório com até 14 fotos sorteadas a cada visita, sem queridinhos, esgotados ou repetidos; arrastar gira, tocar abre o produto.
-- `scripts/`: `recolorir-logo.mjs` (logo dourada original -> limão), `vetorizar-logo.mjs` (logo -> `public/logo.svg`), `plugin-fotos.ts` (lista de fotos no build).
+- `scripts/`: `recolorir-logo.mjs` (logo dourada original -> limão), `vetorizar-logo.mjs` (logo -> `public/logo.svg`), `plugin-fotos.ts` (lista de fotos no build), `padronizar-fotos.mjs` (leva foto fora do padrão a 1200×900 sem cortar o produto), `molde-foto.mjs` (gera o molde em `docs/`).
 - `public/`: `imagens/`, `logo.png` (limão), `og-image.jpg`, ícones e `medicao.js`.
 - `medicao.js`: Google Analytics 4 com aviso de cookies. É o mesmo arquivo em todos os projetos do domínio; se mudar aqui, avisar que precisa copiar pros outros. As cores do aviso são trocadas só pelo CSS do catálogo (`src/styles.css`).
 

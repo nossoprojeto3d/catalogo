@@ -4,3 +4,8 @@ dist
 *.local
 *.tsbuildinfo
 previa-fotos/
+
+# Arquivos locais do plugin Ruflo
+.claude-flow/
+.swarm/
+ruvector.db
