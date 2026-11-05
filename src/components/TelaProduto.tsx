@@ -1,9 +1,11 @@
-import { ArrowLeft, BellRinging, CaretDown, ShareNetwork, ShoppingBag, X } from '@phosphor-icons/react';
+import { ArrowLeft, BellRinging, CaretRight, Info, ShareNetwork, ShoppingBag, X } from '@phosphor-icons/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { chaveProduto, type Produto } from '../lib/catalogo';
+import { Drawer } from 'vaul';
+import { chaveProduto, normalizar, type Produto } from '../lib/catalogo';
 import { voarParaSacola } from '../lib/efeitos';
+import { linkCompartilhar } from '../lib/fotos';
 import { medir } from '../lib/medicao';
 import { linkWhatsapp, mensagemAviseMe, mensagemPedido } from '../lib/whatsapp';
 import { useDesktop } from '../hooks/useTela';
@@ -40,22 +42,45 @@ function Parecidos({ produto }: { produto: Produto }) {
   );
 }
 
-// Garantia e cuidados ficam recolhidos: quem quer ler abre.
-function Recolhivel({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+// Garantia e cuidados ficam numa gaveta: a tela do produto não precisa rolar
+// por causa deles, e quem quer ler abre com um toque.
+function InformacoesDoProduto() {
+  const [aberta, setAberta] = useState(false);
+  const desktop = useDesktop();
   return (
-    <details className="group border-t border-linha">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 text-[15px] font-medium [&::-webkit-details-marker]:hidden">
-        {titulo}
-        <CaretDown size={18} className="shrink-0 transition-transform group-open:rotate-180" />
-      </summary>
-      <div className="pb-4 text-[14px] leading-relaxed text-suave">{children}</div>
-    </details>
+    <>
+      <button type="button" onClick={() => setAberta(true)} className="mt-3 flex min-h-11 w-full items-center gap-2.5 text-left text-[15px] font-medium">
+        <Info size={20} className="shrink-0 text-suave" />
+        Garantia, cuidados e cores
+        <CaretRight size={18} className="ml-auto shrink-0 text-suave" />
+      </button>
+      <Drawer.Root open={aberta} onOpenChange={setAberta} direction={desktop ? 'right' : 'bottom'}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 z-[60]" />
+          <Drawer.Content aria-describedby={undefined} className={`fixed z-[60] flex flex-col bg-fundo outline-none ${desktop ? 'inset-y-0 right-0 w-[440px]' : 'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-3xl'}`}>
+            {!desktop && <div className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-texto/20" aria-hidden />}
+            <div className="flex items-center justify-between px-5 pb-1 pt-3">
+              <Drawer.Title className="titulo text-[22px]">Antes de pedir</Drawer.Title>
+              <BotaoIcone onClick={() => setAberta(false)} aria-label="Fechar" className="-mr-2"><X size={22} /></BotaoIcone>
+            </div>
+            <div className="overflow-y-auto overscroll-contain px-5 pb-[max(20px,env(safe-area-inset-bottom))]">
+              {ITENS_ANTES_DE_PEDIR.map((item) => (
+                <div key={item.titulo} className="border-t border-linha py-3.5 first:border-t-0">
+                  <h3 className="text-[15px] font-semibold">{item.titulo}</h3>
+                  <p className="mt-1 text-[14px] leading-relaxed text-suave">{item.texto}</p>
+                </div>
+              ))}
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    </>
   );
 }
 
 function Corpo({ produto, escolha }: { produto: Produto; escolha: ReturnType<typeof useEscolha> }) {
   const compartilhar = async () => {
-    const url = `${location.origin}${location.pathname}#produto/${encodeURIComponent(produto.codigo || produto.nome)}`;
+    const url = linkCompartilhar(produto);
     try {
       if (navigator.share) await navigator.share({ title: produto.nome, url });
       else { await navigator.clipboard.writeText(url); toast('Link copiado'); }
@@ -63,12 +88,10 @@ function Corpo({ produto, escolha }: { produto: Produto; escolha: ReturnType<typ
   };
   return (
     <>
-      <div className="flex items-start justify-between gap-3">
-        <h2 className="titulo text-[26px] text-balance md:text-[30px]">{produto.nome}</h2>
-        <BotaoIcone onClick={compartilhar} aria-label="Compartilhar produto" className="-mr-2 -mt-1 shrink-0"><ShareNetwork size={20} /></BotaoIcone>
-      </div>
-      <div className="mt-2">
+      <h2 className="titulo text-[26px] text-balance md:pr-8 md:text-[30px]">{produto.nome}</h2>
+      <div className="mt-1 flex items-center justify-between gap-3">
         {produto.esgotado ? <p className="text-[17px] font-medium text-suave">Esgotado no momento</p> : <Preco produto={produto} grande />}
+        <BotaoIcone onClick={compartilhar} aria-label="Compartilhar produto" className="-mr-2 shrink-0"><ShareNetwork size={20} /></BotaoIcone>
       </div>
       {produto.descricao && <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-suave">{produto.descricao}</p>}
       {!produto.esgotado && (
@@ -77,9 +100,7 @@ function Corpo({ produto, escolha }: { produto: Produto; escolha: ReturnType<typ
           <SeletorQuantidade produto={produto} escolha={escolha} />
         </div>
       )}
-      <div className="mt-7 border-b border-linha">
-        {ITENS_ANTES_DE_PEDIR.map((i) => <Recolhivel key={i.titulo} titulo={i.titulo}>{i.texto}</Recolhivel>)}
-      </div>
+      <InformacoesDoProduto />
     </>
   );
 }
@@ -141,7 +162,7 @@ export function useProdutoNaUrl() {
     const m = location.hash.match(/^#produto\/(.+)$/);
     if (!m || categorias.length === 0) return;
     const id = decodeURIComponent(m[1]);
-    const p = categorias.flatMap((c) => c.produtos).find((x) => x.codigo === id || x.nome === id);
+    const p = categorias.flatMap((c) => c.produtos).find((x) => normalizar(x.codigo) === normalizar(id) || x.nome === id);
     if (p) abrir(p);
   }, [categorias, abrir]);
 
@@ -191,7 +212,8 @@ export function TelaProduto() {
   }, [produto]);
   useEffect(() => {
     if (!produto) return;
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && abrir(null);
+    // Com a gaveta de garantia aberta, o Esc fecha só ela.
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && !document.querySelector('[data-vaul-drawer]') && abrir(null);
     window.addEventListener('keydown', esc);
     return () => window.removeEventListener('keydown', esc);
   }, [produto, abrir]);
@@ -223,7 +245,7 @@ export function TelaProduto() {
                   <BotaoIcone onClick={fechar} aria-label="Fechar" autoFocus><X size={22} /></BotaoIcone>
                 </div>
                 <div ref={rolagem} className="min-h-0 flex-1 overflow-y-auto px-8 pb-6"><Corpo produto={produto} escolha={escolha} /></div>
-                <div className="border-t border-linha px-8 py-4"><Acoes produto={produto} escolha={escolha} fechar={fechar} /></div>
+                <div className="px-8 pb-5 pt-1"><Acoes produto={produto} escolha={escolha} fechar={fechar} /></div>
               </div>
             </motion.div>
           </motion.div>
@@ -262,7 +284,7 @@ export function TelaProduto() {
               <Parecidos produto={exibido} />
             </div>
           </div>
-          <div className="shrink-0 border-t border-linha bg-superficie px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+          <div className="shrink-0 bg-fundo px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-2">
             <Acoes produto={exibido} escolha={escolha} fechar={fechar} />
           </div>
         </motion.div>

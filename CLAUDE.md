@@ -26,8 +26,8 @@ Em desenvolvimento: versão 4, na branch `v4`. Push na `v4` não publica nada; o
 - `src/lib/preco.ts` (combo em valor inteiro, unidade com centavos), `cores.ts`, `fotos.ts`, `medicao.ts` e `efeitos.ts` (foto voando até a sacola).
 - `src/hooks/`: `useRota` (rotas por hash: `#inicio`, `#produtos`, `#categoria/<nome>`, `#brindes`, `#produto/<CODIGO>`) e `useTela` (consultas de tela e movimento reduzido).
 - `src/store/`: lista de pedido (zustand, chave `np3d_lista` no localStorage, compatível com a v2) e estado da interface.
-- `src/components/`: `Paginas` (início, produtos e brindes), `Banners` (carrossel de produtos: Natal, religiosos e criançada; os públicos ficam nos cartões logo abaixo), `Navegacao` (no celular, topo e barra de baixo), `Menu` (gaveta de categorias), `Escolhas` (cor, quantidade e combos), `CompraRapida` (painel do botão de sacola no card, quando há cor para escolher), `ListaPedido` (sacola). `TelaProduto` é tela cheia no celular (entra da direita, com "Voltar") e modal de duas colunas no computador.
-- `scripts/`: `recolorir-logo.mjs` (logo dourada original -> limão), `vetorizar-logo.mjs` (logo -> `public/logo.svg`), `plugin-fotos.ts` (lista de fotos no build), `padronizar-fotos.mjs` (leva foto fora do padrão a 1200×900 sem cortar o produto), `molde-foto.mjs` (gera o molde em `docs/`).
+- `src/components/`: `Paginas` (início, produtos e brindes), `Banners` (carrossel de produtos: Natal, religiosos e criançada; os públicos ficam nos cartões logo abaixo), `Navegacao` (no celular, topo e barra de baixo), `Menu` (gaveta de categorias), `Escolhas` (cor, quantidade e combos), `CompraRapida` (painel do botão de sacola no card, quando há cor para escolher), `ListaPedido` (sacola). `TelaProduto` é tela cheia no celular (entra da direita, com "Voltar") e modal de duas colunas no computador. Garantia e cuidados ficam numa gaveta aberta por um único link, para a tela não precisar rolar.
+- `scripts/`: `recolorir-logo.mjs` (logo dourada original -> limão), `vetorizar-logo.mjs` (logo -> `public/logo.svg`), `plugin-fotos.ts` (lista de fotos no build), `plugin-compartilhar.ts` (página `p/<codigo>/` de cada foto, com a prévia do link: o robô do WhatsApp não enxerga o `#`. Nome lido da planilha no build; para testar num link temporário, `URL_DO_SITE=https://.../catalogo/ npm run build`), `padronizar-fotos.mjs` (leva foto fora do padrão a 1200×900 sem cortar o produto), `molde-foto.mjs` (gera o molde em `docs/`).
 - `public/`: `imagens/`, `logo.png` (limão), `logo.svg`, `og-image.jpg` (imagem do link compartilhado), ícones e `medicao.js`.
 - `medicao.js`: Google Analytics 4 com aviso de cookies. É o mesmo arquivo em todos os projetos do domínio; se mudar aqui, avisar que precisa copiar pros outros. As cores do aviso são trocadas só pelo CSS do catálogo (`src/styles.css`), que também esconde o botão flutuante do WhatsApp no celular enquanto o aviso está aberto.
 
@@ -37,8 +37,10 @@ Em desenvolvimento: versão 4, na branch `v4`. Push na `v4` não publica nada; o
 - Cada aba fica 5 minutos em cache no `sessionStorage`.
 - Pedido pelo WhatsApp. Não tem carrinho, pagamento nem cadastro.
 - Coluna `Tag` não é usada (sem selo e sem categoria "Lançamentos").
-- Combos de 10, 20 e 30 só existem nas abas de `ABAS_BRINDES`. Nas outras, a quantidade é só quantidade, com centavos e sem "Combo" na mensagem.
-- Coluna opcional `Combos` define preço fechado (`10=99,00; 20=180,00; 30=250,00`). Sem ela, o combo multiplica o preço da unidade.
+- A aba `Brindes` alimenta a página "Brindes para seus clientes" e fica fora das categorias comuns. `Personalizados` é venda comum, sem combo. A aba `Natal`, quando tem peças, vira categoria e destino do banner de Natal; vazia, o banner vai para o Cantinho da Fé.
+- Combos de 10, 30 e 50 só existem nas abas de `ABAS_BRINDES`. Nas outras, a quantidade é só quantidade, com centavos e sem "Combo" na mensagem.
+- Desconto dos combos (`DESCONTOS_COMBO`): 10 un. 5%, 30 un. 10%, 50 un. 15%, mostrado como "de R$ 500 por R$ 425". Nas abas de brindes, de 1 a 9 unidades vale o preço normal, sem desconto; acima disso, fora dos combos, é a combinar.
+- Coluna opcional `Combos` define preço fechado (`10=90,00; 30=260,00; 50=400,00`), que manda sobre o desconto naquela quantidade exata.
 - Brindes são as abas de `ABAS_BRINDES`. Termos: "Para você ou para presentear" e "Brindes para seus clientes", sem "lembrancinhas" nem "evento" no texto visível.
 - Produto com `Cores` exige escolher a cor antes de pedir ou pôr na lista.
 - `PrecoPromocional` só vale se for menor que `Preco`.
@@ -73,7 +75,7 @@ Usado pelo `/conferir-site`, no celular e no desktop (`npm run build && npm run 
 3. Rolagem infinita: rolar até o fim de "Kids" (6 em 6), trocar de categoria e rolar de novo.
 4. Cards em 2 colunas sem vazar. Esgotados por último, com "Avise-me quando voltar" na tela do produto.
 5. Nenhuma foto quebrada. "Foto em breve" só para quem não tem foto; liste esses códigos.
-6. Tela do produto: num produto com `Cores`, "Pedir" sem cor pede a cor; escolher cor e quantidade e conferir o valor no botão e a mensagem. Em peças das abas de brindes, conferir os combos de 10, 20 e 30 em valor inteiro; nas outras, sem botões de combo. No computador, duas colunas, com "Sacola" e "Pedir" sempre visíveis.
+6. Tela do produto: num produto com `Cores`, "Pedir" sem cor pede a cor; escolher cor e quantidade e conferir o valor no botão e a mensagem. Em peças das abas de brindes, conferir "1 unidade" no preço normal, os combos de 10, 30 e 50 em valor inteiro com "de/por" e "Outra quantidade"; nas outras, sem botões de combo. No computador, duas colunas, com "Sacola" e "Pedir" sempre visíveis.
 7. Card: botão de sacola adiciona direto com a foto voando, sem parte transparente; com `Cores`, abre a compra rápida.
 8. Sacola: adicionar 2 produtos, conferir contador, mudar quantidade, total, mensagem de "Enviar pedido no WhatsApp" e "Limpar sacola" (dois toques).
 9. WhatsApp: conferir o `href` (`wa.me/5562993152843?text=...`) sem clicar.

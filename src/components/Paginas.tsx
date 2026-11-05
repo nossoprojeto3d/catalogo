@@ -1,6 +1,6 @@
-import { ArrowLeft, Gift, ShoppingBag, WhatsappLogo } from '@phosphor-icons/react';
+import { ArrowLeft, Gift, ShoppingBag } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ordenarPor, queridinhos, type Categoria, type Ordem, type Produto } from '../lib/catalogo';
+import { categoriasDeVarejo, ordenarPor, queridinhos, type Categoria, type Ordem, type Produto } from '../lib/catalogo';
 import { ABAS_BRINDES, TAMANHO_LOTE } from '../lib/config';
 import { urlFoto } from '../lib/fotos';
 import { MENSAGEM_GERAL, linkWhatsapp } from '../lib/whatsapp';
@@ -65,8 +65,8 @@ function ComoPedir() {
         {passos.map(([titulo, texto], i) => (
           <li key={titulo} className="flex gap-3 rounded-2xl bg-superficie p-4 ring-1 ring-linha">
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-acento text-[15px] font-bold text-sobre-acento">{i + 1}</span>
-            <div>
-              <h3 className="text-[16px] font-semibold">{titulo}</h3>
+            <div className="pt-1.5">
+              <h3 className="text-[16px] font-semibold leading-6">{titulo}</h3>
               <p className="mt-0.5 text-[14px] leading-snug text-suave">{texto}</p>
             </div>
           </li>
@@ -87,7 +87,7 @@ export function PaginaInicio() {
 
       <div className={`${LARGURA} mt-4 grid gap-3 md:mt-6 md:grid-cols-2 md:gap-5`}>
         <Porta href="#produtos" titulo="Para você ou para presentear" texto="Uma ou mais peças." acao="Ver peças" icone={<ShoppingBag size={17} />} produto={comFoto(destaques)} />
-        <Porta href="#brindes" titulo="Brindes para seus clientes" texto="Combos de 10, 20 e 30 unidades." acao="Ver combos" icone={<Gift size={17} />} produto={comFoto(produtosBrindes(categorias))} />
+        <Porta href="#brindes" titulo="Brindes para seus clientes" texto="Combos de 10, 30 e 50 unidades." acao="Ver combos" icone={<Gift size={17} />} produto={comFoto(produtosBrindes(categorias)) ?? comFoto(categorias.find((c) => c.nome === 'Personalizados')?.produtos ?? [])} />
       </div>
 
       {status === 'erro' ? (
@@ -97,7 +97,7 @@ export function PaginaInicio() {
           <section className="mt-10 md:mt-14">
             <h2 className={`${LARGURA} titulo text-[24px] md:text-[32px]`}>Categorias</h2>
             <ul className="sem-barra mx-auto mt-4 flex max-w-[1240px] gap-3 overflow-x-auto px-4 md:gap-5 md:px-6">
-              {categorias.map((c) => {
+              {categoriasDeVarejo(categorias).map((c) => {
                 const foto = comFoto(c.produtos);
                 return (
                   <li key={c.nome} className="w-[84px] shrink-0 md:w-28">
@@ -173,12 +173,13 @@ function Grade({ produtos, brindes, chave }: { produtos: Produto[]; brindes?: bo
 }
 
 export function PaginaProdutos({ categoria }: { categoria?: string }) {
-  const categorias = useUI((s) => s.categorias);
+  const todas = useUI((s) => s.categorias);
+  const categorias = useMemo(() => categoriasDeVarejo(todas), [todas]);
   const [ordem, setOrdem] = useState<Ordem>('pedidos');
   const produtos = useMemo(() => {
-    const base = categoria ? categorias.find((c) => c.nome === categoria)?.produtos ?? [] : categorias.flatMap((c) => c.produtos);
+    const base = categoria ? todas.find((c) => c.nome === categoria)?.produtos ?? [] : categorias.flatMap((c) => c.produtos);
     return ordenarPor(base, ordem);
-  }, [categorias, categoria, ordem]);
+  }, [todas, categorias, categoria, ordem]);
   const chip = (ativo: boolean) => `shrink-0 rounded-full px-4 py-2.5 text-[14px] font-medium ring-1 ${ativo ? 'bg-acento text-sobre-acento ring-acento-forte' : 'bg-superficie ring-linha'}`;
 
   return (
@@ -208,13 +209,15 @@ export function PaginaProdutos({ categoria }: { categoria?: string }) {
 
 const PASSOS_BRINDES = [
   ['Escolha a peça', 'Veja as opções logo abaixo.'],
-  ['Personalize com nome ou logo', 'Combinamos os detalhes pelo WhatsApp.'],
-  ['Feche a quantidade', 'Combos de 10, 20 ou 30 unidades. Outra quantidade, é só falar com a gente.'],
+  ['Coloque a sua marca', 'Nome, logo e identidade da sua empresa. Combinamos os detalhes pelo WhatsApp.'],
+  ['Feche a quantidade', 'Combos de 10, 30 ou 50 unidades, com desconto. Outra quantidade, a gente combina.'],
 ];
 
 export function PaginaBrindes() {
   const categorias = useUI((s) => s.categorias);
+  const status = useUI((s) => s.status);
   const produtos = useMemo(() => ordenarPor(produtosBrindes(categorias), 'pedidos'), [categorias]);
+  const vazia = status !== 'carregando' && status !== 'erro' && produtos.length === 0;
   return (
     <section className={`${LARGURA} pt-2 md:pt-5`}>
       <Voltar />
@@ -223,17 +226,16 @@ export function PaginaBrindes() {
         {PASSOS_BRINDES.map(([titulo, texto], i) => (
           <li key={titulo} className="flex gap-3">
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-acento text-[15px] font-bold text-sobre-acento">{i + 1}</span>
-            <div>
-              <h2 className="text-[16px] font-semibold">{titulo}</h2>
+            <div className="pt-1.5">
+              <h2 className="text-[16px] font-semibold leading-6">{titulo}</h2>
               <p className="mt-0.5 text-[14px] leading-snug text-suave">{texto}</p>
             </div>
           </li>
         ))}
       </ol>
-      <a href={linkWhatsapp('Oi! Vi o catálogo e queria um orçamento de brindes.')} target="_blank" rel="noopener" data-evento="duvida_whatsapp" data-link="brindes" className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-superficie px-4 text-[15px] font-semibold ring-1 ring-texto/20">
-        <WhatsappLogo size={20} /> Pedir orçamento
-      </a>
-      <Grade produtos={produtos} brindes chave="brindes" />
+      {vazia
+        ? <p className="mt-6 text-[15px] text-suave">Estamos separando as peças de brindes. Enquanto isso, peça um orçamento pelo WhatsApp.</p>
+        : <Grade produtos={produtos} brindes chave="brindes" />}
     </section>
   );
 }

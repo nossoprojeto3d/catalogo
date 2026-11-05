@@ -58,7 +58,7 @@ export function CompraRapida() {
         >
           {!desktop && <div className="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-texto/20" aria-hidden />}
           <div className="flex items-start justify-between gap-3 px-5 pb-2 pt-3">
-            <Drawer.Title className="titulo pt-2 text-[22px]">{exibido?.nome}</Drawer.Title>
+            <Drawer.Title className="titulo pt-2.5 text-[22px]">{exibido?.nome}</Drawer.Title>
             <BotaoIcone onClick={fechar} aria-label="Fechar" className="-mr-2 shrink-0"><X size={22} /></BotaoIcone>
           </div>
           {exibido && <Conteudo produto={exibido} fechar={fechar} />}

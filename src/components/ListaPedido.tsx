@@ -2,7 +2,7 @@ import { ShoppingBag, Trash, X } from '@phosphor-icons/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { Drawer } from 'vaul';
-import { textoDoItem, textoDoTotal, totalDoItem } from '../lib/preco';
+import { temCombos, textoDoItem, textoDoTotal, totalDoItem } from '../lib/preco';
 import { linkWhatsapp, mensagemPedido } from '../lib/whatsapp';
 import { useDesktop } from '../hooks/useTela';
 import { irPara } from '../hooks/useRota';
@@ -10,7 +10,7 @@ import { resolverItens, totalDeItens, useLista } from '../store/lista';
 import { useUI } from '../store/ui';
 import { Botao, BotaoIcone, BotaoLink, IconeWhats } from './Botoes';
 import { FotoProduto } from './FotoProduto';
-import { Quantidade } from './Escolhas';
+import { Quantidade, QuantidadeDeBrinde } from './Escolhas';
 
 function Conteudo({ fechar }: { fechar: () => void }) {
   const categorias = useUI((s) => s.categorias);
@@ -69,12 +69,14 @@ function Conteudo({ fechar }: { fechar: () => void }) {
                         {[cor, produto.codigo].filter(Boolean).join(' / ')}
                       </p>
                     </div>
-                    <button type="button" onClick={() => remover(chave, cor)} aria-label={`Remover ${produto.nome}`} className="-mr-1 -mt-1 grid size-9 shrink-0 place-items-center rounded-full text-suave transition hover:bg-texto/5 hover:text-texto">
+                    <button type="button" onClick={() => remover(chave, cor)} aria-label={`Remover ${produto.nome}`} className="-mr-1 -mt-1.5 grid size-9 shrink-0 place-items-center rounded-full text-suave transition hover:bg-texto/5 hover:text-texto">
                       <Trash size={18} />
                     </button>
                   </div>
                   <div className="mt-auto flex items-center justify-between gap-2 pt-1">
-                    <Quantidade compacta valor={q} mudar={(n) => mudarQuantidade(chave, cor, n)} rotulo={`Quantidade de ${produto.nome}`} />
+                    {temCombos(produto)
+                      ? <QuantidadeDeBrinde valor={q} mudar={(n) => mudarQuantidade(chave, cor, n)} rotulo={`Quantidade de ${produto.nome}`} />
+                      : <Quantidade compacta valor={q} mudar={(n) => mudarQuantidade(chave, cor, n)} rotulo={`Quantidade de ${produto.nome}`} />}
                     <span className="text-[15px] font-semibold tracking-tight">{valor > 0 ? textoDoItem(produto, q) : 'A combinar'}</span>
                   </div>
                 </div>

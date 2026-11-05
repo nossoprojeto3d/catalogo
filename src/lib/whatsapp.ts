@@ -1,6 +1,6 @@
 import type { Produto } from './catalogo';
 import { WHATSAPP_NUMERO } from './config';
-import { emCombo, emPromocao, emReais, paraNumero, precoUnitario, textoDoItem, textoDoTotal, totalDoItem } from './preco';
+import { emCombo, emPromocao, emReais, paraNumero, precoNaQuantidade, textoDoItem, textoDoTotal, totalDoItem } from './preco';
 
 export type ItemPedido = { produto: Produto; quantidade: number; cor: string };
 
@@ -17,7 +17,7 @@ export const MENSAGEM_GERAL = 'Oi! Vi o catálogo de vocês e fiquei com uma dú
 //   Promoção, de R$ 29,90 cada
 //   Cor: Azul
 function blocoItem({ produto, quantidade, cor }: ItemPedido, indice: number): string {
-  const unitario = precoUnitario(produto);
+  const unitario = precoNaQuantidade(produto, quantidade);
   const linhas = [`*${indice + 1}. ${produto.nome}*${produto.codigo ? ` (${produto.codigo})` : ''}`];
   const combo = emCombo(produto, quantidade);
   if (combo) linhas.push(`Combo de ${quantidade} = ${textoDoItem(produto, quantidade)}`);

@@ -1,5 +1,5 @@
 import type { Produto } from './catalogo';
-import { ABAS_BRINDES, QUANTIDADES_COMBO } from './config';
+import { ABAS_BRINDES, DESCONTOS_COMBO, QUANTIDADES_COMBO } from './config';
 
 // "1.234,56" -> 1234.56 (a planilha usa vírgula decimal)
 export function paraNumero(valor: string): number {
@@ -27,17 +27,37 @@ export function temCombos(p: Produto): boolean {
   return ABAS_BRINDES.includes(p.categoria);
 }
 
-// Combo: preço fechado da coluna Combos ou, sem ele, 10, 20 ou 30 vezes o
-// preço da unidade. O valor do combo é sempre inteiro: os centavos caem.
+// Combo: preço fechado da coluna Combos ou, sem ele, a quantidade do combo vezes o
+// preço da unidade com o desconto do combo. O valor do combo é sempre inteiro: os centavos caem.
 export function emCombo(p: Produto, quantidade: number): boolean {
   if (!temCombos(p)) return false;
   if ((p.combos[quantidade] ?? 0) > 0) return true;
   return QUANTIDADES_COMBO.includes(quantidade) && precoUnitario(p) > 0;
 }
 
+// Preço de cada peça na quantidade pedida, já em centavos exatos. Nas abas de
+// brindes, abaixo do menor combo vale o preço normal; acima, fora dos combos,
+// não há preço: é a combinar.
+export function precoNaQuantidade(p: Produto, quantidade: number): number {
+  if (!temCombos(p) || quantidade < QUANTIDADES_COMBO[0]) return precoUnitario(p);
+  if (!emCombo(p, quantidade)) return 0;
+  const centavos = Math.round(precoUnitario(p) * 100);
+  return Math.round(centavos * (100 - (DESCONTOS_COMBO[quantidade] ?? 0)) / 100) / 100;
+}
+
+// Percentual real do combo. Com preço fechado na coluna Combos, é calculado a
+// partir dele, para nunca indicar um desconto que não existe.
+export function descontoDaQuantidade(p: Produto, quantidade: number): number {
+  if (!temCombos(p) || !emCombo(p, quantidade)) return 0;
+  const fechado = p.combos[quantidade] ?? 0;
+  if (fechado <= 0) return DESCONTOS_COMBO[quantidade] ?? 0;
+  const cheio = precoUnitario(p) * quantidade;
+  return cheio > 0 ? Math.max(0, Math.round((1 - Math.floor(fechado) / cheio) * 100)) : 0;
+}
+
 export function totalDoItem(p: Produto, quantidade: number): number {
   // Arredonda em centavos antes: 0.7 * 30 daria 20.999... em ponto flutuante.
-  const multiplicado = Math.round(precoUnitario(p) * 100) * quantidade / 100;
+  const multiplicado = Math.round(precoNaQuantidade(p, quantidade) * 100) * quantidade / 100;
   if (!emCombo(p, quantidade)) return multiplicado;
   return Math.floor(p.combos[quantidade] ?? multiplicado);
 }
@@ -54,6 +74,7 @@ export function textoDoItem(p: Produto, quantidade: number): string {
 // Total do pedido: sem centavos só se tiver combo e a soma der valor inteiro.
 export function textoDoTotal(itens: { produto: Produto; quantidade: number }[]): string {
   const total = itens.reduce((s, i) => s + totalDoItem(i.produto, i.quantidade), 0);
+  if (total <= 0) return 'A combinar';
   const inteiro = Number.isInteger(Math.round(total * 100) / 100) && itens.some((i) => emCombo(i.produto, i.quantidade));
   return inteiro ? emReaisInteiro(total) : emReais(total);
 }

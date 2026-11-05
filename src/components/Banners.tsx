@@ -1,13 +1,12 @@
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useSemMovimento } from '../hooks/useTela';
-import { useAlgumPainelAberto } from '../store/ui';
+import { linkDoNatal } from '../lib/catalogo';
+import { useAlgumPainelAberto, useUI } from '../store/ui';
 import { Camadas } from './Botoes';
 
 const foto = (codigo: string) => `${import.meta.env.BASE_URL}imagens/${codigo}.jpg`;
 const CATEGORIA_FE = '#categoria/Cantinho%20da%20F%C3%A9';
-// Enquanto a aba Natal não existe na planilha, os anjinhos estão no Cantinho da Fé.
-const CATEGORIA_NATAL = CATEGORIA_FE;
 const CATEGORIA_KIDS = '#categoria/Kids';
 
 // Estrela de quatro pontas, desenhada aqui para não depender de imagem.
@@ -61,8 +60,9 @@ function Texto({ titulo, texto, acao, botao, cor = '', topo = '' }: { titulo: st
 const IMAGEM = 'h-full w-full object-cover';
 
 function BannerNatal({ prioridade }: { prioridade: boolean }) {
+  const link = useUI((s) => linkDoNatal(s.categorias));
   return (
-    <Moldura href={CATEGORIA_NATAL} rotulo="Natal: ver anjinhos iluminados e peças de fé" fundo="bg-[#17492f]" canto="baixo" camadas="hidden text-acento opacity-40 md:block">
+    <Moldura href={link} rotulo="Natal: ver as peças de Natal" fundo="bg-[#17492f]" canto="baixo" camadas="hidden text-acento opacity-40 md:block">
       <Varal />
       <Estrela className="right-[43%] top-[52px] size-4 md:right-[46%] md:top-[120px] md:size-7" cor="#c6f432" />
       <Estrela className="hidden md:left-[44%] md:block md:bottom-[70px] md:size-6" cor="#ffffff" />
@@ -93,8 +93,8 @@ function BannerCriancada() {
     <Moldura href={CATEGORIA_KIDS} rotulo="Para a criançada: ver as peças de Kids" fundo="bg-acento text-sobre-acento" canto="cima" camadas="camadas-curta opacity-30">
       <Texto titulo="Para a criançada" texto="Peças para brincar e soltar a imaginação." acao="Ver peças" botao="bg-sobre-acento text-[#f8f9f4]" />
       <div className="relative mb-3 ml-auto mr-4 flex h-[150px] w-[36%] items-center justify-center gap-3 md:mx-auto md:mb-0 md:h-[320px] md:w-1/2 md:px-6">
-        <div className="h-full w-full rotate-[-3deg] overflow-hidden rounded-3xl shadow-(--shadow-flutua) md:w-[46%]"><img src={foto('KID-16')} alt="" loading="lazy" className={IMAGEM} /></div>
-        <div className="hidden h-full w-[46%] rotate-[3deg] overflow-hidden rounded-3xl shadow-(--shadow-flutua) md:block"><img src={foto('KID-19')} alt="" loading="lazy" className={IMAGEM} /></div>
+        <div className="absolute left-0 top-0 h-[106px] w-[72%] rotate-[-3deg] overflow-hidden rounded-2xl shadow-(--shadow-flutua) md:static md:h-full md:w-[46%] md:rounded-3xl"><img src={foto('KID-07')} alt="" loading="lazy" className={IMAGEM} /></div>
+        <div className="absolute bottom-0 right-0 h-[106px] w-[72%] rotate-[3deg] overflow-hidden rounded-2xl shadow-(--shadow-flutua) md:static md:h-full md:w-[46%] md:rounded-3xl"><img src={foto('SEN-04')} alt="" loading="lazy" className={IMAGEM} /></div>
       </div>
     </Moldura>
   );

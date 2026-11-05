@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { chaveProduto, type Categoria, type Produto } from '../lib/catalogo';
+import { QUANTIDADE_MAXIMA } from '../lib/config';
 import { medir } from '../lib/medicao';
 import type { ItemPedido } from '../lib/whatsapp';
 
@@ -51,7 +52,7 @@ export const useLista = create<EstadoLista>((set, get) => {
       medir('lista_adicionado', { produto: p.nome, categoria: p.categoria });
     },
     mudarQuantidade(chave, cor, quantidade) {
-      atualizar(get().itens.map((i) => (i.chave === chave && i.cor === cor ? { ...i, quantidade: Math.max(1, Math.min(99, quantidade)) } : i)));
+      atualizar(get().itens.map((i) => (i.chave === chave && i.cor === cor ? { ...i, quantidade: Math.max(1, Math.min(QUANTIDADE_MAXIMA, quantidade)) } : i)));
     },
     remover(chave, cor) {
       atualizar(get().itens.filter((i) => !(i.chave === chave && i.cor === cor)));

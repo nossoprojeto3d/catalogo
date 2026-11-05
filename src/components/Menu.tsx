@@ -1,5 +1,6 @@
 import { CaretRight, Gift, SquaresFour, X } from '@phosphor-icons/react';
 import { Drawer } from 'vaul';
+import { categoriasDeVarejo } from '../lib/catalogo';
 import { urlFoto } from '../lib/fotos';
 import { useDesktop } from '../hooks/useTela';
 import { useUI } from '../store/ui';
@@ -29,7 +30,7 @@ export function Menu() {
             <a href="#produtos" onClick={fechar} className={linha}><span className={iconeBase}><SquaresFour size={22} /></span>Todas as peças<CaretRight size={18} className="ml-auto text-suave" /></a>
             <a href="#brindes" onClick={fechar} className={linha}><span className={`${iconeBase} !bg-acento !text-sobre-acento`}><Gift size={22} /></span>Brindes para seus clientes<CaretRight size={18} className="ml-auto text-suave" /></a>
             <div className="mx-2 my-1.5 border-t border-linha" />
-            {categorias.map((c) => {
+            {categoriasDeVarejo(categorias).map((c) => {
               const foto = c.produtos.find((p) => !p.esgotado && urlFoto(p));
               return (
                 <a key={c.nome} href={`#categoria/${encodeURIComponent(c.nome)}`} onClick={fechar} className={linha}>

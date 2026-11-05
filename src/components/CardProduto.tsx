@@ -38,30 +38,34 @@ export function CardProduto({ produto, brindes = false, prioridade = false }: { 
   };
 
   return (
-    <li className="relative min-w-0">
-      <button type="button" onClick={() => abrir(produto)} className="group block w-full text-left" aria-label={`${produto.esgotado ? 'Esgotado. ' : ''}${produto.nome}, ${textoPreco(precoUnitario(produto))}`}>
-        <div ref={foto} className="relative aspect-square overflow-hidden rounded-2xl bg-superficie-2">
-          <FotoProduto decorativa prioridade={prioridade} produto={produto} className="transition-transform duration-500 ease-(--ease-saida) group-hover:scale-[1.03]" />
-          {desconto > 0 && !produto.esgotado && (
-            <span className="absolute left-2 top-2 rounded-full bg-acento px-2 py-1 text-[12px] font-semibold leading-none text-sobre-acento">-{desconto}%</span>
-          )}
-          {produto.esgotado && (
-            <span className="absolute left-2 top-2 rounded-full bg-superficie px-2.5 py-1 text-[12px] font-semibold leading-none text-texto">Esgotado</span>
-          )}
-        </div>
-        <h3 className="mt-2.5 line-clamp-2 pr-1 text-[15px] font-medium leading-snug">{produto.nome}</h3>
-        <div className="mt-1">
-          {produto.esgotado ? <span className="text-[14px] text-suave">Avise-me quando voltar</span> : <Preco produto={produto} />}
-        </div>
-        {brindes && !produto.esgotado && <p className="mt-0.5 text-[13px] text-suave">a unidade, em combos de 10, 20 ou 30</p>}
-        {produto.cores.length > 0 && !produto.esgotado && (
-          <div className="mt-1.5 flex items-center gap-1.5" aria-label={`${produto.cores.length} cores`}>
-            {produto.cores.slice(0, 4).map((c) => (
-              <span key={c} className="size-3.5 rounded-full ring-1 ring-texto/20" style={{ background: corDaBolinha(c) }} />
-            ))}
-            {produto.cores.length > 4 && <span className="text-[12px] text-suave">+{produto.cores.length - 4}</span>}
+    // Foto e nome numa linha da grade, preço na seguinte: os preços ficam na mesma
+    // altura, e a folga só aparece na linha em que algum nome quebra.
+    <li className="relative row-span-2 grid min-w-0 grid-rows-subgrid gap-y-0">
+      <button type="button" onClick={() => abrir(produto)} className="group row-span-2 grid w-full grid-rows-subgrid gap-y-0 text-left" aria-label={`${produto.esgotado ? 'Esgotado. ' : ''}${produto.nome}, ${textoPreco(precoUnitario(produto))}`}>
+        <div className="min-w-0">
+          <div ref={foto} className="relative aspect-square overflow-hidden rounded-2xl bg-superficie-2">
+            <FotoProduto decorativa prioridade={prioridade} produto={produto} className="transition-transform duration-500 ease-(--ease-saida) group-hover:scale-[1.03]" />
+            {desconto > 0 && !produto.esgotado && (
+              <span className="absolute left-2 top-2 rounded-full bg-acento px-2 py-1 text-[12px] font-semibold leading-none text-sobre-acento">-{desconto}%</span>
+            )}
+            {produto.esgotado && (
+              <span className="absolute left-2 top-2 rounded-full bg-superficie px-2.5 py-1 text-[12px] font-semibold leading-none text-texto">Esgotado</span>
+            )}
           </div>
-        )}
+          <h3 className="mt-2.5 line-clamp-2 pr-1 text-[15px] font-medium leading-snug">{produto.nome}</h3>
+        </div>
+        <div className="min-w-0 pt-1">
+          {produto.esgotado ? <span className="text-[14px] text-suave">Avise-me quando voltar</span> : <Preco produto={produto} />}
+          {brindes && !produto.esgotado && <p className="mt-0.5 text-[13px] text-suave">a unidade, em combos de 10, 30 ou 50</p>}
+          {produto.cores.length > 0 && !produto.esgotado && (
+            <div className="mt-1.5 flex items-center gap-1.5" aria-label={`${produto.cores.length} cores`}>
+              {produto.cores.slice(0, 4).map((c) => (
+                <span key={c} className="size-3.5 rounded-full ring-1 ring-texto/20" style={{ background: corDaBolinha(c) }} />
+              ))}
+              {produto.cores.length > 4 && <span className="text-[12px] text-suave">+{produto.cores.length - 4}</span>}
+            </div>
+          )}
+        </div>
       </button>
       {!produto.esgotado && (
         <button

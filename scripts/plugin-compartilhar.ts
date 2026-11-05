@@ -1,0 +1,80 @@
+import { env } from 'node:process';
+import type { Plugin } from 'vite';
+import { interpretarCSV, montarCategoria, normalizar } from '../src/lib/catalogo';
+import { ABAS_CATEGORIAS, SHEET_ID } from '../src/lib/config';
+import { listarFotos } from './plugin-fotos';
+
+// O robô que monta a prévia do link (WhatsApp e outros) não roda o site nem
+// enxerga o que vem depois do "#". Por isso cada peça com foto ganha uma página
+// própria em p/<codigo>/, com foto e nome, que leva a pessoa para #produto/<CODIGO>.
+// Para testar por um link temporário: URL_DO_SITE=https://.../catalogo/ npm run build
+const URL_PADRAO = 'https://nossoprojeto3d.github.io/catalogo/';
+const MARCA = 'Nosso Projeto 3D';
+const DESCRICAO = 'Peça impressa em 3D. Veja o preço e peça direto pelo WhatsApp.';
+
+const escapar = (texto: string) =>
+  texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+export function paginaDoProduto({ site, caminho, foto, codigo, nome }: { site: string; caminho: string; foto: string; codigo: string; nome?: string }) {
+  const titulo = escapar(nome ? `${nome} | ${MARCA}` : `Catálogo ${MARCA}`);
+  const destino = `${caminho}#produto/${encodeURIComponent(codigo)}`;
+  const endereco = escapar(`${site}p/${encodeURIComponent(normalizar(codigo))}/`);
+  const imagem = escapar(`${site}imagens/${encodeURIComponent(foto)}`);
+  return `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>${titulo}</title>
+<meta name="description" content="${DESCRICAO}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${MARCA}">
+<meta property="og:title" content="${titulo}">
+<meta property="og:description" content="${DESCRICAO}">
+<meta property="og:url" content="${endereco}">
+<meta property="og:image" content="${imagem}">
+<meta name="twitter:card" content="summary_large_image">
+<script>location.replace(${JSON.stringify(destino)})</script>
+</head>
+<body><a href="${escapar(destino)}">Ver a peça no catálogo</a></body>
+</html>
+`;
+}
+
+// Sem a planilha, a página sai sem o nome da peça, e o build não para por isso.
+async function nomesDasPecas(avisar: (texto: string) => void) {
+  const nomes = new Map<string, string>();
+  await Promise.all(ABAS_CATEGORIAS.map(async (aba) => {
+    try {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(aba)}`;
+      const resposta = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      if (!resposta.ok) throw new Error(String(resposta.status));
+      for (const p of montarCategoria(aba, interpretarCSV(await resposta.text())).produtos) {
+        if (p.codigo) nomes.set(normalizar(p.codigo), p.nome);
+      }
+    } catch (erro) {
+      avisar(`Aba ${aba} não lida para as prévias de link: ${String(erro)}`);
+    }
+  }));
+  return nomes;
+}
+
+export function pluginCompartilhar(caminho: string): Plugin {
+  return {
+    name: 'np3d-compartilhar',
+    apply: 'build',
+    async generateBundle() {
+      const site = env.URL_DO_SITE || URL_PADRAO;
+      const nomes = await nomesDasPecas((texto) => this.warn(texto));
+      for (const foto of listarFotos()) {
+        const codigo = foto.split('/').pop()!.replace(/\.[^.]+$/, '');
+        this.emitFile({
+          type: 'asset',
+          fileName: `p/${normalizar(codigo)}/index.html`,
+          source: paginaDoProduto({ site, caminho, foto, codigo, nome: nomes.get(normalizar(codigo)) }),
+        });
+      }
+    },
+  };
+}

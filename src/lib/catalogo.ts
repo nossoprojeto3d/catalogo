@@ -1,4 +1,4 @@
-import { ABAS_CATEGORIAS, DURACAO_CACHE_ABA_MS, SHEET_ID } from './config';
+import { ABAS_CATEGORIAS, DURACAO_CACHE_ABA_MS, SHEET_ID, ABAS_BRINDES } from './config';
 import { paraNumero, precoUnitario } from './preco';
 
 export type Produto = {
@@ -115,6 +115,17 @@ export function ordenarCategorias(categorias: Categoria[]): Categoria[] {
   return categorias
     .filter((c) => c.produtos.length > 0)
     .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+}
+
+// Categorias de quem compra para si: os brindes têm página própria.
+export function categoriasDeVarejo(categorias: Categoria[]): Categoria[] {
+  return categorias.filter((c) => !ABAS_BRINDES.includes(c.nome));
+}
+
+// Aba vazia não vira categoria, então o banner só vai para Natal quando há peças.
+export function linkDoNatal(categorias: Categoria[]): string {
+  const nome = categorias.some((c) => c.nome === 'Natal') ? 'Natal' : 'Cantinho da Fé';
+  return `#categoria/${encodeURIComponent(nome)}`;
 }
 
 // "Os queridinhos": coluna MaisVendido. Número define a posição; texto

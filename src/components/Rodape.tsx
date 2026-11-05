@@ -7,7 +7,7 @@ export function Rodape() {
   return (
     <footer className="relative mt-12 overflow-hidden bg-barra pb-[calc(58px+env(safe-area-inset-bottom))] text-sobre-barra md:mt-16 md:pb-0">
       <Camadas canto="cima" className="opacity-30" />
-      <div className="relative mx-auto grid max-w-[1240px] gap-6 px-4 py-8 md:grid-cols-3 md:px-6 md:py-12">
+      <div className="relative mx-auto grid max-w-[1240px] gap-6 px-4 py-8 md:grid-cols-3 md:items-center md:px-6 md:py-12">
         <div className="flex items-center gap-3">
           <Logo className="h-12" />
           <p className="titulo text-[18px]">Nosso Projeto 3D</p>

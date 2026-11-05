@@ -17,13 +17,15 @@ function listar(pasta: string): string[] {
   });
 }
 
+export const listarFotos = () => listar(PASTA).sort();
+
 export function pluginFotos(): Plugin {
   return {
     name: 'np3d-fotos',
     resolveId: (id) => (id === ID ? '\0' + ID : undefined),
     load(id) {
       if (id !== '\0' + ID) return;
-      return `export default ${JSON.stringify(listar(PASTA).sort())};`;
+      return `export default ${JSON.stringify(listarFotos())};`;
     },
   };
 }

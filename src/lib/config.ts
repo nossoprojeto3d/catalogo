@@ -8,6 +8,8 @@
 export const WHATSAPP_NUMERO = '5562993152843';
 export const SHEET_ID = '1g8NUVwsozRXUAVavaQlmjtLQOuw3td0q';
 export const ABAS_CATEGORIAS = [
+  'Natal',
+  'Brindes',
   'Kids',
   'Pros Fãs',
   'Organizadores',
@@ -20,9 +22,13 @@ export const ABAS_CATEGORIAS = [
   'Lembrancinhas',
 ];
 
-// Abas mostradas em "Brindes para seus clientes", com os atalhos de quantidade.
-export const ABAS_BRINDES = ['Personalizados', 'Lembrancinhas'];
-export const QUANTIDADES_COMBO = [10, 20, 30];
+// Abas mostradas em "Brindes para seus clientes", com os combos. Elas ficam fora
+// das categorias de quem compra para si; Personalizados é venda comum.
+export const ABAS_BRINDES = ['Brindes'];
+export const QUANTIDADES_COMBO = [10, 30, 50];
+export const QUANTIDADE_MAXIMA = 999;
+// Desconto de cada combo nas abas de brindes. Outra quantidade é a combinar.
+export const DESCONTOS_COMBO: Record<number, number> = { 10: 5, 30: 10, 50: 15 };
 
 // Cada aba fica 5 minutos no sessionStorage: trocar de categoria ou
 // voltar à página não refaz as 10 buscas, e preço/estoque seguem atuais.

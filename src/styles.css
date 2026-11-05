@@ -138,6 +138,9 @@ html body #np3d-cookies button[data-acao=aceitar] {
   color: var(--color-sobre-acento);
 }
 html body #np3d-cookies button:focus-visible { outline-color: var(--color-acento-escuro); }
+/* Sacola, compra rápida, produto, busca e menu são diálogos: o aviso não cobre os
+   botões deles e volta quando fecham. */
+html body:has([role='dialog']) #np3d-cookies { display: none; }
 @media (max-width: 767px) {
   html body #np3d-cookies { bottom: calc(76px + env(safe-area-inset-bottom)); }
   /* O aviso ocupa a mesma altura do botão do WhatsApp: esconde o botão até a resposta. */

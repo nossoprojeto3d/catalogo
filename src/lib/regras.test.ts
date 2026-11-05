@@ -1,11 +1,30 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { buscar, interpretarCSV, lerCombos, montarCategoria, ordenarPor, queridinhos, type Produto } from './catalogo';
-import { emPromocao, paraNumero, precoUnitario, totalDoItem, temCombos } from './preco';
+import { buscar, categoriasDeVarejo, interpretarCSV, linkDoNatal, lerCombos, montarCategoria, ordenarPor, queridinhos, type Produto } from './catalogo';
+import { paginaDoProduto } from '../../scripts/plugin-compartilhar';
+import { descontoDaQuantidade, emPromocao, paraNumero, precoUnitario, temCombos, textoDoTotal, totalDoItem } from './preco';
 import { linkWhatsapp, mensagemAviseMe, mensagemPedido as mensagemBruta } from './whatsapp';
 
 // toLocaleString põe espaço sem quebra depois de "R$"; aqui vira espaço comum pra ler melhor.
 const mensagemPedido = (...a: Parameters<typeof mensagemBruta>) => mensagemBruta(...a).replace(/\u00a0/g, ' ');
+
+describe('página de compartilhar', () => {
+  const site = 'https://exemplo.com/catalogo/';
+  const pagina = (nome?: string) => paginaDoProduto({ site, caminho: '/catalogo/', foto: 'KID-07.jpg', codigo: 'KID-07', nome });
+
+  it('traz foto, nome e leva ao produto', () => {
+    const html = pagina('Dinossauros');
+    expect(html).toContain('property="og:image" content="https://exemplo.com/catalogo/imagens/KID-07.jpg"');
+    expect(html).toContain('property="og:title" content="Dinossauros | Nosso Projeto 3D"');
+    expect(html).toContain('property="og:url" content="https://exemplo.com/catalogo/p/kid-07/"');
+    expect(html).toContain('location.replace("/catalogo/#produto/KID-07")');
+  });
+
+  it('protege o nome vindo da planilha e funciona sem ele', () => {
+    expect(pagina('Vaso "A" <b>')).toContain('Vaso &quot;A&quot; &lt;b&gt;');
+    expect(pagina()).toContain('og:title" content="Catálogo Nosso Projeto 3D"');
+  });
+});
 
 const amostra = (nome: string) => readFileSync(new URL(`./__amostras__/${nome}`, import.meta.url), 'utf8');
 const kids = montarCategoria('Kids', interpretarCSV(amostra('kids.csv')));
@@ -95,7 +114,7 @@ describe('mensagem do WhatsApp', () => {
 });
 
 describe('combos de brindes', () => {
-  const brinde = (dados: Partial<Produto>) => produto({ categoria: 'Personalizados', ...dados });
+  const brinde = (dados: Partial<Produto>) => produto({ categoria: 'Brindes', ...dados });
 
   it('lê a coluna Combos e ignora o que não entende', () => {
     expect(lerCombos('10=119,00; 20=220,00; 30: 300')).toEqual({ 10: 119, 20: 220, 30: 300 });
@@ -103,37 +122,62 @@ describe('combos de brindes', () => {
     expect(lerCombos('sob consulta')).toEqual({});
   });
 
-  it('usa o preço do combo só na quantidade exata', () => {
-    const p = brinde({ preco: '15,00', combos: { 10: 119 } });
-    expect(totalDoItem(p, 10)).toBe(119);
-    expect(totalDoItem(p, 11)).toBe(165);
+  it('10, 30 e 50 têm 5, 10 e 15% de desconto, sem centavos', () => {
+    const p = brinde({ preco: '10,00' });
+    expect([10, 30, 50].map((n) => descontoDaQuantidade(p, n))).toEqual([5, 10, 15]);
+    expect([10, 30, 50].map((n) => totalDoItem(p, n))).toEqual([95, 270, 425]);
+    const q = brinde({ preco: '19,99' });
+    expect([10, 30, 50].map((n) => totalDoItem(q, n))).toEqual([189, 539, 849]);
+    expect(totalDoItem(brinde({ preco: '0,70' }), 30)).toBe(18);
   });
 
-  it('combo de 10, 20 e 30 multiplica o preço e descarta os centavos', () => {
-    const p = brinde({ preco: '19,99' });
-    expect(totalDoItem(p, 10)).toBe(199);
-    expect(totalDoItem(p, 20)).toBe(399);
-    expect(totalDoItem(p, 30)).toBe(599);
-    expect(totalDoItem(brinde({ preco: '0,70' }), 30)).toBe(21);
+  it('de 1 a 9 unidades vale o preço normal, sem desconto', () => {
+    const p = brinde({ nome: 'Bandeja', preco: '10,90' });
+    expect(totalDoItem(p, 1)).toBe(10.9);
+    expect(totalDoItem(p, 9)).toBe(98.1);
+    expect(descontoDaQuantidade(p, 1)).toBe(0);
+    const msg = mensagemPedido([{ produto: p, quantidade: 2, cor: '' }]);
+    expect(msg).toContain('2 x R$ 10,90 = R$ 21,80');
+    expect(msg).toContain('*Total: R$ 21,80*');
+    expect(mensagemPedido([{ produto: p, quantidade: 1, cor: '' }])).toContain('1 x R$ 10,90');
+  });
+
+  it('acima de 10, fora dos combos, o valor é a combinar', () => {
+    const p = brinde({ nome: 'Bandeja', preco: '10,00' });
+    for (const n of [11, 20, 49, 60, 100]) {
+      expect(totalDoItem(p, n)).toBe(0);
+      expect(descontoDaQuantidade(p, n)).toBe(0);
+    }
+    const msg = mensagemPedido([{ produto: p, quantidade: 60, cor: '' }]);
+    expect(msg).toContain('60 x valor a combinar');
+    expect(msg).toContain('*Total: a combinar*');
+    expect(msg).not.toContain('Combo');
+  });
+
+  it('total só com itens a combinar não vira R$ 0,00', () => {
+    const p = brinde({ preco: '10,00' });
+    expect(textoDoTotal([{ produto: p, quantidade: 31 }])).toBe('A combinar');
+    expect(textoDoTotal([{ produto: p, quantidade: 31 }, { produto: p, quantidade: 30 }])).toMatch(/^R\$\s270$/);
   });
 
   it('mensagem do combo mostra valor inteiro, igual ao botão', () => {
     const p = brinde({ nome: 'Chaveiro', codigo: 'PER-03', preco: '12,90' });
     const msg = mensagemPedido([{ produto: p, quantidade: 10, cor: '' }]);
-    expect(msg).toContain('*1. Chaveiro* (PER-03)\nCombo de 10 = R$ 129\n');
-    expect(msg).toContain('*Total: R$ 129*');
-  });
-
-  it('fora dos combos, mantém o formato aprovado e os centavos', () => {
-    const p = brinde({ nome: 'Chaveiro', preco: '12,90' });
-    const msg = mensagemPedido([{ produto: p, quantidade: 11, cor: '' }]);
-    expect(msg).toContain('11 x R$ 12,90 = R$ 141,90');
-    expect(msg).toContain('*Total: R$ 141,90*');
+    expect(msg).toContain('*1. Chaveiro* (PER-03)\nCombo de 10 = R$ 122\n');
+    expect(msg).toContain('*Total: R$ 122*');
   });
 
   it('sem preço, combo continua a combinar', () => {
     expect(totalDoItem(brinde({}), 10)).toBe(0);
     expect(mensagemPedido([{ produto: brinde({}), quantidade: 10, cor: '' }])).toContain('10 x valor a combinar');
+  });
+
+  it('preço fechado na coluna Combos manda sobre o desconto, só na quantidade exata', () => {
+    const p = brinde({ preco: '10,00', combos: { 50: 400, 100: 700 } });
+    expect(totalDoItem(p, 50)).toBe(400);
+    expect(descontoDaQuantidade(p, 50)).toBe(20);
+    expect(totalDoItem(p, 100)).toBe(700);
+    expect(totalDoItem(p, 99)).toBe(0);
   });
 
   it('com combo cadastrado, a mensagem e o total usam o valor do combo', () => {
@@ -146,17 +190,35 @@ describe('combos de brindes', () => {
 
   it('só as abas de brindes têm combo', () => {
     expect(temCombos(brinde({ preco: '12,90' }))).toBe(true);
-    expect(temCombos(produto({ categoria: 'Lembrancinhas', preco: '12,90' }))).toBe(true);
+    expect(temCombos(produto({ categoria: 'Personalizados', preco: '12,90' }))).toBe(false);
     expect(temCombos(produto({ categoria: 'Kids', preco: '12,90' }))).toBe(false);
   });
 
-  it('fora das abas de brindes, 10 unidades são 10 unidades, com centavos', () => {
+  it('fora das abas de brindes, a quantidade é só quantidade, com centavos', () => {
     const p = produto({ nome: 'Kit', categoria: 'Kids', preco: '45,90', combos: { 10: 399 } });
     expect(totalDoItem(p, 10)).toBe(459);
+    expect(descontoDaQuantidade(p, 10)).toBe(0);
     const msg = mensagemPedido([{ produto: p, quantidade: 10, cor: '' }]);
     expect(msg).toContain('10 x R$ 45,90 = R$ 459,00');
     expect(msg).not.toContain('Combo');
     expect(msg).toContain('*Total: R$ 459,00*');
+  });
+});
+
+describe('abas de Natal e Brindes', () => {
+  const cat = (nome: string) => ({ nome, produtos: [produto({ categoria: nome })] });
+
+  it('a aba Brindes fica fora das categorias de quem compra para si', () => {
+    const nomes = categoriasDeVarejo([cat('Brindes'), cat('Kids'), cat('Personalizados')]).map((c) => c.nome);
+    expect(nomes).toEqual(['Kids', 'Personalizados']);
+  });
+
+  it('o banner de Natal usa a aba Natal quando ela tem peças', () => {
+    expect(linkDoNatal([cat('Natal'), cat('Cantinho da Fé')])).toBe('#categoria/Natal');
+  });
+
+  it('com a aba Natal vazia, o banner vai para o Cantinho da Fé', () => {
+    expect(linkDoNatal([cat('Cantinho da Fé')])).toBe('#categoria/Cantinho%20da%20F%C3%A9');
   });
 });
 
