@@ -84,6 +84,17 @@
           "maisVendido": null,
           "esgotado": false,
           "codigo": "NAT-03"
+        },
+        {
+          "nome": "Presépio (Sagrada Família) Crochê",
+          "descricao": "3 peças - José, Maria e Jesus",
+          "preco": "57,00",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-08"
         }
       ]
     },
