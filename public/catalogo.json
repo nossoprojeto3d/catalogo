@@ -4,6 +4,17 @@
       "nome": "Natal",
       "produtos": [
         {
+          "nome": "Árvore  Família Personalizada com Nomes",
+          "descricao": "✨ Personalização: Produzida com os nomes da sua família, formando uma linda árvore de Natal.\n\n📏 Tamanho: A altura e a largura dos nomes podem variar conforme a quantidade de nomes e o número de letras de cada um, mantendo a harmonia e as proporções da árvore.\n\n💰 Valor a partir de R$ 55,90: O preço final varia de acordo com a quantidade de nomes e o tamanho da peça.\n\n🎨 Cores: Personalizáveis conforme disponibilidade.",
+          "preco": "55,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-16"
+        },
+        {
           "nome": "Árvore de Natal Decor",
           "descricao": "",
           "preco": "25,90",
