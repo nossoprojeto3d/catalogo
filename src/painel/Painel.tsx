@@ -192,7 +192,7 @@ export function Painel() {
       ) : !dados ? (
         <p role="status" className="py-16 text-center text-[15px] text-suave">Abrindo o catálogo...</p>
       ) : tela.tipo === 'lista' ? (
-        <Lista arquivo={dados.arquivo} urlFoto={urlFoto} abrir={abrir} atualizar={() => void carregar()} atualizando={atualizando} />
+        <Lista nome={nome} arquivo={dados.arquivo} urlFoto={urlFoto} abrir={abrir} atualizar={() => void carregar()} atualizando={atualizando} />
       ) : (
         <Ficha
           key={tela.codigo ?? 'nova'}
@@ -214,7 +214,8 @@ export function Painel() {
 function Moldura({ sair, children }: { sair?: () => void; children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-fundo text-texto">
-      <header className="flex h-14 items-center justify-between bg-barra px-4 text-sobre-barra">
+      <header className="bg-barra text-sobre-barra">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 md:px-6">
         <span className="flex items-center gap-2.5">
           <Logo className="h-8" />
           <span className="titulo text-[17px]">Painel</span>
@@ -224,6 +225,7 @@ function Moldura({ sair, children }: { sair?: () => void; children: React.ReactN
             <SignOut size={20} /> Sair
           </button>
         )}
+        </div>
       </header>
       {RAMO !== 'main' && <p className="bg-superficie-2 px-4 py-2 text-center text-[13px] font-medium">Modo de teste: salva só na v4. O site não muda.</p>}
       {children}

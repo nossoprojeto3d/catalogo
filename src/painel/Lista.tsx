@@ -6,6 +6,7 @@ import { CAMPO } from './Acesso';
 import { Miniatura } from './Miniatura';
 
 type Props = {
+  nome: string;
   arquivo: ArquivoCatalogo;
   urlFoto: (codigo: string) => string | null;
   abrir: (codigo: string | null) => void;
@@ -13,59 +14,120 @@ type Props = {
   atualizando: boolean;
 };
 
-export function Lista({ arquivo, urlFoto, abrir, atualizar, atualizando }: Props) {
+type Situacao = '' | 'esgotada' | 'semFoto' | 'queridinho';
+
+const TONS = {
+  ativa: 'bg-acento/25 text-acento-escuro',
+  esgotada: 'bg-red-100 text-red-800',
+  queridinho: 'bg-acento text-sobre-acento',
+  semFoto: 'bg-amber-100 text-amber-900',
+};
+
+function Etiqueta({ tom, children }: { tom: keyof typeof TONS; children: string }) {
+  return <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold leading-tight ${TONS[tom]}`}>{children}</span>;
+}
+
+function Resumo({ numero, rotulo, ativo, aoTocar }: { numero: number; rotulo: string; ativo: boolean; aoTocar: () => void }) {
+  return (
+    <button type="button" onClick={aoTocar} aria-pressed={ativo} className={`rounded-2xl p-3 text-left transition-colors md:p-4 ${ativo ? 'bg-acento text-sobre-acento ring-2 ring-texto' : 'bg-superficie ring-1 ring-linha'}`}>
+      <span className="titulo block text-[28px] leading-none tabular-nums">{numero}</span>
+      <span className={`mt-1.5 block text-[14px] ${ativo ? 'font-medium' : 'text-suave'}`}>{rotulo}</span>
+    </button>
+  );
+}
+
+export function Lista({ nome, arquivo, urlFoto, abrir, atualizar, atualizando }: Props) {
   const [termo, setTermo] = useState('');
   const [categoria, setCategoria] = useState('');
+  const [situacao, setSituacao] = useState<Situacao>('');
+
+  const todas = useMemo(() => arquivo.categorias.flatMap((c) => c.produtos.map((p) => ({ ...p, categoria: c.nome }))), [arquivo]);
+  const contagem = useMemo(() => ({
+    esgotada: todas.filter((p) => p.esgotado).length,
+    semFoto: todas.filter((p) => !urlFoto(p.codigo)).length,
+    queridinho: todas.filter((p) => p.maisVendido !== null).length,
+  }), [todas, urlFoto]);
+
   const pecas = useMemo(() => {
     const partes = normalizar(termo).split(/\s+/).filter(Boolean);
-    const todas = arquivo.categorias.filter((c) => !categoria || c.nome === categoria)
-      .flatMap((c) => c.produtos.map((p) => ({ ...p, categoria: c.nome })));
     return ordenarProdutos(todas.filter((p) => {
+      if (categoria && p.categoria !== categoria) return false;
+      if (situacao === 'esgotada' && !p.esgotado) return false;
+      if (situacao === 'semFoto' && urlFoto(p.codigo)) return false;
+      if (situacao === 'queridinho' && p.maisVendido === null) return false;
       const alvo = normalizar(`${p.nome} ${p.codigo} ${p.categoria}`);
       return partes.every((parte) => alvo.includes(parte));
     }));
-  }, [arquivo, termo, categoria]);
+  }, [todas, termo, categoria, situacao, urlFoto]);
+
+  const alternar = (s: Situacao) => setSituacao(situacao === s ? '' : s);
+  const pilula = (ativa: boolean) => `shrink-0 rounded-full px-4 py-2.5 text-[14px] font-medium ring-1 ${ativa ? 'bg-acento text-sobre-acento ring-acento-forte' : 'bg-superficie ring-linha'}`;
 
   return (
-    <main className="mx-auto w-full max-w-xl px-4 pb-10 pt-3">
-      <div className="relative">
-        <MagnifyingGlass size={20} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-suave" aria-hidden />
-        <input type="search" value={termo} onChange={(e) => setTermo(e.target.value)} placeholder="Buscar peça" aria-label="Buscar peça" className={`${CAMPO} rounded-full pl-11`} autoComplete="off" />
-      </div>
-      <div className="mt-2.5 flex items-center gap-2">
-        <select value={categoria} onChange={(e) => setCategoria(e.target.value)} aria-label="Filtrar por categoria" className="h-11 min-w-0 flex-1 rounded-full bg-superficie px-3 text-[16px] ring-1 ring-texto/20">
-          <option value="">Todas as categorias</option>
-          {arquivo.categorias.map((c) => <option key={c.nome} value={c.nome}>{c.nome} ({c.produtos.length})</option>)}
-        </select>
-        <button type="button" onClick={() => abrir(null)} className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-acento px-4 text-[15px] font-semibold text-sobre-acento">
-          <Plus size={18} weight="bold" /> Nova
+    <main className="mx-auto w-full max-w-5xl px-4 pb-10 pt-4 md:px-6">
+      <h1 className="titulo text-[24px] md:text-[30px]">Olá, {nome}</h1>
+
+      <section aria-label="Resumo do catálogo" className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
+        <Resumo numero={todas.length} rotulo="peças" ativo={!situacao} aoTocar={() => setSituacao('')} />
+        <Resumo numero={contagem.esgotada} rotulo={contagem.esgotada === 1 ? 'esgotada' : 'esgotadas'} ativo={situacao === 'esgotada'} aoTocar={() => alternar('esgotada')} />
+        <Resumo numero={contagem.semFoto} rotulo="sem foto" ativo={situacao === 'semFoto'} aoTocar={() => alternar('semFoto')} />
+        <Resumo numero={contagem.queridinho} rotulo={contagem.queridinho === 1 ? 'queridinho' : 'queridinhos'} ativo={situacao === 'queridinho'} aoTocar={() => alternar('queridinho')} />
+      </section>
+
+      <div className="mt-3 flex flex-col gap-2 md:flex-row-reverse">
+        <button type="button" onClick={() => abrir(null)} className="inline-flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-full bg-acento px-6 text-[16px] font-semibold text-sobre-acento">
+          <Plus size={18} weight="bold" /> Nova peça
         </button>
+        <div className="relative min-w-0 flex-1">
+          <MagnifyingGlass size={20} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-suave" aria-hidden />
+          <input type="search" value={termo} onChange={(e) => setTermo(e.target.value)} placeholder="Buscar peça" aria-label="Buscar peça" className={`${CAMPO} rounded-full pl-11`} autoComplete="off" />
+        </div>
       </div>
-      <div className="mt-3 flex items-center justify-between">
-        <p className="text-[14px] text-suave">{pecas.length} {pecas.length === 1 ? 'peça' : 'peças'}</p>
+
+      <ul aria-label="Filtrar por categoria" className="sem-barra -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
+        <li><button type="button" onClick={() => setCategoria('')} aria-pressed={!categoria} className={pilula(!categoria)}>Todas</button></li>
+        {arquivo.categorias.map((c) => (
+          <li key={c.nome}>
+            <button type="button" onClick={() => setCategoria(categoria === c.nome ? '' : c.nome)} aria-pressed={categoria === c.nome} className={`whitespace-nowrap ${pilula(categoria === c.nome)}`}>
+              {c.nome} <span className="tabular-nums opacity-60">{c.produtos.length}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-2 flex items-center justify-between">
+        <p role="status" className="text-[14px] text-suave">{pecas.length} {pecas.length === 1 ? 'peça' : 'peças'}</p>
         <button type="button" onClick={atualizar} disabled={atualizando} className="-mr-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-[14px] text-suave disabled:opacity-50">
           <ArrowsClockwise size={16} className={atualizando ? 'animate-spin' : ''} /> Atualizar
         </button>
       </div>
+
       {pecas.length === 0 ? (
-        <p className="mt-8 text-center text-[15px] text-suave">Nenhuma peça encontrada. Tente outra palavra ou outra categoria.</p>
+        <p className="mt-8 text-center text-[15px] text-suave">Nenhuma peça encontrada. Tente outra palavra ou tire um filtro.</p>
       ) : (
-        <ul className="mt-1 space-y-2">
-          {pecas.map((p) => (
-            <li key={p.codigo}>
-              <button type="button" onClick={() => abrir(p.codigo)} className="flex w-full items-center gap-3 rounded-2xl bg-superficie p-2 text-left ring-1 ring-linha active:bg-superficie-2">
-                <Miniatura url={urlFoto(p.codigo)} className="size-16 shrink-0 rounded-xl" />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[15px] font-medium">{p.nome}</span>
-                  <span className="mt-0.5 block truncate text-[13px] text-suave">{p.codigo} / {p.categoria}</span>
-                  <span className="mt-0.5 flex items-center justify-between gap-2 pr-1 text-[14px]">
-                    <span className="font-semibold tabular-nums">{paraNumero(p.preco) > 0 ? emReais(paraNumero(p.preco)) : 'Sem preço'}</span>
-                    <span className={p.esgotado ? 'font-medium text-red-700' : 'text-acento-escuro'}>{p.esgotado ? 'Esgotada' : 'Ativa'}</span>
+        <ul className="mt-1 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-3">
+          {pecas.map((p) => {
+            const temFoto = !!urlFoto(p.codigo);
+            return (
+              <li key={p.codigo}>
+                <button type="button" onClick={() => abrir(p.codigo)} className="flex w-full items-center gap-3 rounded-2xl bg-superficie p-2 text-left ring-1 ring-linha active:bg-superficie-2 md:hover:ring-texto/30">
+                  <Miniatura url={urlFoto(p.codigo)} className="size-[72px] shrink-0 rounded-xl" />
+                  <span className="min-w-0 flex-1 pr-1">
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span className="truncate text-[15px] font-medium">{p.nome}</span>
+                      <span className="shrink-0 text-[14px] font-semibold tabular-nums">{paraNumero(p.preco) > 0 ? emReais(paraNumero(p.preco)) : 'Sem preço'}</span>
+                    </span>
+                    <span className="mt-0.5 block truncate text-[13px] text-suave">{p.codigo} / {p.categoria}</span>
+                    <span className="mt-1.5 flex flex-wrap gap-1">
+                      {p.esgotado ? <Etiqueta tom="esgotada">Esgotada</Etiqueta> : <Etiqueta tom="ativa">Ativa</Etiqueta>}
+                      {p.maisVendido !== null && <Etiqueta tom="queridinho">Queridinho</Etiqueta>}
+                      {!temFoto && <Etiqueta tom="semFoto">Sem foto</Etiqueta>}
+                    </span>
                   </span>
-                </span>
-              </button>
-            </li>
-          ))}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </main>
