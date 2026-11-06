@@ -19,9 +19,10 @@ Molde visual com as áreas: [molde-foto-1200x900.png](molde-foto-1200x900.png)
 | Luz | suave e difusa, com sombra leve e natural embaixo do produto |
 | Proibido | texto, logo, marca d'água, moldura, borda, colagem de várias fotos, setas ou medidas desenhadas |
 
-A coluna `Foto` da planilha fica vazia: a página acha a foto pelo nome do
-arquivo. Se a IA não acertar o tamanho exato ou o peso do arquivo, o
-`/otimizar-imagens` ajusta isso. O enquadramento, porém, precisa vir certo.
+A foto é enviada pelo painel, que cuida do nome e do tamanho do arquivo. A
+página acha a foto pelo nome do arquivo. Se a IA não acertar o tamanho exato ou
+o peso do arquivo, o painel ajusta ao salvar. O enquadramento, porém, precisa vir
+certo.
 
 ## Prompt para a IA de imagens
 
