@@ -9,14 +9,14 @@
       "produtos": [
         {
           "nome": "Bandeja Orgânica Porta-Joias",
-          "codigo": "BRI-01",
           "descricao": "",
-          "preco": "10",
+          "preco": "9,00",
           "foto": "",
           "cores": [],
           "combos": {},
           "maisVendido": null,
-          "esgotado": false
+          "esgotado": false,
+          "codigo": "BRI-01"
         }
       ]
     },
