@@ -24,6 +24,17 @@
           "maisVendido": null,
           "esgotado": false,
           "codigo": "NAT-01"
+        },
+        {
+          "nome": "Papai Noel Crochê",
+          "descricao": "",
+          "preco": "25,00",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-03"
         }
       ]
     },
