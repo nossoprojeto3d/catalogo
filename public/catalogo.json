@@ -4,6 +4,17 @@
       "nome": "Natal",
       "produtos": [
         {
+          "nome": "Casinha Iluminada",
+          "descricao": "Acompanha vela artificial",
+          "preco": "15,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-02"
+        },
+        {
           "nome": "Kit Vila Iluminada",
           "descricao": "acompanha vela artificial",
           "preco": "59,90",
