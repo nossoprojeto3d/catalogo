@@ -4,6 +4,17 @@
       "nome": "Natal",
       "produtos": [
         {
+          "nome": "Árvore de Natal Decor",
+          "descricao": "",
+          "preco": "25,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-12"
+        },
+        {
           "nome": "Árvore de Natal Felpudinha Média",
           "descricao": "13 cm",
           "preco": "54,90",
