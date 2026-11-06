@@ -1,4 +1,4 @@
-import { ArrowLeft, Camera, ImageSquare, Trash, X } from '@phosphor-icons/react';
+import { ArrowLeft, ImageSquare, Trash, X } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { Botao } from '../components/Botoes';
 import type { ArquivoCatalogo, Peca } from '../lib/catalogo';
@@ -176,7 +176,7 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
           {/* O card mostra o quadrado central da foto. */}
           <div className="pointer-events-none absolute inset-y-0 left-1/2 aspect-square -translate-x-1/2 border-x-2 border-dashed border-white/80 mix-blend-difference" aria-hidden />
         </div>
-        <p className="mt-1.5 text-[13px] leading-snug text-suave">O card mostra só o que fica entre as linhas. Fotografe com o celular deitado e a peça no centro.</p>
+        <p className="mt-1.5 text-[13px] leading-snug text-suave">O card mostra só o que fica entre as linhas. Use a foto já tratada, com a peça no centro.</p>
         {foto && (sobraLados || sobraAltura) && (
           <label className={`${ROTULO} mt-3`}>Ajustar o corte
             <input
@@ -189,16 +189,10 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
             />
           </label>
         )}
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
-            <Camera size={20} /> Tirar foto
-            <input type="file" accept="image/*" capture="environment" className="sr-only" onChange={escolherFoto} />
-          </label>
-          <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
-            <ImageSquare size={20} /> Galeria
-            <input type="file" accept="image/*" className="sr-only" onChange={escolherFoto} />
-          </label>
-        </div>
+        <label className="mt-3 flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
+          <ImageSquare size={20} /> Galeria
+          <input type="file" accept="image/*" className="sr-only" onChange={escolherFoto} />
+        </label>
       </section>
 
       <div className="mt-6 space-y-4">

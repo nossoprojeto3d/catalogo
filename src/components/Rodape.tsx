@@ -23,6 +23,9 @@ export function Rodape() {
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener" className="inline-flex min-h-11 items-center gap-2">
             <InstagramLogo size={20} /> @nossoprojeto3d
           </a>
+          <a href={`${import.meta.env.BASE_URL}painel/`} rel="nofollow" className="inline-flex min-h-11 items-center text-[13px] font-normal underline-offset-2 hover:underline">
+            Área da loja
+          </a>
         </div>
       </div>
     </footer>

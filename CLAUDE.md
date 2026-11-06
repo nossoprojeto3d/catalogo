@@ -36,7 +36,7 @@ A branch `v4` guarda o desenvolvimento dela; push na `v4` não publica nada. Est
 ## Como os dados chegam
 
 - Produtos ficam em `public/catalogo.json`, lido pelo site a cada visita e editado pelo painel. Categoria vazia não aparece no site. A planilha foi importada uma vez por `scripts/importar-planilha.mjs`; rodar de novo apaga o que foi feito no painel.
-- Painel em `/catalogo/painel/` (`src/painel/`), página à parte, sem Analytics. Grava direto no GitHub, num commit só, com a chave do aparelho; o Action publica em 1 a 2 minutos. Só o site oficial grava na `main`; em qualquer outro endereço grava na `v4`, com aviso de modo de teste.
+- Painel em `/catalogo/painel/` (`src/painel/`), aberto pelo link "Área da loja" no rodapé, página à parte, sem Analytics. Grava direto no GitHub, num commit só, com a chave do aparelho; o Action publica em 1 a 2 minutos. Só o site oficial grava na `main`; em qualquer outro endereço grava na `v4`, com aviso de modo de teste.
 - Acesso: uma chave do GitHub por aparelho (Contents: Read and write, só neste repositório), guardada cifrada com a senha do painel (`chaveLocal.ts`). A chave nunca entra no código nem no chat. Depois que o painel estiver no ar, commits da `main` chegam também por ele: dê `git pull` antes de mexer.
 - Se duas pessoas salvam peças diferentes, as duas alterações ficam. Se for a mesma peça, o painel avisa e não grava por cima.
 - Pedido pelo WhatsApp. Não tem carrinho, pagamento nem cadastro.
@@ -84,3 +84,4 @@ Usado pelo `/conferir-site`, no celular e no desktop (`npm run build && npm run 
 9. WhatsApp: conferir o `href` (`wa.me/5562993152843?text=...`) sem clicar.
 10. Link compartilhado `#produto/<CODIGO>` abre o produto; o "voltar" do celular fecha a tela.
 11. Aviso de cookies: no celular, o botão flutuante do WhatsApp fica escondido até a resposta e volta depois dela.
+12. Painel: "Área da loja" no rodapé abre `/catalogo/painel/`. Sem chave real, conferir só a tela de configuração; salvar de verdade grava na `main` e publica.
