@@ -64,6 +64,27 @@
           "codigo": "NAT-07"
         },
         {
+          "nome": "Bandeja Redonda - Gominhos",
+          "descricao": "17cm",
+          "preco": "29,90",
+          "foto": "",
+          "cores": [
+            "Branco Perolado",
+            "Vermelho",
+            "Vermelho Bordô",
+            "Verde Militar",
+            "Areia",
+            "Marrom Café",
+            "Dourado",
+            "Azul Marinho",
+            "Rosa"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-14"
+        },
+        {
           "nome": "Casinha Iluminada",
           "descricao": "Acompanha vela artificial",
           "preco": "15,90",
