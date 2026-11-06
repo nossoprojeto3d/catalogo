@@ -1,4 +1,4 @@
-import { SignOut } from '@phosphor-icons/react';
+import { ArrowLeft, SignOut } from '@phosphor-icons/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Botao, Logo } from '../components/Botoes';
@@ -180,10 +180,9 @@ export function Painel() {
   if (fase === 'senha') return <Moldura><Desbloquear pronto={entrar} reconfigurar={() => setFase('configurar')} /></Moldura>;
 
   const emEdicao = tela.tipo === 'ficha' && dados ? (tela.codigo ? acharPeca(dados.arquivo, tela.codigo) : null) : null;
-  const primeiraCategoria = dados?.arquivo.categorias.find((c) => c.produtos.length)?.nome ?? '';
 
   return (
-    <Moldura sair={sair}>
+    <Moldura sair={sair} temAlteracao={() => alterado.current}>
       {erroCarga && !dados ? (
         <main className="mx-auto max-w-md px-4 py-12 text-center">
           <p role="alert" className="text-[15px] text-suave">{erroCarga}</p>
@@ -198,7 +197,6 @@ export function Painel() {
           key={tela.codigo ?? 'nova'}
           inicial={emEdicao}
           arquivo={dados.arquivo}
-          categoriaPadrao={primeiraCategoria}
           urlFoto={tela.codigo ? urlFoto(tela.codigo) : null}
           salvar={salvar}
           apagar={apagar}
@@ -211,7 +209,7 @@ export function Painel() {
   );
 }
 
-function Moldura({ sair, children }: { sair?: () => void; children: React.ReactNode }) {
+function Moldura({ sair, temAlteracao, children }: { sair?: () => void; temAlteracao?: () => boolean; children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-fundo text-texto">
       <header className="bg-barra text-sobre-barra">
@@ -220,11 +218,20 @@ function Moldura({ sair, children }: { sair?: () => void; children: React.ReactN
           <Logo className="h-8" />
           <span className="titulo text-[17px]">Painel</span>
         </span>
-        {sair && (
-          <button type="button" onClick={sair} className="-mr-2 inline-flex h-11 items-center gap-1.5 rounded-full px-2 text-[15px] font-medium">
-            <SignOut size={20} /> Sair
-          </button>
-        )}
+        <span className="-mr-2 flex items-center gap-1">
+          <a
+            href={import.meta.env.BASE_URL}
+            onClick={(e) => { if (temAlteracao?.() && !confirm('Sair sem salvar as alterações?')) e.preventDefault(); }}
+            className="inline-flex h-11 items-center gap-1.5 rounded-full px-2 text-[15px] font-medium"
+          >
+            <ArrowLeft size={20} /> Catálogo
+          </a>
+          {sair && (
+            <button type="button" onClick={sair} className="inline-flex h-11 items-center gap-1.5 rounded-full px-2 text-[15px] font-medium">
+              <SignOut size={20} /> Sair
+            </button>
+          )}
+        </span>
         </div>
       </header>
       {RAMO !== 'main' && <p className="bg-superficie-2 px-4 py-2 text-center text-[13px] font-medium">Modo de teste: salva só na v4. O site não muda.</p>}

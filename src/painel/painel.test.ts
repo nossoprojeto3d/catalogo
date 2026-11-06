@@ -73,6 +73,7 @@ describe('painel', () => {
     const base = { nome: 'Peça', preco: '10', categoria: 'Kids', esgotado: false };
     expect(errosDaPeca(base)).toEqual([]);
     expect(errosDaPeca({ ...base, nome: ' ' })).toEqual(['Escreva o nome da peça.']);
+    expect(errosDaPeca({ ...base, categoria: '' })).toEqual(['Escolha a categoria.']);
     expect(errosDaPeca({ ...base, preco: '' })).toEqual(['Escreva o preço da peça.']);
     expect(errosDaPeca({ ...base, preco: '', esgotado: true })).toEqual([]);
   });

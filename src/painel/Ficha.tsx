@@ -25,7 +25,6 @@ export type Pedido = {
 type Props = {
   inicial: Localizada | null;
   arquivo: ArquivoCatalogo;
-  categoriaPadrao: string;
   urlFoto: string | null;
   salvar: (pedido: Pedido) => Promise<void>;
   apagar: (original: Localizada) => Promise<void>;
@@ -93,12 +92,12 @@ function PreviaDoCard({ nome, preco, esgotada, cores, ehBrinde, foto, urlFoto }:
 
 type FotoNova = { url: string; img: HTMLImageElement; x: number; y: number };
 
-export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apagar, voltar, recarregar, avisarAlterado }: Props) {
+export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recarregar, avisarAlterado }: Props) {
   const p = inicial?.peca;
   const [nome, setNome] = useState(p?.nome ?? '');
   const [preco, setPreco] = useState(p?.preco ?? '');
   const [descricao, setDescricao] = useState(p?.descricao ?? '');
-  const [categoria, setCategoria] = useState(inicial?.categoria ?? categoriaPadrao);
+  const [categoria, setCategoria] = useState(inicial?.categoria ?? '');
   const [novaCategoria, setNovaCategoria] = useState('');
   const [cores, setCores] = useState<string[]>(p?.cores ?? []);
   const [corDigitada, setCorDigitada] = useState('');
@@ -137,10 +136,10 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
   // Só conta como alterada se o resultado final mudou, e não por ter tocado num campo.
   const assinatura = (dados: Omit<Peca, 'codigo'>, cat: string) => JSON.stringify([dados.nome, dados.descricao, dados.preco, dados.cores, dados.combos, dados.maisVendido, dados.esgotado, cat]);
   const inicialAssinatura = useMemo(() => {
-    if (!inicial) return JSON.stringify(['', '', '', [], {}, null, false, categoriaPadrao]);
+    if (!inicial) return JSON.stringify(['', '', '', [], {}, null, false, '']);
     const { codigo: _c, ...resto } = inicial.peca;
     return assinatura({ ...resto, preco: normalizarPreco(resto.preco) }, inicial.categoria);
-    // A foto inicial e a categoria padrão só valem na abertura da ficha.
+    // A foto inicial só vale na abertura da ficha.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const alterado = !!foto || assinatura(montar(), categoriaFinal) !== inicialAssinatura;
@@ -305,6 +304,8 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
               </label>
               <label className={ROTULO}>Categoria
                 <select className={`${CAMPO} mt-1.5 font-normal`} value={categoria} onChange={(e) => setCategoria(e.target.value)}>
+                  {/* Peça nova começa sem categoria, para ninguém salvar na primeira da lista sem querer. */}
+                  <option value="" disabled hidden>Selecione uma categoria</option>
                   {arquivo.categorias.map((c) => <option key={c.nome} value={c.nome}>{c.nome}</option>)}
                   <option value={OUTRA_CATEGORIA}>Nova categoria...</option>
                 </select>
