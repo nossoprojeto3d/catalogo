@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { categoriasDoArquivo, montarCategoria, type ArquivoCatalogo, type Peca } from '../lib/catalogo';
+import { promptDaFoto } from './promptFoto';
 import { acharPeca, aplicarPeca, descreverMudanca, errosDaPeca, gerarCodigo, mesmaPeca, normalizarPreco, removerPeca } from './pecas';
 
 const peca = (codigo: string, extra: Partial<Peca> = {}): Peca => ({
@@ -74,6 +75,13 @@ describe('painel', () => {
     expect(errosDaPeca({ ...base, nome: ' ' })).toEqual(['Escreva o nome da peça.']);
     expect(errosDaPeca({ ...base, preco: '' })).toEqual(['Escreva o preço da peça.']);
     expect(errosDaPeca({ ...base, preco: '', esgotado: true })).toEqual([]);
+  });
+
+  it('monta o prompt da foto com o padrão do catálogo', () => {
+    expect(promptDaFoto(' Azeite Sensorial ')).toContain('Produto: Azeite Sensorial.');
+    expect(promptDaFoto('')).not.toContain('Produto:');
+    expect(promptDaFoto('A')).toContain('1200 x 900 pixels');
+    expect(promptDaFoto('A')).toContain('faixa central de 675 pixels');
   });
 
   it('descreve a mudança no histórico', () => {

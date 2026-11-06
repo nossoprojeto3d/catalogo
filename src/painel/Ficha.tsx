@@ -1,5 +1,6 @@
-import { ArrowLeft, ImageSquare, Trash, X } from '@phosphor-icons/react';
+import { ArrowLeft, Copy, ImageSquare, Trash, X } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { toast } from 'sonner';
 import { Botao } from '../components/Botoes';
 import type { ArquivoCatalogo, Peca } from '../lib/catalogo';
 import { ABAS_BRINDES, QUANTIDADES_COMBO } from '../lib/config';
@@ -9,6 +10,7 @@ import { CAMPO, ROTULO } from './Acesso';
 import { carregarImagem, prepararFoto } from './foto';
 import { ErroPainel } from './github';
 import { errosDaPeca, normalizarPreco, type Localizada } from './pecas';
+import { promptDaFoto } from './promptFoto';
 import { Miniatura } from './Miniatura';
 
 const OUTRA_CATEGORIA = '__nova__';
@@ -67,6 +69,7 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
   const [erros, setErros] = useState<string[]>([]);
   const [conflito, setConflito] = useState(false);
   const [ocupado, setOcupado] = useState(false);
+  const [promptManual, setPromptManual] = useState(false);
   const [confirmarApagar, setConfirmarApagar] = useState(false);
   const urlAberta = useRef<string | null>(null);
   useEffect(() => () => { if (urlAberta.current) URL.revokeObjectURL(urlAberta.current); }, []);
@@ -115,6 +118,17 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
     } catch (falha) {
       URL.revokeObjectURL(url);
       setErros([(falha as Error).message]);
+    }
+  };
+
+  const copiarPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(promptDaFoto(nome));
+      setPromptManual(false);
+      toast.success('Prompt copiado. Cole na IA junto com a foto da peça.');
+    } catch {
+      // Navegador sem acesso à área de transferência: mostra o texto para copiar à mão.
+      setPromptManual(true);
     }
   };
 
@@ -189,10 +203,20 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
             />
           </label>
         )}
-        <label className="mt-3 flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
-          <ImageSquare size={20} /> Galeria
-          <input type="file" accept="image/*" className="sr-only" onChange={escolherFoto} />
-        </label>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button type="button" onClick={copiarPrompt} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
+            <Copy size={20} /> Copiar prompt
+          </button>
+          <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
+            <ImageSquare size={20} /> Galeria
+            <input type="file" accept="image/*" className="sr-only" onChange={escolherFoto} />
+          </label>
+        </div>
+        {promptManual && (
+          <label className={`${ROTULO} mt-3`}>Copie o texto abaixo
+            <textarea readOnly value={promptDaFoto(nome)} onFocus={(e) => e.currentTarget.select()} className={`${CAMPO} mt-1.5 h-40 py-3 text-[14px] font-normal`} />
+          </label>
+        )}
       </section>
 
       <div className="mt-6 space-y-4">

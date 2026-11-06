@@ -25,6 +25,9 @@ arquivo. Se a IA não acertar o tamanho exato ou o peso do arquivo, o
 
 ## Prompt para a IA de imagens
 
+No painel, o botão "Copiar prompt" da ficha da peça já copia este texto com o
+nome da peça (`src/painel/promptFoto.ts`). Se mudar aqui, mude lá também.
+
 Copie o bloco abaixo, anexe a foto original do produto (e, se a ferramenta
 aceitar, o molde `molde-foto-1200x900.png`) e troque `<CÓDIGO>` pelo código
 do produto.
