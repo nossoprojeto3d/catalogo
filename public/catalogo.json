@@ -26,6 +26,17 @@
           "codigo": "NAT-01"
         },
         {
+          "nome": "Ovelhinha - Crochê",
+          "descricao": "Coleção Presépio",
+          "preco": "18,00",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-04"
+        },
+        {
           "nome": "Papai Noel Crochê",
           "descricao": "",
           "preco": "25,00",
