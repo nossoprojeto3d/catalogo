@@ -26,6 +26,22 @@
           "codigo": "NAT-05"
         },
         {
+          "nome": "Árvore de Natal Minimalista",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "20,90",
+          "foto": "",
+          "cores": [
+            "Vermelho Bordo",
+            "Verde Militar",
+            "Dourado",
+            "Branco Perolado"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-07"
+        },
+        {
           "nome": "Casinha Iluminada",
           "descricao": "Acompanha vela artificial",
           "preco": "15,90",
