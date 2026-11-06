@@ -64,6 +64,22 @@
           "codigo": "NAT-01"
         },
         {
+          "nome": "Letreiro Feliz Natal Médio",
+          "descricao": "20cm",
+          "preco": "29,90",
+          "foto": "",
+          "cores": [
+            "verde militar",
+            "dourado",
+            "vermelho",
+            "vermelho bordô"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-10"
+        },
+        {
           "nome": "Letreiro Feliz Natal Pequeno",
           "descricao": "10 cm",
           "preco": "14,90",
