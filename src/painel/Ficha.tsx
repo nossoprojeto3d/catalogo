@@ -1,4 +1,4 @@
-import { ArrowLeft, Copy, ImageSquare, Trash, X } from '@phosphor-icons/react';
+import { ArrowLeft, Copy, DownloadSimple, ImageSquare, Trash, X } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
 import { Botao } from '../components/Botoes';
@@ -70,6 +70,7 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
   const [conflito, setConflito] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const [promptManual, setPromptManual] = useState(false);
+  const [baixando, setBaixando] = useState(false);
   const [confirmarApagar, setConfirmarApagar] = useState(false);
   const urlAberta = useRef<string | null>(null);
   useEffect(() => () => { if (urlAberta.current) URL.revokeObjectURL(urlAberta.current); }, []);
@@ -118,6 +119,28 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
     } catch (falha) {
       URL.revokeObjectURL(url);
       setErros([(falha as Error).message]);
+    }
+  };
+
+  // Entrega o arquivo que está no site, sem recomprimir, com o nome do código da peça.
+  const baixarFoto = async () => {
+    if (!urlFoto || !inicial) return;
+    setBaixando(true);
+    try {
+      const resposta = await fetch(urlFoto);
+      if (!resposta.ok) throw new Error(String(resposta.status));
+      const endereco = URL.createObjectURL(await resposta.blob());
+      const link = document.createElement('a');
+      link.href = endereco;
+      link.download = `${inicial.peca.codigo}.jpg`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(endereco), 30_000);
+    } catch {
+      toast.error('Não foi possível baixar. Se a foto acabou de ser salva, espere 1 a 2 minutos e tente de novo.');
+    } finally {
+      setBaixando(false);
     }
   };
 
@@ -204,11 +227,16 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
           </label>
         )}
         <div className="mt-3 grid grid-cols-2 gap-2">
+          {inicial && urlFoto && (
+            <button type="button" onClick={baixarFoto} disabled={baixando} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20 disabled:opacity-50">
+              <DownloadSimple size={20} /> {baixando ? 'Baixando...' : 'Baixar foto'}
+            </button>
+          )}
           <button type="button" onClick={copiarPrompt} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
             <Copy size={20} /> Copiar prompt
           </button>
-          <label className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20">
-            <ImageSquare size={20} /> Galeria
+          <label className={`inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-superficie text-[15px] font-semibold ring-1 ring-texto/20 ${inicial && urlFoto ? 'col-span-2' : ''}`}>
+            <ImageSquare size={20} /> {inicial && urlFoto ? 'Trocar pela galeria' : 'Galeria'}
             <input type="file" accept="image/*" className="sr-only" onChange={escolherFoto} />
           </label>
         </div>
