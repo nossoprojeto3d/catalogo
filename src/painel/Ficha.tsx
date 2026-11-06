@@ -32,20 +32,36 @@ type Props = {
   avisarAlterado: (alterado: boolean) => void;
 };
 
+// Valor que a planilha já usava para marcar queridinho sem posição definida.
+const POSICAO_NOVO_QUERIDINHO = 999;
+
+function Interruptor({ rotulo, ajuda, ligado, mudar }: { rotulo: string; ajuda?: string; ligado: boolean; mudar: (v: boolean) => void }) {
+  return (
+    <button type="button" role="switch" aria-checked={ligado} onClick={() => mudar(!ligado)} className="flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl bg-superficie px-4 py-3 text-left ring-1 ring-linha">
+      <span>
+        <span className="block text-[15px] font-semibold">{rotulo}</span>
+        {ajuda && <span className="mt-0.5 block text-[13px] leading-snug text-suave">{ajuda}</span>}
+      </span>
+      <span className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${ligado ? 'bg-acento-escuro' : 'bg-superficie-2 ring-1 ring-texto/20'}`}>
+        <span className={`absolute top-1 size-6 rounded-full bg-white shadow transition-[left] ${ligado ? 'left-7' : 'left-1'}`} />
+      </span>
+    </button>
+  );
+}
+
 type FotoNova = { url: string; img: HTMLImageElement; x: number; y: number };
 
 export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apagar, voltar, recarregar, avisarAlterado }: Props) {
   const p = inicial?.peca;
   const [nome, setNome] = useState(p?.nome ?? '');
   const [preco, setPreco] = useState(p?.preco ?? '');
-  const [promocao, setPromocao] = useState(p?.precoPromocional ?? '');
   const [descricao, setDescricao] = useState(p?.descricao ?? '');
   const [categoria, setCategoria] = useState(inicial?.categoria ?? categoriaPadrao);
   const [novaCategoria, setNovaCategoria] = useState('');
   const [cores, setCores] = useState<string[]>(p?.cores ?? []);
   const [corDigitada, setCorDigitada] = useState('');
   const [esgotada, setEsgotada] = useState(p?.esgotado ?? false);
-  const [queridinho, setQueridinho] = useState(p?.maisVendido != null ? String(p.maisVendido) : '');
+  const [queridinho, setQueridinho] = useState(p?.maisVendido != null);
   const [combos, setCombos] = useState<Record<number, string>>(() => Object.fromEntries(Object.entries(p?.combos ?? {}).map(([q, v]) => [q, String(v).replace('.', ',')])));
   const [foto, setFoto] = useState<FotoNova | null>(null);
   const [erros, setErros] = useState<string[]>([]);
@@ -59,29 +75,27 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
   const ehBrinde = ABAS_BRINDES.includes(categoriaFinal);
 
   const montar = (): Omit<Peca, 'codigo'> => {
-    const textoNumero = queridinho.trim().replace(',', '.');
-    const posicao = textoNumero ? Number(textoNumero) : null;
     return {
       nome: nome.trim(),
       descricao: descricao.trim(),
       preco: normalizarPreco(preco),
-      precoPromocional: normalizarPreco(promocao),
       foto: p?.foto ?? '',
       cores,
       combos: ehBrinde
         ? Object.fromEntries(Object.entries(combos).map(([q, v]) => [q, paraNumero(normalizarPreco(v))]).filter(([, v]) => Number(v) > 0))
         : p?.combos ?? {},
-      maisVendido: posicao === null || Number.isNaN(posicao) ? null : posicao,
+      // Quem já era queridinho mantém a posição; quem entra agora vai para o fim da vitrine.
+      maisVendido: queridinho ? p?.maisVendido ?? POSICAO_NOVO_QUERIDINHO : null,
       esgotado: esgotada,
     };
   };
 
   // Só conta como alterada se o resultado final mudou, e não por ter tocado num campo.
-  const assinatura = (dados: Omit<Peca, 'codigo'>, cat: string) => JSON.stringify([dados.nome, dados.descricao, dados.preco, dados.precoPromocional, dados.cores, dados.combos, dados.maisVendido, dados.esgotado, cat]);
+  const assinatura = (dados: Omit<Peca, 'codigo'>, cat: string) => JSON.stringify([dados.nome, dados.descricao, dados.preco, dados.cores, dados.combos, dados.maisVendido, dados.esgotado, cat]);
   const inicialAssinatura = useMemo(() => {
-    if (!inicial) return JSON.stringify(['', '', '', '', [], {}, null, false, categoriaPadrao]);
+    if (!inicial) return JSON.stringify(['', '', '', [], {}, null, false, categoriaPadrao]);
     const { codigo: _c, ...resto } = inicial.peca;
-    return assinatura({ ...resto, preco: normalizarPreco(resto.preco), precoPromocional: normalizarPreco(resto.precoPromocional) }, inicial.categoria);
+    return assinatura({ ...resto, preco: normalizarPreco(resto.preco) }, inicial.categoria);
     // A foto inicial e a categoria padrão só valem na abertura da ficha.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -116,7 +130,7 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
   };
 
   const enviar = async () => {
-    const problemas = errosDaPeca({ nome, preco, precoPromocional: promocao, categoria: categoriaFinal, esgotado: esgotada });
+    const problemas = errosDaPeca({ nome, preco, categoria: categoriaFinal, esgotado: esgotada });
     setErros(problemas);
     setConflito(false);
     if (problemas.length) return;
@@ -191,14 +205,9 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
         <label className={ROTULO}>Nome
           <input className={`${CAMPO} mt-1.5 font-normal`} value={nome} onChange={(e) => setNome(e.target.value)} />
         </label>
-        <div className="grid grid-cols-2 gap-3">
-          <label className={ROTULO}>Preço
-            <input className={`${CAMPO} mt-1.5 font-normal`} inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} onBlur={() => setPreco(normalizarPreco(preco))} placeholder="0,00" />
-          </label>
-          <label className={ROTULO}>Promoção
-            <input className={`${CAMPO} mt-1.5 font-normal`} inputMode="decimal" value={promocao} onChange={(e) => setPromocao(e.target.value)} onBlur={() => setPromocao(normalizarPreco(promocao))} placeholder="Opcional" />
-          </label>
-        </div>
+        <label className={ROTULO}>Preço
+          <input className={`${CAMPO} mt-1.5 font-normal`} inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} onBlur={() => setPreco(normalizarPreco(preco))} placeholder="0,00" />
+        </label>
         <label className={ROTULO}>Categoria
           <select className={`${CAMPO} mt-1.5 font-normal`} value={categoria} onChange={(e) => setCategoria(e.target.value)}>
             {arquivo.categorias.map((c) => <option key={c.nome} value={c.nome}>{c.nome}</option>)}
@@ -257,23 +266,8 @@ export function Ficha({ inicial, arquivo, categoriaPadrao, urlFoto, salvar, apag
           </fieldset>
         )}
 
-        <label className={ROTULO}>Posição em "Os queridinhos"
-          <input className={`${CAMPO} mt-1.5 font-normal`} inputMode="numeric" value={queridinho} onChange={(e) => setQueridinho(e.target.value)} placeholder="Vazio: não aparece no início" />
-        </label>
-
-        <div className="flex min-h-11 items-center justify-between gap-3 rounded-2xl bg-superficie px-4 py-3 ring-1 ring-linha">
-          <span id="rotulo-esgotada" className="text-[15px] font-semibold">Esgotada</span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={esgotada}
-            aria-labelledby="rotulo-esgotada"
-            onClick={() => setEsgotada(!esgotada)}
-            className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${esgotada ? 'bg-texto' : 'bg-superficie-2 ring-1 ring-texto/20'}`}
-          >
-            <span className={`absolute top-1 size-6 rounded-full bg-white shadow transition-[left] ${esgotada ? 'left-7' : 'left-1'}`} />
-          </button>
-        </div>
+        <Interruptor rotulo="Queridinho" ajuda={'Aparece em "Os queridinhos", no início do site.'} ligado={queridinho} mudar={setQueridinho} />
+        <Interruptor rotulo="Esgotada" ligado={esgotada} mudar={setEsgotada} />
 
         {inicial && (
           <button type="button" onClick={tocarApagar} disabled={ocupado} className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full text-[15px] font-medium text-red-700 disabled:opacity-50">

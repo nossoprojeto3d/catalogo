@@ -10,16 +10,8 @@ export function emReais(n: number): string {
   return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// Promoção só vale quando é menor que o preço cheio. Promocional igual ou
-// maior que o original é erro de digitação na planilha e é ignorado.
-export function emPromocao(p: Produto): boolean {
-  const original = paraNumero(p.preco);
-  const promo = paraNumero(p.precoPromocional);
-  return promo > 0 && (original <= 0 || promo < original);
-}
-
 export function precoUnitario(p: Produto): number {
-  return emPromocao(p) ? paraNumero(p.precoPromocional) : paraNumero(p.preco);
+  return paraNumero(p.preco);
 }
 
 // Só as abas de brindes têm combo. Nas outras, 10 unidades são 10 unidades.
@@ -84,8 +76,3 @@ export function textoPreco(n: number): string {
   return n > 0 ? emReais(n) : 'Sob consulta';
 }
 
-export function percentualDesconto(p: Produto): number {
-  const original = paraNumero(p.preco);
-  if (!emPromocao(p) || original <= 0) return 0;
-  return Math.round((1 - paraNumero(p.precoPromocional) / original) * 100);
-}

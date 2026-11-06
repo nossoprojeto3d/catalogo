@@ -293,7 +293,7 @@ export function TelaProduto() {
   );
 }
 
-const SEM_PRODUTO: Produto = { nome: '', codigo: '', descricao: '', preco: '', precoPromocional: '', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: false, categoria: '' };
+const SEM_PRODUTO: Produto = { nome: '', codigo: '', descricao: '', preco: '', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: false, categoria: '' };
 
 // O hook precisa existir mesmo antes de o primeiro produto ser aberto.
 function useEscolhaSegura(produto: Produto | null, inicial: number) {

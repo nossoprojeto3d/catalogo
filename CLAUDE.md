@@ -47,7 +47,6 @@ A branch `v4` guarda o desenvolvimento dela; push na `v4` não publica nada. Est
 - Coluna opcional `Combos` define preço fechado (`10=90,00; 30=260,00; 50=400,00`), que manda sobre o desconto naquela quantidade exata.
 - Brindes são as abas de `ABAS_BRINDES`. Termos: "Para você ou para presentear" e "Brindes para seus clientes", sem "lembrancinhas" nem "evento" no texto visível.
 - Produto com `Cores` exige escolher a cor antes de pedir ou pôr na lista.
-- `PrecoPromocional` só vale se for menor que `Preco`.
 - Item da lista que esgota ou sai da planilha é removido com aviso.
 
 ## Visual

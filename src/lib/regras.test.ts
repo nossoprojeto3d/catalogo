@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { buscar, categoriasDeVarejo, interpretarCSV, linkDoNatal, lerCombos, montarCategoria, ordenarPor, queridinhos, type Produto } from './catalogo';
 import { paginaDoProduto } from '../../scripts/plugin-compartilhar';
-import { descontoDaQuantidade, emPromocao, paraNumero, precoUnitario, temCombos, textoDoTotal, totalDoItem } from './preco';
+import { descontoDaQuantidade, paraNumero, precoUnitario, temCombos, textoDoTotal, totalDoItem } from './preco';
 import { linkWhatsapp, mensagemAviseMe, mensagemPedido as mensagemBruta } from './whatsapp';
 
 // toLocaleString põe espaço sem quebra depois de "R$"; aqui vira espaço comum pra ler melhor.
@@ -32,7 +32,7 @@ const org = montarCategoria('Organizadores', interpretarCSV(amostra('organizador
 const porCodigo = (codigo: string) => [...kids.produtos, ...org.produtos].find((p) => p.codigo === codigo)!;
 
 const produto = (dados: Partial<Produto>): Produto => ({
-  nome: 'Peça', codigo: '', descricao: '', preco: '', precoPromocional: '', foto: '',
+  nome: 'Peça', codigo: '', descricao: '', preco: '', foto: '',
   cores: [], combos: {}, maisVendido: null, esgotado: false, categoria: 'Kids', ...dados,
 });
 
@@ -67,18 +67,16 @@ describe('preço', () => {
     expect(paraNumero('')).toBe(0);
   });
 
-  it('usa o promocional só quando é menor que o cheio', () => {
+  it('importa a promoção antiga como preço normal', () => {
     expect(precoUnitario(porCodigo('SEN-01'))).toBe(24.9);
-    expect(emPromocao(produto({ preco: '20,00', precoPromocional: '25,00' }))).toBe(false);
-    expect(precoUnitario(produto({ preco: '20,00', precoPromocional: '25,00' }))).toBe(20);
   });
 });
 
 describe('mensagem do WhatsApp', () => {
-  it('pedido de um produto com cor, quantidade e promoção', () => {
+  it('pedido de um produto com cor e quantidade', () => {
     expect(mensagemPedido([{ produto: porCodigo('SEN-01'), quantidade: 2, cor: 'Azul' }])).toBe(
       'Olá! Quero fazer um pedido pelo catálogo:\n\n' +
-        '*1. Estrela Sensorial* (SEN-01)\n2 x R$ 24,90 = R$ 49,80\nPromoção, de R$ 29,90 cada\nCor: Azul\n\n' +
+        '*1. Estrela Sensorial* (SEN-01)\n2 x R$ 24,90 = R$ 49,80\nCor: Azul\n\n' +
         '*Total: R$ 49,80*\n\nPode confirmar disponibilidade e prazo?',
     );
   });

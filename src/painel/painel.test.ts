@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { categoriasDoArquivo, type ArquivoCatalogo, type Peca } from '../lib/catalogo';
+import { categoriasDoArquivo, montarCategoria, type ArquivoCatalogo, type Peca } from '../lib/catalogo';
 import { acharPeca, aplicarPeca, descreverMudanca, errosDaPeca, gerarCodigo, mesmaPeca, normalizarPreco, removerPeca } from './pecas';
 
 const peca = (codigo: string, extra: Partial<Peca> = {}): Peca => ({
-  nome: codigo, codigo, descricao: '', preco: '10,00', precoPromocional: '', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: false, ...extra,
+  nome: codigo, codigo, descricao: '', preco: '10,00', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: false, ...extra,
 });
 const arquivo: ArquivoCatalogo = {
   categorias: [
@@ -20,6 +20,7 @@ describe('arquivo real do catálogo', () => {
   it('toda peça tem nome e código, sem repetir', () => {
     expect(todas.length).toBeGreaterThan(0);
     expect(todas.every((p) => p.nome && p.codigo)).toBe(true);
+    expect(todas.some((p) => 'precoPromocional' in p)).toBe(false);
     expect(new Set(todas.map((p) => p.codigo.toLowerCase())).size).toBe(todas.length);
   });
 
@@ -54,6 +55,12 @@ describe('painel', () => {
     expect(aplicarPeca(arquivo, peca('NOV-01'), 'Nova').categorias.at(-1)?.nome).toBe('Nova');
   });
 
+  it('importa a promoção antiga como o preço que o cliente já pagava', () => {
+    const cab = ['Produto', 'Codigo', 'Preco', 'PrecoPromocional'];
+    const { produtos } = montarCategoria('A', [cab, ['Com', 'A-1', '24,90', '19,90'], ['Sem', 'A-2', '24,90', ''], ['Errada', 'A-3', '20,00', '25,00']]);
+    expect(produtos.map((p) => p.preco)).toEqual(['19,90', '20,00', '24,90']);
+  });
+
   it('reconhece peça alterada por outra pessoa', () => {
     const a = { peca: peca('KID-02'), categoria: 'Kids' };
     expect(mesmaPeca(a, { peca: peca('KID-02'), categoria: 'Kids' })).toBe(true);
@@ -62,12 +69,11 @@ describe('painel', () => {
   });
 
   it('avisa o que falta antes de salvar', () => {
-    const base = { nome: 'Peça', preco: '10', precoPromocional: '', categoria: 'Kids', esgotado: false };
+    const base = { nome: 'Peça', preco: '10', categoria: 'Kids', esgotado: false };
     expect(errosDaPeca(base)).toEqual([]);
     expect(errosDaPeca({ ...base, nome: ' ' })).toEqual(['Escreva o nome da peça.']);
     expect(errosDaPeca({ ...base, preco: '' })).toEqual(['Escreva o preço da peça.']);
     expect(errosDaPeca({ ...base, preco: '', esgotado: true })).toEqual([]);
-    expect(errosDaPeca({ ...base, precoPromocional: '10' })).toEqual(['O preço de promoção precisa ser menor que o preço normal.']);
   });
 
   it('descreve a mudança no histórico', () => {

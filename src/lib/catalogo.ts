@@ -6,7 +6,6 @@ export type Produto = {
   codigo: string;
   descricao: string;
   preco: string;
-  precoPromocional: string;
   foto: string;
   cores: string[];
   // Preço fechado por quantidade (coluna Combos): { 10: 119, 20: 220 }
@@ -71,12 +70,15 @@ export function montarCategoria(nomeAba: string, linhas: string[][]): Categoria 
       maisVendido = Number.isNaN(n) ? 999 : n;
     }
     const coresTexto = ler(linha, 'cores');
+    // O site não tem mais promoção: na importação, vale o preço que o cliente já pagava.
+    const promocao = paraNumero(ler(linha, 'precopromocional'));
+    const normal = paraNumero(ler(linha, 'preco'));
+    const preco = promocao > 0 && (normal <= 0 || promocao < normal) ? ler(linha, 'precopromocional') : ler(linha, 'preco');
     produtos.push({
       nome,
       codigo: ler(linha, 'codigo'),
       descricao: ler(linha, 'descricao'),
-      preco: ler(linha, 'preco'),
-      precoPromocional: ler(linha, 'precopromocional'),
+      preco,
       foto: ler(linha, 'foto'),
       cores: coresTexto ? coresTexto.split(',').map((c) => c.trim()).filter(Boolean) : [],
       combos: lerCombos(ler(linha, 'combos')),

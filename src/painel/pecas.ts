@@ -61,16 +61,14 @@ export function removerPeca(arquivo: ArquivoCatalogo, codigo: string): ArquivoCa
   };
 }
 
-export type CamposDaPeca = { nome: string; preco: string; precoPromocional: string; categoria: string; esgotado: boolean };
+export type CamposDaPeca = { nome: string; preco: string; categoria: string; esgotado: boolean };
 
 // Devolve o que falta arrumar; vazio quer dizer que pode salvar.
-export function errosDaPeca({ nome, preco, precoPromocional, categoria, esgotado }: CamposDaPeca): string[] {
+export function errosDaPeca({ nome, preco, categoria, esgotado }: CamposDaPeca): string[] {
   const erros: string[] = [];
   if (!nome.trim()) erros.push('Escreva o nome da peça.');
   if (!categoria.trim()) erros.push('Escolha a categoria.');
-  const valor = paraNumero(normalizarPreco(preco));
-  if (!esgotado && valor <= 0) erros.push('Escreva o preço da peça.');
-  if (paraNumero(normalizarPreco(precoPromocional)) >= valor && precoPromocional.trim() && valor > 0) erros.push('O preço de promoção precisa ser menor que o preço normal.');
+  if (!esgotado && paraNumero(normalizarPreco(preco)) <= 0) erros.push('Escreva o preço da peça.');
   return erros;
 }
 
@@ -86,7 +84,7 @@ export function descreverMudanca(antes: Localizada | null, depois: Localizada, f
   }
   const a = antes.peca; const d = depois.peca; const mudou: string[] = [];
   if (a.nome !== d.nome) mudou.push('nome');
-  if (a.preco !== d.preco || a.precoPromocional !== d.precoPromocional) mudou.push('preço');
+  if (a.preco !== d.preco) mudou.push('preço');
   if (a.descricao !== d.descricao) mudou.push('descrição');
   if (JSON.stringify(a.cores) !== JSON.stringify(d.cores)) mudou.push('cores');
   if (JSON.stringify(a.combos) !== JSON.stringify(d.combos)) mudou.push('combos');

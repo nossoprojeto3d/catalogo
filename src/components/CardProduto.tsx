@@ -4,17 +4,15 @@ import { toast } from 'sonner';
 import type { Produto } from '../lib/catalogo';
 import { corDaBolinha } from '../lib/cores';
 import { voarParaSacola } from '../lib/efeitos';
-import { emReais, paraNumero, percentualDesconto, precoUnitario, textoPreco } from '../lib/preco';
+import { precoUnitario, textoPreco } from '../lib/preco';
 import { useLista } from '../store/lista';
 import { useUI } from '../store/ui';
 import { FotoProduto } from './FotoProduto';
 
 export function Preco({ produto, grande = false }: { produto: Produto; grande?: boolean }) {
-  const desconto = percentualDesconto(produto);
   return (
-    <div className={`flex flex-wrap items-baseline gap-x-2 gap-y-0.5 ${grande ? 'text-[26px]' : 'text-[16px]'}`}>
+    <div className={grande ? 'text-[26px]' : 'text-[16px]'}>
       <span className="font-bold tabular-nums tracking-tight">{textoPreco(precoUnitario(produto))}</span>
-      {desconto > 0 && <s className={`tabular-nums text-suave ${grande ? 'text-base' : 'text-[13px]'}`}>{emReais(paraNumero(produto.preco))}</s>}
     </div>
   );
 }
@@ -27,7 +25,6 @@ export function CardProduto({ produto, brindes = false, prioridade = false }: { 
   const setLista = useUI((s) => s.setListaAberta);
   const adicionar = useLista((s) => s.adicionar);
   const foto = useRef<HTMLDivElement>(null);
-  const desconto = percentualDesconto(produto);
 
   const naSacola = () => {
     if (brindes || produto.cores.length > 0) return setCompra(produto);
@@ -45,9 +42,6 @@ export function CardProduto({ produto, brindes = false, prioridade = false }: { 
         <div className="min-w-0">
           <div ref={foto} className="relative aspect-square overflow-hidden rounded-2xl bg-superficie-2">
             <FotoProduto decorativa prioridade={prioridade} produto={produto} className="transition-transform duration-500 ease-(--ease-saida) group-hover:scale-[1.03]" />
-            {desconto > 0 && !produto.esgotado && (
-              <span className="absolute left-2 top-2 rounded-full bg-acento px-2 py-1 text-[12px] font-semibold leading-none text-sobre-acento">-{desconto}%</span>
-            )}
             {produto.esgotado && (
               <span className="absolute left-2 top-2 rounded-full bg-superficie px-2.5 py-1 text-[12px] font-semibold leading-none text-texto">Esgotado</span>
             )}

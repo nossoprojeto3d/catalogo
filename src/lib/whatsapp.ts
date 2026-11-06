@@ -1,6 +1,6 @@
 import type { Produto } from './catalogo';
 import { WHATSAPP_NUMERO } from './config';
-import { emCombo, emPromocao, emReais, paraNumero, precoNaQuantidade, textoDoItem, textoDoTotal, totalDoItem } from './preco';
+import { emCombo, emReais, precoNaQuantidade, textoDoItem, textoDoTotal, totalDoItem } from './preco';
 
 export type ItemPedido = { produto: Produto; quantidade: number; cor: string };
 
@@ -14,7 +14,6 @@ export const MENSAGEM_GERAL = 'Oi! Vi o catálogo de vocês e fiquei com uma dú
 //
 //   *1. Estrela Sensorial* (SEN-01)
 //   2 x R$ 24,90 = R$ 49,80
-//   Promoção, de R$ 29,90 cada
 //   Cor: Azul
 function blocoItem({ produto, quantidade, cor }: ItemPedido, indice: number): string {
   const unitario = precoNaQuantidade(produto, quantidade);
@@ -24,9 +23,6 @@ function blocoItem({ produto, quantidade, cor }: ItemPedido, indice: number): st
   else if (unitario <= 0) linhas.push(`${quantidade} x valor a combinar`);
   else if (quantidade > 1) linhas.push(`${quantidade} x ${emReais(unitario)} = ${emReais(unitario * quantidade)}`);
   else linhas.push(`1 x ${emReais(unitario)}`);
-  if (!combo && unitario > 0 && emPromocao(produto) && paraNumero(produto.preco) > 0) {
-    linhas.push(`Promoção, de ${emReais(paraNumero(produto.preco))} cada`);
-  }
   if (cor) linhas.push(`Cor: ${cor}`);
   return linhas.join('\n');
 }
