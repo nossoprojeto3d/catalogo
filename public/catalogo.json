@@ -64,6 +64,28 @@
           "codigo": "NAT-07"
         },
         {
+          "nome": "Bandeja Oval",
+          "descricao": "18cm",
+          "preco": "26,00",
+          "foto": "",
+          "cores": [
+            "Verde Militar",
+            "Branco Perolado",
+            "Vermelho",
+            "Vermelho Bordô",
+            "Dourado",
+            "Marrom Café",
+            "Rosa",
+            "Azul Marinho",
+            "Preto",
+            "Areia"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-15"
+        },
+        {
           "nome": "Bandeja Redonda - Gominhos",
           "descricao": "17cm",
           "preco": "29,90",
