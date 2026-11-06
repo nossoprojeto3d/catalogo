@@ -149,6 +149,24 @@
           "maisVendido": null,
           "esgotado": false,
           "codigo": "NAT-08"
+        },
+        {
+          "nome": "Rena com Trenó",
+          "descricao": "",
+          "preco": "29,90",
+          "foto": "",
+          "cores": [
+            "Marrom café",
+            "Areia",
+            "Vermelho Bordô",
+            "Verde Militar",
+            "Vermelho",
+            "Branco Perolado"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-13"
         }
       ]
     },
