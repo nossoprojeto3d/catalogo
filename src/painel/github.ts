@@ -6,7 +6,7 @@ const ARQUIVO = 'public/catalogo.json';
 const PASTA_FOTOS = 'public/imagens';
 
 // Só o site oficial grava na main (que publica). Link de teste ou máquina local gravam na branch teste, que não publica.
-const SITES_OFICIAIS = ['nossoprojeto3d.github.io', 'nossoprojeto3d.com.br', 'www.nossoprojeto3d.com.br'];
+const SITES_OFICIAIS = ['nossoprojeto3d.com.br', 'www.nossoprojeto3d.com.br'];
 export const RAMO = SITES_OFICIAIS.includes(location.hostname) ? 'main' : 'teste';
 
 export type TipoDeErro = 'chave' | 'conflito' | 'rede' | 'outro';

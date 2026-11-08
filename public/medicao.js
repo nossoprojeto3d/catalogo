@@ -4,7 +4,7 @@
 
    - Só carrega o Google depois que a pessoa clica em "Aceitar".
    - A escolha fica salva no navegador e vale para todos os projetos
-     do mesmo domínio (nossoprojeto3d.com.br ou o antigo nossoprojeto3d.github.io).
+     do domínio nossoprojeto3d.com.br.
    - Quem usa "Não rastrear" no navegador não é medido nem vê o aviso.
    - Nunca enviamos preços, valores de orçamento, nomes de arquivo nem
      endereços completos. Só nomes de eventos e rótulos curtos (a busca
@@ -23,7 +23,7 @@
 
   var GA_ID = "G-PNRZ6JQWLP";
   var KEY = "nossoprojeto3d-medicao";
-  var HOSTS_PROJETOS = ["nossoprojeto3d.com.br", "nossoprojeto3d.github.io"];
+  var HOSTS_PROJETOS = ["nossoprojeto3d.com.br"];
 
   var ativo = false;
   var naoRastrear = navigator.doNotTrack === "1";
