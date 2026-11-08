@@ -142,7 +142,17 @@
         {
           "nome": "Letreiro Feliz Natal Médio",
           "descricao": "20cm",
-          "preco": "29,90",
+          "preco": "14,90",
+          "versoes": [
+            {
+              "nome": "10 cm",
+              "preco": "14,90"
+            },
+            {
+              "nome": "20 cm",
+              "preco": "29,90"
+            }
+          ],
           "foto": "",
           "cores": [
             "verde militar",
