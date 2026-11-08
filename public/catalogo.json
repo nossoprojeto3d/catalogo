@@ -470,14 +470,14 @@
         },
         {
           "nome": "Ovo Mágico",
-          "codigo": "SEN-04",
           "descricao": "Consulte Cores Disponíveis",
           "preco": "34,90",
           "foto": "",
           "cores": [],
           "combos": {},
-          "maisVendido": 999,
-          "esgotado": false
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "SEN-04"
         },
         {
           "nome": "Pegador de Comidinha",
