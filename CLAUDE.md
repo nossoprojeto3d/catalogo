@@ -1,6 +1,6 @@
 # Catálogo Nosso Projeto 3D
 
-Site publicado no GitHub Pages: https://nossoprojeto3d.github.io/catalogo/
+Site publicado no GitHub Pages: https://nossoprojeto3d.com.br/catalogo/
 Todo push na `main` vai pro ar pelo GitHub Action `.github/workflows/publicar.yml` (testes, build e publicação).
 
 No ar: versão 4 (React + Vite + Tailwind v4), publicada em 05/11/2026 e aprovada como oficial em 08/11/2026 (tag `v4.0.0`).

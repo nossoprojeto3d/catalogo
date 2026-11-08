@@ -8,7 +8,7 @@ import { listarFotos } from './plugin-fotos';
 // enxerga o que vem depois do "#". Por isso cada peça com foto ganha uma página
 // própria em p/<codigo>/, com foto e nome, que leva a pessoa para #produto/<CODIGO>.
 // Para testar por um link temporário: URL_DO_SITE=https://.../catalogo/ npm run build
-const URL_PADRAO = 'https://nossoprojeto3d.github.io/catalogo/';
+const URL_PADRAO = 'https://nossoprojeto3d.com.br/catalogo/';
 const MARCA = 'Nosso Projeto 3D';
 const DESCRICAO = 'Peça impressa em 3D. Veja o preço e peça direto pelo WhatsApp.';
 

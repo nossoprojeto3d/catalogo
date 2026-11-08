@@ -1,6 +1,6 @@
 # Catálogo Nosso Projeto 3D
 
-Catálogo digital dos produtos da Nosso Projeto 3D: https://nossoprojeto3d.github.io/catalogo/
+Catálogo digital dos produtos da Nosso Projeto 3D: https://nossoprojeto3d.com.br/catalogo/
 
 O cliente navega pelas categorias, escolhe a peça e finaliza o pedido direto no
 WhatsApp. Não tem pagamento nem cadastro.
@@ -8,7 +8,7 @@ WhatsApp. Não tem pagamento nem cadastro.
 ## Como mexer nos produtos
 
 Tudo é feito pelo painel, no link "Área da loja", no fim do site:
-https://nossoprojeto3d.github.io/catalogo/painel/
+https://nossoprojeto3d.com.br/catalogo/painel/
 
 - **Primeiro acesso:** cada aparelho usa a própria chave do GitHub, criada pelo
   passo a passo da tela, e uma senha do painel. Depois, basta a senha.

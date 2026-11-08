@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { pluginCompartilhar } from './scripts/plugin-compartilhar.ts';
 import { pluginFotos } from './scripts/plugin-fotos.ts';
 
-// GitHub Pages publica em https://nossoprojeto3d.github.io/catalogo/
+// GitHub Pages publica em https://nossoprojeto3d.com.br/catalogo/
 export default defineConfig({
   base: '/catalogo/',
   plugins: [react(), tailwindcss(), pluginFotos(), pluginCompartilhar('/catalogo/')],
