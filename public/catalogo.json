@@ -393,14 +393,14 @@
         },
         {
           "nome": "Kit Friturinha",
-          "codigo": "KID-15",
           "descricao": "Kitzinho pronto",
           "preco": "45,90",
           "foto": "",
           "cores": [],
           "combos": {},
-          "maisVendido": 999,
-          "esgotado": false
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "KID-15"
         },
         {
           "nome": "Kit Massas",
