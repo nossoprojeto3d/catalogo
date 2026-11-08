@@ -20,6 +20,16 @@ function produtosBrindes(categorias: Categoria[]) {
   return categorias.filter((c) => ABAS_BRINDES.includes(c.nome)).flatMap((c) => c.produtos);
 }
 
+// Categorias que aparecem no início e no "Para você". Brindes entra na ordem
+// alfabética com as outras, mas leva para a página própria dele.
+type Atalho = { nome: string; href: string; produtos: Produto[] };
+function atalhosDeCategoria(categorias: Categoria[]): Atalho[] {
+  const atalhos: Atalho[] = categoriasDeVarejo(categorias).map((c) => ({ nome: c.nome, href: `#categoria/${encodeURIComponent(c.nome)}`, produtos: c.produtos }));
+  const brindes = produtosBrindes(categorias);
+  if (brindes.length) atalhos.push({ nome: 'Brindes', href: '#brindes', produtos: brindes });
+  return atalhos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+}
+
 function AvisoErro() {
   return (
     <div className="rounded-3xl bg-superficie px-6 py-12 text-center ring-1 ring-linha">
@@ -97,11 +107,11 @@ export function PaginaInicio() {
           <section className="mt-10 md:mt-14">
             <h2 className={`${LARGURA} titulo text-[24px] md:text-[32px]`}>Categorias</h2>
             <ul className="sem-barra mx-auto mt-4 flex max-w-[1240px] gap-3 overflow-x-auto px-4 md:gap-5 md:px-6">
-              {categoriasDeVarejo(categorias).map((c) => {
+              {atalhosDeCategoria(categorias).map((c) => {
                 const foto = comFoto(c.produtos);
                 return (
                   <li key={c.nome} className="w-[84px] shrink-0 md:w-28">
-                    <a href={`#categoria/${encodeURIComponent(c.nome)}`} className="block text-center">
+                    <a href={c.href} className="block text-center">
                       <div className="aspect-square overflow-hidden rounded-full bg-superficie-2 ring-1 ring-linha">
                         {foto && <FotoProduto decorativa produto={foto} tamanhos="112px" />}
                       </div>
@@ -192,8 +202,8 @@ export function PaginaProdutos({ categoria }: { categoria?: string }) {
       {/* No celular a categoria é escolhida pelo botão abaixo, que abre a gaveta. */}
       <ul className="mt-4 hidden flex-wrap gap-2 md:flex">
         <li><a href="#produtos" className={`block ${chip(!categoria)}`} aria-current={!categoria ? 'page' : undefined}>Todas</a></li>
-        {categorias.map((c) => (
-          <li key={c.nome}><a href={`#categoria/${encodeURIComponent(c.nome)}`} className={`block whitespace-nowrap ${chip(c.nome === categoria)}`} aria-current={c.nome === categoria ? 'page' : undefined}>{c.nome}</a></li>
+        {atalhosDeCategoria(todas).map((c) => (
+          <li key={c.nome}><a href={c.href} className={`block whitespace-nowrap ${chip(c.nome === categoria)}`} aria-current={c.nome === categoria ? 'page' : undefined}>{c.nome}</a></li>
         ))}
       </ul>
       <div className="mt-4 flex items-center gap-2 md:justify-between md:gap-3">
