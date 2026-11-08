@@ -93,7 +93,7 @@ function Corpo({ produto, escolha }: { produto: Produto; escolha: ReturnType<typ
         {produto.esgotado ? <p className="text-[17px] font-medium text-suave">Esgotado no momento</p> : <Preco produto={escolha.escolhido} grande />}
         <BotaoIcone onClick={compartilhar} aria-label="Compartilhar produto" className="-mr-2 shrink-0"><ShareNetwork size={20} /></BotaoIcone>
       </div>
-      {produto.descricao && <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-suave">{produto.descricao}</p>}
+      {produto.descricao && <p className="mt-3 max-w-[52ch] whitespace-pre-line text-[15px] leading-relaxed text-suave">{produto.descricao}</p>}
       {!produto.esgotado && (
         <div className="mt-6 space-y-6">
           {temVersoes(produto) && <SeletorVersao produto={produto} escolha={escolha} />}
