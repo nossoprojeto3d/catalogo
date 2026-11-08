@@ -404,14 +404,14 @@
         },
         {
           "nome": "Kit Massas",
-          "codigo": "KID-19",
           "descricao": "Kitzinho pronto",
           "preco": "99,90",
           "foto": "",
           "cores": [],
           "combos": {},
-          "maisVendido": 999,
-          "esgotado": false
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "KID-19"
         },
         {
           "nome": "Kit Massas Premium",
