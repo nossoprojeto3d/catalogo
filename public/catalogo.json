@@ -166,6 +166,17 @@
           "codigo": "NAT-10"
         },
         {
+          "nome": "Mini Papai Noel Sentadinho",
+          "descricao": "Miniatura para acompanhar sua coleção com o Mini Jesus e a Mini Maria",
+          "preco": "18,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false,
+          "codigo": "NAT-17"
+        },
+        {
           "nome": "Ovelhinha - Crochê",
           "descricao": "Coleção Presépio",
           "preco": "18,00",
