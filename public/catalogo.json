@@ -26,18 +26,7 @@
           "codigo": "NAT-12"
         },
         {
-          "nome": "Árvore de Natal Felpudinha Média",
-          "descricao": "13 cm",
-          "preco": "54,90",
-          "foto": "",
-          "cores": [],
-          "combos": {},
-          "maisVendido": null,
-          "esgotado": false,
-          "codigo": "NAT-06"
-        },
-        {
-          "nome": "Árvore de Natal Felpudinha Pequena",
+          "nome": "Árvore de Natal Felpudinha",
           "descricao": "8cm",
           "preco": "15,90",
           "versoes": [
@@ -56,6 +45,17 @@
           "maisVendido": 999,
           "esgotado": false,
           "codigo": "NAT-05"
+        },
+        {
+          "nome": "Árvore de Natal Felpudinha Média",
+          "descricao": "13 cm",
+          "preco": "54,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-06"
         },
         {
           "nome": "Árvore de Natal Iluminada",
