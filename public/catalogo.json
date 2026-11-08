@@ -783,14 +783,14 @@
         },
         {
           "nome": "Mini Microfone",
-          "codigo": "PER-02",
           "descricao": "",
           "preco": "29,90",
           "foto": "",
           "cores": [],
           "combos": {},
-          "maisVendido": 999,
-          "esgotado": false
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "PER-02"
         },
         {
           "nome": "Porta Anel",
