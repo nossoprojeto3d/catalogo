@@ -40,10 +40,20 @@
           "nome": "Árvore de Natal Felpudinha Pequena",
           "descricao": "8cm",
           "preco": "15,90",
+          "versoes": [
+            {
+              "nome": "8 cm",
+              "preco": "15,90"
+            },
+            {
+              "nome": "13 cm",
+              "preco": "54,90"
+            }
+          ],
           "foto": "",
           "cores": [],
           "combos": {},
-          "maisVendido": null,
+          "maisVendido": 999,
           "esgotado": false,
           "codigo": "NAT-05"
         },
