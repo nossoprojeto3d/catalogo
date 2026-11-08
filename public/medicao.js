@@ -4,7 +4,7 @@
 
    - Só carrega o Google depois que a pessoa clica em "Aceitar".
    - A escolha fica salva no navegador e vale para todos os projetos
-     do domínio nossoprojeto3d.github.io (mesma chave do Ajuste 3MF).
+     do mesmo domínio (nossoprojeto3d.com.br ou o antigo nossoprojeto3d.github.io).
    - Quem usa "Não rastrear" no navegador não é medido nem vê o aviso.
    - Nunca enviamos preços, valores de orçamento, nomes de arquivo nem
      endereços completos. Só nomes de eventos e rótulos curtos (a busca
@@ -23,7 +23,7 @@
 
   var GA_ID = "G-PNRZ6JQWLP";
   var KEY = "nossoprojeto3d-medicao";
-  var HOST_PROJETOS = "nossoprojeto3d.github.io";
+  var HOSTS_PROJETOS = ["nossoprojeto3d.com.br", "nossoprojeto3d.github.io"];
 
   var ativo = false;
   var naoRastrear = navigator.doNotTrack === "1";
@@ -125,7 +125,7 @@
     if (host === "drive.google.com") return { evento: "clique_drive" };
     if (host === "github.com") return { evento: "clique_github" };
 
-    if (host === HOST_PROJETOS) {
+    if (HOSTS_PROJETOS.indexOf(host) !== -1) {
       var destino = url.pathname.split("/").filter(Boolean)[0] || "home";
       if (destino === projetoDaPagina() && url.pathname === location.pathname) return null;
       return { evento: "clique_projeto", params: { projeto: destino } };
