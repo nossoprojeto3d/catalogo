@@ -16,3 +16,7 @@ export const DESCONTOS_COMBO: Record<number, number> = { 10: 5, 30: 10, 50: 15 }
 export const TAMANHO_LOTE = 6;
 
 export const INSTAGRAM_URL = 'https://instagram.com/nossoprojeto3d';
+
+// Kit de Natal (aviso no topo da categoria): a partir de KIT_NATAL.minimo unidades,
+// KIT_NATAL.desconto% de desconto. É só aviso: o desconto é aplicado no WhatsApp.
+export const KIT_NATAL = { categoria: 'Natal', minimo: 3, desconto: 10 };

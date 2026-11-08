@@ -1,12 +1,12 @@
 import { ArrowLeft, CaretDown, Gift, ShoppingBag } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { categoriasDeVarejo, ordenarPor, queridinhos, type Categoria, type Ordem, type Produto } from '../lib/catalogo';
-import { ABAS_BRINDES, TAMANHO_LOTE } from '../lib/config';
+import { ABAS_BRINDES, KIT_NATAL, TAMANHO_LOTE } from '../lib/config';
 import { urlFoto } from '../lib/fotos';
 import { MENSAGEM_GERAL, linkWhatsapp } from '../lib/whatsapp';
 import { useUI } from '../store/ui';
 import { Banners } from './Banners';
-import { BotaoLink, IconeWhats } from './Botoes';
+import { BotaoLink, Camadas, IconeWhats } from './Botoes';
 import { CardEsqueleto, CardProduto, CLASSES_GRADE } from './CardProduto';
 import { FotoProduto } from './FotoProduto';
 
@@ -183,6 +183,27 @@ function Grade({ produtos, brindes, chave }: { produtos: Produto[]; brindes?: bo
   );
 }
 
+// Aviso do kit no topo da categoria Natal, com o mesmo verde e as listras do banner do início.
+function BannerKitNatal() {
+  const { minimo, desconto } = KIT_NATAL;
+  return (
+    <aside aria-label="Kit de Natal" className="relative mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-[20px] bg-[#17492f] p-[18px] text-[#f6fbe6] md:mt-5 md:px-7 md:py-6">
+      <Camadas className="camadas-curta text-acento opacity-35" />
+      <div className="relative">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-acento">Kit de Natal</p>
+        <h2 className="titulo mt-1 text-[22px] text-[#f6fbe6] md:text-[28px]">Monte o seu kit</h2>
+        <p className="mt-1.5 max-w-[46ch] text-[14px] leading-snug text-[#f6fbe6]/85 md:text-[15px]">
+          Leve {minimo} peças ou mais e ganhe {desconto}% de desconto<span className="hidden md:inline">. A gente aplica quando fechar o pedido no WhatsApp.</span><span className="md:hidden"> no WhatsApp.</span>
+        </p>
+      </div>
+      <div className="relative grid size-[84px] place-content-center rounded-full bg-acento text-center leading-none text-sobre-acento md:mr-16 md:size-[104px]">
+        <span className="titulo text-[28px] md:text-[34px]">{desconto}%</span>
+        <span className="mt-0.5 text-[12px] font-semibold">de desconto</span>
+      </div>
+    </aside>
+  );
+}
+
 export function PaginaProdutos({ categoria }: { categoria?: string }) {
   const todas = useUI((s) => s.categorias);
   const categorias = useMemo(() => categoriasDeVarejo(todas), [todas]);
@@ -200,6 +221,7 @@ export function PaginaProdutos({ categoria }: { categoria?: string }) {
       <Voltar />
       <h1 className="titulo mt-1 text-[28px] md:text-[40px]">{categoria ?? 'Para você ou para presentear'}</h1>
       {!categoria && <p className="mt-2 text-[15px] leading-relaxed text-suave md:text-[17px]">Escolha uma ou várias e feche o pedido no WhatsApp.</p>}
+      {categoria === KIT_NATAL.categoria && <BannerKitNatal />}
       {/* No celular a categoria é escolhida pelo botão abaixo, que abre a gaveta. */}
       <ul className="mt-4 hidden flex-wrap gap-2 md:flex">
         <li><a href="#produtos" className={`block ${chip(!categoria)}`} aria-current={!categoria ? 'page' : undefined}>Todas</a></li>
