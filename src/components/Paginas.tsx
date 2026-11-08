@@ -20,8 +20,9 @@ function produtosBrindes(categorias: Categoria[]) {
   return categorias.filter((c) => ABAS_BRINDES.includes(c.nome)).flatMap((c) => c.produtos);
 }
 
-// Categorias que aparecem no início e no "Para você". Brindes entra na ordem
-// alfabética com as outras, mas leva para a página própria dele.
+// Categorias da fileira do início. Brindes entra na ordem alfabética com as
+// outras, mas leva para a página própria dele. (No "Para você" ele não aparece:
+// o usuário testou e preferiu sem, em 08/11/2026.)
 type Atalho = { nome: string; href: string; produtos: Produto[] };
 function atalhosDeCategoria(categorias: Categoria[]): Atalho[] {
   const atalhos: Atalho[] = categoriasDeVarejo(categorias).map((c) => ({ nome: c.nome, href: `#categoria/${encodeURIComponent(c.nome)}`, produtos: c.produtos }));
@@ -202,8 +203,8 @@ export function PaginaProdutos({ categoria }: { categoria?: string }) {
       {/* No celular a categoria é escolhida pelo botão abaixo, que abre a gaveta. */}
       <ul className="mt-4 hidden flex-wrap gap-2 md:flex">
         <li><a href="#produtos" className={`block ${chip(!categoria)}`} aria-current={!categoria ? 'page' : undefined}>Todas</a></li>
-        {atalhosDeCategoria(todas).map((c) => (
-          <li key={c.nome}><a href={c.href} className={`block whitespace-nowrap ${chip(c.nome === categoria)}`} aria-current={c.nome === categoria ? 'page' : undefined}>{c.nome}</a></li>
+        {categorias.map((c) => (
+          <li key={c.nome}><a href={`#categoria/${encodeURIComponent(c.nome)}`} className={`block whitespace-nowrap ${chip(c.nome === categoria)}`} aria-current={c.nome === categoria ? 'page' : undefined}>{c.nome}</a></li>
         ))}
       </ul>
       <div className="mt-4 flex items-center gap-2 md:justify-between md:gap-3">
