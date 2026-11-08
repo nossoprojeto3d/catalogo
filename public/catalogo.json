@@ -917,6 +917,19 @@
           "combos": {},
           "maisVendido": null,
           "esgotado": false
+        },
+        {
+          "nome": "Porta Terço Nosso Senhora Aparecida",
+          "descricao": "",
+          "preco": "45,90",
+          "foto": "",
+          "cores": [
+            "Branco Pérola"
+          ],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false,
+          "codigo": "DEC-08"
         }
       ]
     },
