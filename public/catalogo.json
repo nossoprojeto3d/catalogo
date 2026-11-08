@@ -226,6 +226,17 @@
           "maisVendido": null,
           "esgotado": false,
           "codigo": "NAT-13"
+        },
+        {
+          "nome": "Sagrada Família",
+          "descricao": "",
+          "preco": "18,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false,
+          "codigo": "NAT-18"
         }
       ]
     },
