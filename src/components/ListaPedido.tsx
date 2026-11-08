@@ -46,11 +46,12 @@ function Conteudo({ fechar }: { fechar: () => void }) {
     <>
       <ul className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain px-5 py-2">
         <AnimatePresence initial={false}>
-          {itens.map(({ produto, quantidade: q, cor, chave }) => {
+          {itens.map((item) => {
+            const { produto, quantidade: q, cor, versao } = item;
             const valor = totalDoItem(produto, q);
             return (
               <motion.li
-                key={`${chave}|${cor}`}
+                key={`${item.chave}|${cor}|${versao}`}
                 layout
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -66,17 +67,17 @@ function Conteudo({ fechar }: { fechar: () => void }) {
                     <div className="min-w-0">
                       <p className="truncate text-[15px] font-medium">{produto.nome}</p>
                       <p className="mt-0.5 truncate text-xs text-suave">
-                        {[cor, produto.codigo].filter(Boolean).join(' / ')}
+                        {[versao, cor, produto.codigo].filter(Boolean).join(' / ')}
                       </p>
                     </div>
-                    <button type="button" onClick={() => remover(chave, cor)} aria-label={`Remover ${produto.nome}`} className="-mr-1 -mt-1.5 grid size-9 shrink-0 place-items-center rounded-full text-suave transition hover:bg-texto/5 hover:text-texto">
+                    <button type="button" onClick={() => remover(item)} aria-label={`Remover ${produto.nome}`} className="-mr-1 -mt-1.5 grid size-9 shrink-0 place-items-center rounded-full text-suave transition hover:bg-texto/5 hover:text-texto">
                       <Trash size={18} />
                     </button>
                   </div>
                   <div className="mt-auto flex items-center justify-between gap-2 pt-1">
                     {temCombos(produto)
-                      ? <QuantidadeDeBrinde valor={q} mudar={(n) => mudarQuantidade(chave, cor, n)} rotulo={`Quantidade de ${produto.nome}`} />
-                      : <Quantidade compacta valor={q} mudar={(n) => mudarQuantidade(chave, cor, n)} rotulo={`Quantidade de ${produto.nome}`} />}
+                      ? <QuantidadeDeBrinde valor={q} mudar={(n) => mudarQuantidade(item, n)} rotulo={`Quantidade de ${produto.nome}`} />
+                      : <Quantidade compacta valor={q} mudar={(n) => mudarQuantidade(item, n)} rotulo={`Quantidade de ${produto.nome}`} />}
                     <span className="text-[15px] font-semibold tracking-tight">{valor > 0 ? textoDoItem(produto, q) : 'A combinar'}</span>
                   </div>
                 </div>

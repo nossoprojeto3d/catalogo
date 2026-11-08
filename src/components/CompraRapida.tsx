@@ -2,13 +2,13 @@ import { ShoppingBag, X } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Drawer } from 'vaul';
-import type { Produto } from '../lib/catalogo';
+import { temVersoes, type Produto } from '../lib/catalogo';
 import { useDesktop } from '../hooks/useTela';
 import { useLista } from '../store/lista';
 import { useUI } from '../store/ui';
 import { Botao, BotaoIcone } from './Botoes';
 import { Preco } from './CardProduto';
-import { SeletorCor, SeletorQuantidade, useEscolha } from './Escolhas';
+import { SeletorCor, SeletorQuantidade, SeletorVersao, useEscolha } from './Escolhas';
 
 function Conteudo({ produto, fechar }: { produto: Produto; fechar: () => void }) {
   const brindes = useUI((s) => s.pagina.tipo === 'brindes');
@@ -18,19 +18,20 @@ function Conteudo({ produto, fechar }: { produto: Produto; fechar: () => void })
 
   const colocar = () => {
     if (escolha.faltaCor) return escolha.setPedirCor(true);
-    adicionar(produto, escolha.quantidade, escolha.cor);
+    adicionar(produto, escolha.quantidade, escolha.cor, escolha.versao);
     fechar();
     toast('Colocado na sacola', {
-      description: `${escolha.quantidade} x ${produto.nome}${escolha.cor ? `, ${escolha.cor}` : ''}`,
+      description: `${escolha.quantidade} x ${produto.nome}${[escolha.versao, escolha.cor].filter(Boolean).map((t) => `, ${t}`).join('')}`,
       action: { label: 'Ver sacola', onClick: () => setLista(true) },
     });
   };
 
   return (
     <div className="space-y-5 overflow-y-auto overscroll-contain px-5 pb-[max(20px,env(safe-area-inset-bottom))]">
-      <Preco produto={produto} />
+      <Preco produto={escolha.escolhido} />
+      {temVersoes(produto) && <SeletorVersao produto={produto} escolha={escolha} />}
       {produto.cores.length > 0 && <SeletorCor produto={produto} escolha={escolha} />}
-      <SeletorQuantidade produto={produto} escolha={escolha} />
+      <SeletorQuantidade produto={escolha.escolhido} escolha={escolha} />
       <Botao onClick={colocar} icone={<ShoppingBag size={20} />} className="w-full">
         Colocar na sacola, {escolha.textoTotal}
       </Botao>

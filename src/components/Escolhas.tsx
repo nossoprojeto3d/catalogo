@@ -1,6 +1,6 @@
 import { CaretDown, Check, Minus, Plus } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
-import type { Produto } from '../lib/catalogo';
+import { naVersao, temVersoes, type Produto } from '../lib/catalogo';
 import { QUANTIDADE_MAXIMA, QUANTIDADES_COMBO } from '../lib/config';
 import { corDaBolinha } from '../lib/cores';
 import { medir } from '../lib/medicao';
@@ -45,25 +45,66 @@ export function QuantidadeDeBrinde({ valor, mudar, rotulo }: { valor: number; mu
   );
 }
 
-// Cor e quantidade são escolhidas igual na tela do produto e na compra rápida.
+// Versão, cor e quantidade são escolhidas igual na tela do produto e na compra rápida.
 export function useEscolha(produto: Produto, quantidadeSugerida: number) {
   // Peça de brindes sempre começa no menor combo, venha de onde vier.
   const quantidadeInicial = temCombos(produto) ? QUANTIDADES_COMBO[0] : quantidadeSugerida;
+  // Uma versão só já vem escolhida.
+  const versaoInicial = produto.versoes?.length === 1 ? produto.versoes[0].nome : '';
+  const [versao, setVersao] = useState(versaoInicial);
   const [cor, setCor] = useState('');
   const [quantidade, setQuantidade] = useState(quantidadeInicial);
   const [pedirCor, setPedirCor] = useState(false);
   useEffect(() => {
-    setCor(''); setQuantidade(quantidadeInicial); setPedirCor(false);
-  }, [produto, quantidadeInicial]);
-  const faltaCor = !produto.esgotado && produto.cores.length > 0 && !cor;
-  const valor = totalDoItem(produto, quantidade);
+    setVersao(versaoInicial); setCor(''); setQuantidade(quantidadeInicial); setPedirCor(false);
+  }, [produto, quantidadeInicial, versaoInicial]);
+  const faltaVersao = !produto.esgotado && temVersoes(produto) && !versao;
+  const faltaCor = faltaVersao || (!produto.esgotado && produto.cores.length > 0 && !cor);
+  // Produto com o preço da versão escolhida (sem versão, o próprio produto).
+  const escolhido = naVersao(produto, versao);
+  const valor = totalDoItem(escolhido, quantidade);
   return {
+    versao, setVersao, faltaVersao, escolhido,
     cor, setCor, quantidade, setQuantidade, pedirCor, setPedirCor, faltaCor,
-    textoTotal: valor > 0 ? textoDoItem(produto, quantidade) : 'a combinar',
+    // Para onde rolar quando falta escolher algo.
+    idDaFalta: faltaVersao ? 'escolha-versao' : 'escolha-cor',
+    textoTotal: valor > 0 ? textoDoItem(escolhido, quantidade) : 'a combinar',
   };
 }
 
 type Escolha = ReturnType<typeof useEscolha>;
+
+const PILULA = 'inline-flex min-h-11 items-center gap-2 rounded-full bg-superficie py-1.5 text-[15px] ring-1';
+
+export function SeletorVersao({ produto, escolha }: { produto: Produto; escolha: Escolha }) {
+  const { versao, setVersao, pedirCor, faltaVersao } = escolha;
+  return (
+    <fieldset id="escolha-versao">
+      <legend className="text-[15px] font-semibold">
+        Versão{' '}
+        <span className={`font-normal ${pedirCor && faltaVersao ? 'font-semibold text-red-700' : 'text-suave'}`}>
+          {versao || (pedirCor ? 'Escolha uma versão para continuar' : 'Escolha uma')}
+        </span>
+      </legend>
+      <div className="mt-2.5 flex flex-wrap gap-2">
+        {produto.versoes!.map((v) => {
+          const ativa = v.nome === versao;
+          return (
+            <button
+              key={v.nome}
+              type="button"
+              aria-pressed={ativa}
+              onClick={() => { setVersao(v.nome); medir('versao_escolhida', { produto: produto.nome, versao: v.nome }); }}
+              className={`${PILULA} px-4 ${ativa ? 'font-semibold ring-2 ring-texto' : 'ring-texto/20'}`}
+            >
+              {v.nome}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
 
 export function SeletorCor({ produto, escolha }: { produto: Produto; escolha: Escolha }) {
   const { cor, setCor, pedirCor, setPedirCor } = escolha;
@@ -71,8 +112,8 @@ export function SeletorCor({ produto, escolha }: { produto: Produto; escolha: Es
     <fieldset id="escolha-cor">
       <legend className="text-[15px] font-semibold">
         Cor{' '}
-        <span className={`font-normal ${pedirCor && !cor ? 'font-semibold text-red-700' : 'text-suave'}`}>
-          {cor || (pedirCor ? 'Escolha uma cor para continuar' : 'Escolha uma')}
+        <span className={`font-normal ${pedirCor && !cor && !escolha.faltaVersao ? 'font-semibold text-red-700' : 'text-suave'}`}>
+          {cor || (pedirCor && !escolha.faltaVersao ? 'Escolha uma cor para continuar' : 'Escolha uma')}
         </span>
       </legend>
       <div className="mt-2.5 flex flex-wrap gap-2">
@@ -84,7 +125,7 @@ export function SeletorCor({ produto, escolha }: { produto: Produto; escolha: Es
               type="button"
               aria-pressed={ativa}
               onClick={() => { setCor(c); setPedirCor(false); medir('cor_escolhida', { produto: produto.nome, cor: c }); }}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-superficie py-1.5 pl-2 pr-4 text-[15px] ring-1 ${ativa ? 'font-semibold ring-2 ring-texto' : 'ring-texto/20'}`}
+              className={`${PILULA} pl-2 pr-4 ${ativa ? 'font-semibold ring-2 ring-texto' : 'ring-texto/20'}`}
             >
               <span className="grid size-6 place-items-center rounded-full ring-1 ring-texto/20" style={{ background: corDaBolinha(c) }}>
                 {ativa && <Check size={12} weight="bold" className={['branco', 'areia', 'creme', 'amarelo', 'bege', 'nude', 'prata', 'prateado'].some((n) => c.toLowerCase().startsWith(n)) ? 'text-sobre-acento' : 'text-white'} />}

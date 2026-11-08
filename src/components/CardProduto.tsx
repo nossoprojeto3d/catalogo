@@ -1,23 +1,29 @@
 import { ShoppingBag } from '@phosphor-icons/react';
 import { useRef } from 'react';
 import { toast } from 'sonner';
-import type { Produto } from '../lib/catalogo';
+import { temVersoes, type Produto } from '../lib/catalogo';
 import { corDaBolinha } from '../lib/cores';
 import { voarParaSacola } from '../lib/efeitos';
-import { precoUnitario, textoPreco } from '../lib/preco';
+import { paraNumero, precoUnitario, textoPreco } from '../lib/preco';
 import { useLista } from '../store/lista';
 import { useUI } from '../store/ui';
 import { FotoProduto } from './FotoProduto';
 
+// Versões com preços diferentes: o card mostra o menor, como "a partir de".
+export function aPartirDe(p: Produto): boolean {
+  return temVersoes(p) && new Set(p.versoes!.map((v) => paraNumero(v.preco))).size > 1;
+}
+
 export function Preco({ produto, grande = false }: { produto: Produto; grande?: boolean }) {
   return (
     <div className={grande ? 'text-[26px]' : 'text-[16px]'}>
+      {aPartirDe(produto) && <span className={`font-normal text-suave ${grande ? 'text-[15px]' : 'text-[13px]'}`}>a partir de </span>}
       <span className="font-bold tabular-nums tracking-tight">{textoPreco(precoUnitario(produto))}</span>
     </div>
   );
 }
 
-// Sem cor para escolher, a sacola do card adiciona na hora. Com cor (ou na
+// Sem cor nem versão para escolher, a sacola do card adiciona na hora. Com elas (ou na
 // área de brindes, onde a quantidade importa), abre a compra rápida.
 export function CardProduto({ produto, brindes = false, prioridade = false }: { produto: Produto; brindes?: boolean; prioridade?: boolean }) {
   const abrir = useUI((s) => s.abrirProduto);
@@ -27,7 +33,7 @@ export function CardProduto({ produto, brindes = false, prioridade = false }: { 
   const foto = useRef<HTMLDivElement>(null);
 
   const naSacola = () => {
-    if (brindes || produto.cores.length > 0) return setCompra(produto);
+    if (brindes || produto.cores.length > 0 || temVersoes(produto)) return setCompra(produto);
     voarParaSacola(foto.current).then(() => {
       adicionar(produto, 1, '');
       toast('Colocado na sacola', { description: produto.nome, action: { label: 'Ver sacola', onClick: () => setLista(true) } });
@@ -38,7 +44,7 @@ export function CardProduto({ produto, brindes = false, prioridade = false }: { 
     // Foto e nome numa linha da grade, preço na seguinte: os preços ficam na mesma
     // altura, e a folga só aparece na linha em que algum nome quebra.
     <li className="relative row-span-2 grid min-w-0 grid-rows-subgrid gap-y-0">
-      <button type="button" onClick={() => abrir(produto)} className="group row-span-2 grid w-full grid-rows-subgrid gap-y-0 text-left" aria-label={`${produto.esgotado ? 'Esgotado. ' : ''}${produto.nome}, ${textoPreco(precoUnitario(produto))}`}>
+      <button type="button" onClick={() => abrir(produto)} className="group row-span-2 grid w-full grid-rows-subgrid gap-y-0 text-left" aria-label={`${produto.esgotado ? 'Esgotado. ' : ''}${produto.nome}, ${aPartirDe(produto) ? 'a partir de ' : ''}${textoPreco(precoUnitario(produto))}`}>
         <div className="min-w-0">
           <div ref={foto} className="relative aspect-square overflow-hidden rounded-2xl bg-superficie-2">
             <FotoProduto decorativa prioridade={prioridade} produto={produto} className="transition-transform duration-500 ease-(--ease-saida) group-hover:scale-[1.03]" />

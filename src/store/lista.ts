@@ -1,18 +1,21 @@
 import { create } from 'zustand';
-import { chaveProduto, type Categoria, type Produto } from '../lib/catalogo';
+import { chaveProduto, naVersao, temVersoes, type Categoria, type Produto } from '../lib/catalogo';
 import { QUANTIDADE_MAXIMA } from '../lib/config';
 import { medir } from '../lib/medicao';
 import type { ItemPedido } from '../lib/whatsapp';
 
 // Mesmo formato e mesma chave da versão anterior: quem já tinha uma
-// lista salva no celular continua com ela.
-type ItemSalvo = { chave: string; quantidade: number; cor: string };
+// lista salva no celular continua com ela. `versao` veio depois (vazio = sem versão).
+type ItemSalvo = { chave: string; quantidade: number; cor: string; versao: string };
+// O mesmo produto em outra cor ou versão é outro item da sacola.
+export type Alvo = Pick<ItemSalvo, 'chave' | 'cor' | 'versao'>;
+const mesmo = (a: Alvo, b: Alvo) => a.chave === b.chave && a.cor === b.cor && a.versao === b.versao;
 const CHAVE = 'np3d_lista';
 
 function ler(): ItemSalvo[] {
   try {
     const salva = JSON.parse(localStorage.getItem(CHAVE) || 'null');
-    if (Array.isArray(salva)) return salva.filter((i) => i && i.chave && i.quantidade > 0).map((i) => ({ ...i, cor: i.cor || '' }));
+    if (Array.isArray(salva)) return salva.filter((i) => i && i.chave && i.quantidade > 0).map((i) => ({ ...i, cor: i.cor || '', versao: i.versao || '' }));
   } catch {
     /* modo privado etc. */
   }
@@ -29,9 +32,9 @@ function salvar(itens: ItemSalvo[]) {
 
 type EstadoLista = {
   itens: ItemSalvo[];
-  adicionar: (p: Produto, quantidade: number, cor: string) => void;
-  mudarQuantidade: (chave: string, cor: string, quantidade: number) => void;
-  remover: (chave: string, cor: string) => void;
+  adicionar: (p: Produto, quantidade: number, cor: string, versao?: string) => void;
+  mudarQuantidade: (alvo: Alvo, quantidade: number) => void;
+  remover: (alvo: Alvo) => void;
   limpar: () => void;
   // Tira da lista o que saiu da planilha ou esgotou. Devolve os nomes
   // removidos, pra avisar o cliente.
@@ -42,20 +45,20 @@ export const useLista = create<EstadoLista>((set, get) => {
   const atualizar = (itens: ItemSalvo[]) => { salvar(itens); set({ itens }); };
   return {
     itens: ler(),
-    adicionar(p, quantidade, cor) {
-      const chave = chaveProduto(p);
-      const itens = [...get().itens];
-      const existente = itens.find((i) => i.chave === chave && i.cor === cor);
+    adicionar(p, quantidade, cor, versao = '') {
+      const novo = { chave: chaveProduto(p), cor, versao };
+      const itens = get().itens.map((i) => ({ ...i }));
+      const existente = itens.find((i) => mesmo(i, novo));
       if (existente) existente.quantidade += quantidade;
-      else itens.push({ chave, quantidade, cor });
+      else itens.push({ ...novo, quantidade });
       atualizar(itens.map((i) => ({ ...i })));
       medir('lista_adicionado', { produto: p.nome, categoria: p.categoria });
     },
-    mudarQuantidade(chave, cor, quantidade) {
-      atualizar(get().itens.map((i) => (i.chave === chave && i.cor === cor ? { ...i, quantidade: Math.max(1, Math.min(QUANTIDADE_MAXIMA, quantidade)) } : i)));
+    mudarQuantidade(alvo, quantidade) {
+      atualizar(get().itens.map((i) => (mesmo(i, alvo) ? { ...i, quantidade: Math.max(1, Math.min(QUANTIDADE_MAXIMA, quantidade)) } : i)));
     },
-    remover(chave, cor) {
-      atualizar(get().itens.filter((i) => !(i.chave === chave && i.cor === cor)));
+    remover(alvo) {
+      atualizar(get().itens.filter((i) => !mesmo(i, alvo)));
     },
     limpar() {
       atualizar([]);
@@ -65,7 +68,7 @@ export const useLista = create<EstadoLista>((set, get) => {
       const removidos: string[] = [];
       const validos = get().itens.filter((i) => {
         const p = porChave.get(i.chave);
-        if (p && !p.esgotado) return true;
+        if (p && !p.esgotado && versaoExiste(p, i.versao)) return true;
         if (p) removidos.push(p.nome);
         return false;
       });
@@ -81,11 +84,17 @@ export function mapaProdutos(categorias: Categoria[]): Map<string, Produto> {
   return mapa;
 }
 
-export function resolverItens(itens: ItemSalvo[], categorias: Categoria[]): (ItemPedido & { chave: string })[] {
+// Versão que saiu do produto (ou produto que passou a ter versões) tira o item da sacola.
+function versaoExiste(p: Produto, versao: string): boolean {
+  return versao ? !!p.versoes?.some((v) => v.nome === versao) : !temVersoes(p);
+}
+
+// O produto de cada item já vem com o preço da versão escolhida.
+export function resolverItens(itens: ItemSalvo[], categorias: Categoria[]): (ItemPedido & Alvo)[] {
   const mapa = mapaProdutos(categorias);
   return itens.flatMap((i) => {
     const produto = mapa.get(i.chave);
-    return produto ? [{ produto, quantidade: i.quantidade, cor: i.cor, chave: i.chave }] : [];
+    return produto ? [{ produto: naVersao(produto, i.versao), quantidade: i.quantidade, cor: i.cor, versao: i.versao, chave: i.chave }] : [];
   });
 }
 

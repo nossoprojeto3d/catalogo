@@ -2,7 +2,7 @@ import type { Produto } from './catalogo';
 import { WHATSAPP_NUMERO } from './config';
 import { emCombo, emReais, precoNaQuantidade, textoDoItem, textoDoTotal, totalDoItem } from './preco';
 
-export type ItemPedido = { produto: Produto; quantidade: number; cor: string };
+export type ItemPedido = { produto: Produto; quantidade: number; cor: string; versao?: string };
 
 export function linkWhatsapp(mensagem: string): string {
   return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
@@ -15,9 +15,12 @@ export const MENSAGEM_GERAL = 'Oi! Vi o catálogo de vocês e fiquei com uma dú
 //   *1. Estrela Sensorial* (SEN-01)
 //   2 x R$ 24,90 = R$ 49,80
 //   Cor: Azul
-function blocoItem({ produto, quantidade, cor }: ItemPedido, indice: number): string {
+//
+// Com versão (aprovado em 08/11/2026): *1. Letreiro Feliz Natal (20 cm)* (NAT-10).
+// O produto do item já vem com o preço da versão (naVersao).
+function blocoItem({ produto, quantidade, cor, versao }: ItemPedido, indice: number): string {
   const unitario = precoNaQuantidade(produto, quantidade);
-  const linhas = [`*${indice + 1}. ${produto.nome}*${produto.codigo ? ` (${produto.codigo})` : ''}`];
+  const linhas = [`*${indice + 1}. ${produto.nome}${versao ? ` (${versao})` : ''}*${produto.codigo ? ` (${produto.codigo})` : ''}`];
   const combo = emCombo(produto, quantidade);
   if (combo) linhas.push(`Combo de ${quantidade} = ${textoDoItem(produto, quantidade)}`);
   else if (unitario <= 0) linhas.push(`${quantidade} x valor a combinar`);

@@ -1,4 +1,4 @@
-import { normalizar, ordenarProdutos, type ArquivoCatalogo, type Peca } from '../lib/catalogo';
+import { normalizar, ordenarProdutos, type ArquivoCatalogo, type Peca, type Versao } from '../lib/catalogo';
 import { paraNumero } from '../lib/preco';
 
 // Regras do painel, sem tela nem internet: dá para testar sozinhas.
@@ -61,14 +61,33 @@ export function removerPeca(arquivo: ArquivoCatalogo, codigo: string): ArquivoCa
   };
 }
 
-export type CamposDaPeca = { nome: string; preco: string; categoria: string; esgotado: boolean };
+export type CamposDaPeca = { nome: string; preco: string; categoria: string; esgotado: boolean; versoes?: Versao[] };
+
+// Linhas de versão totalmente vazias são ignoradas; o resto vai limpo para o arquivo.
+export function limparVersoes(versoes: Versao[]): Versao[] {
+  return versoes
+    .map((v) => ({ nome: v.nome.trim(), preco: normalizarPreco(v.preco) }))
+    .filter((v) => v.nome || paraNumero(v.preco) > 0);
+}
+
+// Com versões, o preço da peça é o menor deles (card "a partir de" e ordenação).
+export function menorPreco(versoes: Versao[]): string {
+  const precos = versoes.map((v) => paraNumero(v.preco)).filter((n) => n > 0);
+  return precos.length ? Math.min(...precos).toFixed(2).replace('.', ',') : '';
+}
 
 // Devolve o que falta arrumar; vazio quer dizer que pode salvar.
-export function errosDaPeca({ nome, preco, categoria, esgotado }: CamposDaPeca): string[] {
+export function errosDaPeca({ nome, preco, categoria, esgotado, versoes = [] }: CamposDaPeca): string[] {
   const erros: string[] = [];
   if (!nome.trim()) erros.push('Escreva o nome da peça.');
   if (!categoria.trim()) erros.push('Escolha a categoria.');
-  if (!esgotado && paraNumero(normalizarPreco(preco)) <= 0) erros.push('Escreva o preço da peça.');
+  const limpas = limparVersoes(versoes);
+  if (limpas.length) {
+    if (limpas.some((v) => !v.nome)) erros.push('Escreva o nome de cada versão.');
+    if (!esgotado && limpas.some((v) => paraNumero(v.preco) <= 0)) erros.push('Escreva o preço de cada versão.');
+    const nomes = limpas.map((v) => normalizar(v.nome)).filter(Boolean);
+    if (new Set(nomes).size !== nomes.length) erros.push('Duas versões estão com o mesmo nome.');
+  } else if (!esgotado && paraNumero(normalizarPreco(preco)) <= 0) erros.push('Escreva o preço da peça.');
   return erros;
 }
 
@@ -86,6 +105,7 @@ export function descreverMudanca(antes: Localizada | null, depois: Localizada, f
   if (a.nome !== d.nome) mudou.push('nome');
   if (a.preco !== d.preco) mudou.push('preço');
   if (a.descricao !== d.descricao) mudou.push('descrição');
+  if (JSON.stringify(a.versoes ?? []) !== JSON.stringify(d.versoes ?? [])) mudou.push('versões');
   if (JSON.stringify(a.cores) !== JSON.stringify(d.cores)) mudou.push('cores');
   if (JSON.stringify(a.combos) !== JSON.stringify(d.combos)) mudou.push('combos');
   if (a.maisVendido !== d.maisVendido) mudou.push('queridinhos');

@@ -24,7 +24,7 @@ Desenvolvimento direto na `main` (decisão do usuário em 08/11/2026; a branch `
 - `src/lib/config.ts`: número do WhatsApp, `ABAS_BRINDES`, `QUANTIDADES_COMBO`, descontos e tamanho do lote.
 - `src/lib/catalogo.ts`: leitura de `catalogo.json`, montagem das categorias, combos, ordenação, queridinhos, busca. O leitor de CSV continua aqui para a importação e os testes.
 - `src/painel/`: `Painel` (telas e salvamento), `Acesso` (configurar e senha), `Lista`, `Ficha`, `github.ts` (gravação), `chaveLocal.ts` (chave cifrada), `foto.ts` (foto em 1200×900 no aparelho), `promptFoto.ts` (texto do botão Copiar prompt), `pecas.ts` (regras, testadas em `painel.test.ts`).
-- `src/lib/whatsapp.ts`: texto das mensagens. O formato foi aprovado pelo usuário em 08/10/2026; não mudar sem pedir. A única adição é a linha de combo (`Combo de 10 = R$ 129`), que só aparece em combos.
+- `src/lib/whatsapp.ts`: texto das mensagens. O formato foi aprovado pelo usuário em 08/10/2026; não mudar sem pedir. As adições são a linha de combo (`Combo de 10 = R$ 129`), só em combos, e a versão entre parênteses depois do nome (`*1. Letreiro Feliz Natal (20 cm)* (NAT-10)`), aprovada em 08/11/2026.
 - `src/lib/preco.ts` (combo em valor inteiro, unidade com centavos), `cores.ts`, `fotos.ts`, `medicao.ts` e `efeitos.ts` (foto voando até a sacola).
 - `src/hooks/`: `useRota` (rotas por hash: `#inicio`, `#produtos`, `#categoria/<nome>`, `#brindes`, `#produto/<CODIGO>`) e `useTela` (consultas de tela e movimento reduzido).
 - `src/store/`: lista de pedido (zustand, chave `np3d_lista` no localStorage, compatível com a v2) e estado da interface.
@@ -48,6 +48,7 @@ Desenvolvimento direto na `main` (decisão do usuário em 08/11/2026; a branch `
 - Preço fechado do combo (campo opcional no painel, `combos` no arquivo) manda sobre o desconto naquela quantidade exata.
 - Termos: "Para você ou para presentear" e "Brindes para seus clientes", sem "lembrancinhas" nem "evento" no texto visível.
 - Produto com cores exige escolher a cor antes de pedir ou pôr na lista.
+- Versões (`versoes: [{ nome, preco }]`, opcional): o mesmo anúncio em tamanhos que só mudam o preço; foto, cores e descrição são as mesmas. Com versões, `preco` guarda o menor (card e busca mostram "a partir de") e o cliente precisa escolher a versão (pílulas acima da cor). `naVersao` troca o preço, então as regras de preço e combo não mudam. Na sacola, outra versão é outro item; versão que some do produto tira o item. No painel, bloco "Versões" (linhas nome + preço); com versões, o campo Preço some.
 - Item da sacola que esgota ou sai do catálogo é removido com aviso.
 
 ## Visual

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Drawer } from 'vaul';
-import { chaveProduto, normalizar, type Produto } from '../lib/catalogo';
+import { chaveProduto, normalizar, temVersoes, type Produto } from '../lib/catalogo';
 import { voarParaSacola } from '../lib/efeitos';
 import { linkCompartilhar } from '../lib/fotos';
 import { medir } from '../lib/medicao';
@@ -14,7 +14,7 @@ import { useUI } from '../store/ui';
 import { ITENS_ANTES_DE_PEDIR } from './AntesDePedir';
 import { Botao, BotaoIcone, BotaoLink, IconeWhats } from './Botoes';
 import { Preco } from './CardProduto';
-import { SeletorCor, SeletorQuantidade, useEscolha } from './Escolhas';
+import { SeletorCor, SeletorQuantidade, SeletorVersao, useEscolha } from './Escolhas';
 import { FotoProduto } from './FotoProduto';
 
 function Parecidos({ produto }: { produto: Produto }) {
@@ -90,14 +90,15 @@ function Corpo({ produto, escolha }: { produto: Produto; escolha: ReturnType<typ
     <>
       <h2 className="titulo text-[26px] text-balance md:pr-8 md:text-[30px]">{produto.nome}</h2>
       <div className="mt-1 flex items-center justify-between gap-3">
-        {produto.esgotado ? <p className="text-[17px] font-medium text-suave">Esgotado no momento</p> : <Preco produto={produto} grande />}
+        {produto.esgotado ? <p className="text-[17px] font-medium text-suave">Esgotado no momento</p> : <Preco produto={escolha.escolhido} grande />}
         <BotaoIcone onClick={compartilhar} aria-label="Compartilhar produto" className="-mr-2 shrink-0"><ShareNetwork size={20} /></BotaoIcone>
       </div>
       {produto.descricao && <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-suave">{produto.descricao}</p>}
       {!produto.esgotado && (
         <div className="mt-6 space-y-6">
+          {temVersoes(produto) && <SeletorVersao produto={produto} escolha={escolha} />}
           {produto.cores.length > 0 && <SeletorCor produto={produto} escolha={escolha} />}
-          <SeletorQuantidade produto={produto} escolha={escolha} />
+          <SeletorQuantidade produto={escolha.escolhido} escolha={escolha} />
         </div>
       )}
       <InformacoesDoProduto />
@@ -109,18 +110,18 @@ function Corpo({ produto, escolha }: { produto: Produto; escolha: ReturnType<typ
 function Acoes({ produto, escolha, fechar }: { produto: Produto; escolha: ReturnType<typeof useEscolha>; fechar: () => void }) {
   const adicionar = useLista((s) => s.adicionar);
   const setLista = useUI((s) => s.setListaAberta);
-  const { cor, quantidade, faltaCor, textoTotal, setPedirCor } = escolha;
+  const { cor, versao, escolhido, quantidade, faltaCor, textoTotal, setPedirCor, idDaFalta } = escolha;
 
   const exigirCor = () => {
     setPedirCor(true);
-    document.getElementById('escolha-cor')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById(idDaFalta)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
   const naSacola = () => {
     if (faltaCor) return exigirCor();
-    voarParaSacola(document.querySelector<HTMLElement>('[data-foto-produto]')).then(() => adicionar(produto, quantidade, cor));
+    voarParaSacola(document.querySelector<HTMLElement>('[data-foto-produto]')).then(() => adicionar(produto, quantidade, cor, versao));
     fechar();
     setTimeout(() => toast('Colocado na sacola', {
-      description: `${quantidade} x ${produto.nome}${cor ? `, ${cor}` : ''}`,
+      description: `${quantidade} x ${produto.nome}${[versao, cor].filter(Boolean).map((t) => `, ${t}`).join('')}`,
       action: { label: 'Ver sacola', onClick: () => setLista(true) },
     }), 750);
   };
@@ -140,7 +141,7 @@ function Acoes({ produto, escolha, fechar }: { produto: Produto; escolha: Return
       {faltaCor ? (
         <Botao onClick={exigirCor} icone={<IconeWhats />} aria-disabled>Pedir, {textoTotal}</Botao>
       ) : (
-        <BotaoLink href={linkWhatsapp(mensagemPedido([{ produto, quantidade, cor }]))} target="_blank" rel="noopener" icone={<IconeWhats />} data-evento="pedido_whatsapp" data-produto={produto.nome} data-categoria={produto.categoria} data-cor={cor || undefined}>
+        <BotaoLink href={linkWhatsapp(mensagemPedido([{ produto: escolhido, quantidade, cor, versao }]))} target="_blank" rel="noopener" icone={<IconeWhats />} data-evento="pedido_whatsapp" data-produto={produto.nome} data-categoria={produto.categoria} data-cor={cor || undefined}>
           Pedir, {textoTotal}
         </BotaoLink>
       )}

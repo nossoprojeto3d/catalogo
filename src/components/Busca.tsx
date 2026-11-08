@@ -4,6 +4,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { buscar, chaveProduto } from '../lib/catalogo';
 import { medir } from '../lib/medicao';
 import { precoUnitario, textoPreco } from '../lib/preco';
+import { aPartirDe } from './CardProduto';
 import { useUI } from '../store/ui';
 import { BotaoIcone } from './Botoes';
 import { FotoProduto } from './FotoProduto';
@@ -79,7 +80,7 @@ export function Busca() {
                       <p className="truncate text-[15px] font-medium">{p.nome}</p>
                       <p className="truncate text-[13px] text-suave">{p.categoria}</p>
                     </div>
-                    <span className="shrink-0 text-[14px] font-semibold">{p.esgotado ? 'Esgotado' : textoPreco(precoUnitario(p))}</span>
+                    <span className="shrink-0 text-[14px] font-semibold">{p.esgotado ? 'Esgotado' : `${aPartirDe(p) ? 'a partir de ' : ''}${textoPreco(precoUnitario(p))}`}</span>
                   </button>
                 </li>
               ))}

@@ -1,15 +1,15 @@
-import { ArrowLeft, Copy, DownloadSimple, ImageSquare, ShoppingBag, Trash, X } from '@phosphor-icons/react';
+import { ArrowLeft, Copy, DownloadSimple, ImageSquare, Plus, ShoppingBag, Trash, X } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { Botao } from '../components/Botoes';
-import type { ArquivoCatalogo, Peca } from '../lib/catalogo';
+import type { ArquivoCatalogo, Peca, Versao } from '../lib/catalogo';
 import { ABAS_BRINDES, QUANTIDADES_COMBO } from '../lib/config';
 import { corDaBolinha } from '../lib/cores';
 import { paraNumero, textoPreco } from '../lib/preco';
 import { CAMPO, ROTULO } from './Acesso';
 import { carregarImagem, prepararFoto } from './foto';
 import { ErroPainel } from './github';
-import { errosDaPeca, normalizarPreco, type Localizada } from './pecas';
+import { errosDaPeca, limparVersoes, menorPreco, normalizarPreco, type Localizada } from './pecas';
 import { promptDaFoto } from './promptFoto';
 import { Miniatura } from './Miniatura';
 
@@ -60,7 +60,7 @@ function Bloco({ titulo, children }: { titulo: string; children: ReactNode }) {
 }
 
 // Mesmo tamanho e mesmo recorte do card em 2 colunas do celular.
-function PreviaDoCard({ nome, preco, esgotada, cores, ehBrinde, foto, urlFoto }: { nome: string; preco: string; esgotada: boolean; cores: string[]; ehBrinde: boolean; foto: FotoNova | null; urlFoto: string | null }) {
+function PreviaDoCard({ nome, preco, aPartirDe, esgotada, cores, ehBrinde, foto, urlFoto }: { nome: string; preco: string; aPartirDe: boolean; esgotada: boolean; cores: string[]; ehBrinde: boolean; foto: FotoNova | null; urlFoto: string | null }) {
   return (
     <div className="w-[calc(50%-6px)] min-w-0">
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-superficie-2">
@@ -78,7 +78,7 @@ function PreviaDoCard({ nome, preco, esgotada, cores, ehBrinde, foto, urlFoto }:
       <p className={`mt-2 line-clamp-2 text-[15px] font-medium leading-snug ${nome.trim() ? '' : 'text-suave'}`}>{nome.trim() || 'Nome da peça'}</p>
       {esgotada
         ? <p className="mt-1 text-[14px] text-suave">Avise-me quando voltar</p>
-        : <p className="mt-1 text-[16px] font-bold tabular-nums tracking-tight">{textoPreco(paraNumero(normalizarPreco(preco)))}</p>}
+        : <p className="mt-1 text-[16px] font-bold tabular-nums tracking-tight">{aPartirDe && <span className="text-[13px] font-normal text-suave">a partir de </span>}{textoPreco(paraNumero(normalizarPreco(preco)))}</p>}
       {ehBrinde && !esgotada && <p className="mt-0.5 text-[13px] text-suave">a unidade, em combos de 10, 30 ou 50</p>}
       {cores.length > 0 && !esgotada && (
         <div className="mt-1.5 flex items-center gap-1.5">
@@ -100,6 +100,7 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
   const [categoria, setCategoria] = useState(inicial?.categoria ?? '');
   const [novaCategoria, setNovaCategoria] = useState('');
   const [cores, setCores] = useState<string[]>(p?.cores ?? []);
+  const [versoes, setVersoes] = useState<Versao[]>(p?.versoes ?? []);
   const [corDigitada, setCorDigitada] = useState('');
   const [esgotada, setEsgotada] = useState(p?.esgotado ?? false);
   const [queridinho, setQueridinho] = useState(p?.maisVendido != null);
@@ -117,11 +118,14 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
   const categoriaFinal = categoria === OUTRA_CATEGORIA ? novaCategoria.trim() : categoria;
   const ehBrinde = ABAS_BRINDES.includes(categoriaFinal);
 
+  const versoesLimpas = limparVersoes(versoes);
   const montar = (): Omit<Peca, 'codigo'> => {
     return {
       nome: nome.trim(),
       descricao: descricao.trim(),
-      preco: normalizarPreco(preco),
+      preco: versoesLimpas.length ? menorPreco(versoesLimpas) : normalizarPreco(preco),
+      // Só entra no arquivo quando existe, para as outras peças não mudarem.
+      ...(versoesLimpas.length ? { versoes: versoesLimpas } : {}),
       foto: p?.foto ?? '',
       cores,
       combos: ehBrinde
@@ -134,9 +138,9 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
   };
 
   // Só conta como alterada se o resultado final mudou, e não por ter tocado num campo.
-  const assinatura = (dados: Omit<Peca, 'codigo'>, cat: string) => JSON.stringify([dados.nome, dados.descricao, dados.preco, dados.cores, dados.combos, dados.maisVendido, dados.esgotado, cat]);
+  const assinatura = (dados: Omit<Peca, 'codigo'>, cat: string) => JSON.stringify([dados.nome, dados.descricao, dados.preco, dados.cores, dados.combos, dados.maisVendido, dados.esgotado, cat, dados.versoes ?? []]);
   const inicialAssinatura = useMemo(() => {
-    if (!inicial) return JSON.stringify(['', '', '', [], {}, null, false, '']);
+    if (!inicial) return JSON.stringify(['', '', '', [], {}, null, false, '', []]);
     const { codigo: _c, ...resto } = inicial.peca;
     return assinatura({ ...resto, preco: normalizarPreco(resto.preco) }, inicial.categoria);
     // A foto inicial só vale na abertura da ficha.
@@ -194,6 +198,16 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
     }
   };
 
+  // A primeira versão leva o preço que já estava na peça e abre uma segunda linha.
+  const adicionarVersao = () => setVersoes((atuais) => (atuais.length ? [...atuais, { nome: '', preco: '' }] : [{ nome: '', preco }, { nome: '', preco: '' }]));
+  const mudarVersao = (i: number, campo: keyof Versao, valor: string) => setVersoes((atuais) => atuais.map((v, j) => (j === i ? { ...v, [campo]: valor } : v)));
+  const tirarVersao = (i: number) => setVersoes((atuais) => {
+    const resto = atuais.filter((_, j) => j !== i);
+    // Sem versões, o preço volta para o campo comum.
+    if (!resto.length && atuais[i]?.preco) setPreco(atuais[i].preco);
+    return resto;
+  });
+
   const adicionarCor = () => {
     const novas = corDigitada.split(',').map((c) => c.trim()).filter(Boolean);
     if (novas.length) setCores((atuais) => [...atuais, ...novas.filter((n) => !atuais.some((a) => a.toLowerCase() === n.toLowerCase()))]);
@@ -206,7 +220,7 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
   };
 
   const enviar = async () => {
-    const problemas = errosDaPeca({ nome, preco, categoria: categoriaFinal, esgotado: esgotada });
+    const problemas = errosDaPeca({ nome, preco, categoria: categoriaFinal, esgotado: esgotada, versoes });
     setErros(problemas);
     setConflito(false);
     if (problemas.length) return;
@@ -289,7 +303,7 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
           </Bloco>
 
           <Bloco titulo="Como aparece no site">
-            <PreviaDoCard nome={nome} preco={preco} esgotada={esgotada} cores={cores} ehBrinde={ehBrinde} foto={foto} urlFoto={urlFoto} />
+            <PreviaDoCard nome={nome} preco={versoesLimpas.length ? menorPreco(versoesLimpas) : preco} aPartirDe={new Set(versoesLimpas.map((v) => paraNumero(v.preco)).filter((n) => n > 0)).size > 1} esgotada={esgotada} cores={cores} ehBrinde={ehBrinde} foto={foto} urlFoto={urlFoto} />
           </Bloco>
         </div>
 
@@ -299,9 +313,11 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
               <label className={ROTULO}>Nome
                 <input className={`${CAMPO} mt-1.5 font-normal`} value={nome} onChange={(e) => setNome(e.target.value)} />
               </label>
-              <label className={ROTULO}>Preço
-                <input className={`${CAMPO} mt-1.5 font-normal`} inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} onBlur={() => setPreco(normalizarPreco(preco))} placeholder="0,00" />
-              </label>
+              {versoes.length === 0 && (
+                <label className={ROTULO}>Preço
+                  <input className={`${CAMPO} mt-1.5 font-normal`} inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} onBlur={() => setPreco(normalizarPreco(preco))} placeholder="0,00" />
+                </label>
+              )}
               <label className={ROTULO}>Categoria
                 <select className={`${CAMPO} mt-1.5 font-normal`} value={categoria} onChange={(e) => setCategoria(e.target.value)}>
                   {/* Peça nova começa sem categoria, para ninguém salvar na primeira da lista sem querer. */}
@@ -319,6 +335,25 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
                 <textarea className={`${CAMPO} mt-1.5 h-24 py-3 font-normal`} value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Opcional" />
               </label>
             </div>
+          </Bloco>
+
+          <Bloco titulo="Versões">
+            {versoes.length > 0 && (
+              <ul className="mb-2 space-y-2">
+                {versoes.map((v, i) => (
+                  <li key={i} className="flex gap-2">
+                    <input className={`${CAMPO} min-w-0 flex-1`} aria-label={`Nome da versão ${i + 1}`} value={v.nome} onChange={(e) => mudarVersao(i, 'nome', e.target.value)} placeholder="Ex.: 20 cm" />
+                    <input className={`${CAMPO} w-28! shrink-0 px-3`} inputMode="decimal" aria-label={`Preço da versão ${i + 1}`} value={v.preco} onChange={(e) => mudarVersao(i, 'preco', e.target.value)} onBlur={() => mudarVersao(i, 'preco', normalizarPreco(v.preco))} placeholder="0,00" />
+                    <button type="button" onClick={() => tirarVersao(i)} aria-label={`Tirar a versão ${v.nome || i + 1}`} className="grid size-12 shrink-0 place-items-center rounded-full text-suave ring-1 ring-texto/20">
+                      <X size={16} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button type="button" onClick={adicionarVersao} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-superficie px-4 text-[15px] font-semibold ring-1 ring-texto/20">
+              <Plus size={18} /> Adicionar versão
+            </button>
           </Bloco>
 
           <Bloco titulo="Cores">

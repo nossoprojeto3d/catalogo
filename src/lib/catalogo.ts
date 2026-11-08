@@ -13,7 +13,23 @@ export type Produto = {
   maisVendido: number | null;
   esgotado: boolean;
   categoria: string;
+  // Mesmo produto em tamanhos/versões que só mudam o preço. Com versões,
+  // `preco` guarda o menor deles (para o card e a ordenação).
+  versoes?: Versao[];
 };
+
+export type Versao = { nome: string; preco: string };
+
+// A versão escolhida vira o preço do produto: o resto das regras de preço não
+// muda. O resultado já não tem versões, então mostra o preço exato.
+export function naVersao(p: Produto, versao: string): Produto {
+  const v = p.versoes?.find((x) => x.nome === versao);
+  if (!v) return p;
+  const { versoes: _v, ...resto } = p;
+  return { ...resto, preco: v.preco };
+}
+
+export const temVersoes = (p: Produto) => (p.versoes?.length ?? 0) > 0;
 
 export type Categoria = { nome: string; produtos: Produto[] };
 
