@@ -1,5 +1,5 @@
 import { ArrowsClockwise, MagnifyingGlass, Plus } from '@phosphor-icons/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { normalizar, ordenarProdutos, type ArquivoCatalogo } from '../lib/catalogo';
 import { emReais, paraNumero } from '../lib/preco';
 import { CAMPO } from './Acesso';
@@ -12,9 +12,15 @@ type Props = {
   abrir: (codigo: string | null) => void;
   atualizar: () => void;
   atualizando: boolean;
+  filtros: FiltrosLista;
+  mudarFiltros: (f: FiltrosLista) => void;
 };
 
 type Situacao = '' | 'esgotada' | 'semFoto' | 'queridinho';
+
+// Ficam no Painel: a lista some enquanto a ficha está aberta e volta como estava.
+export type FiltrosLista = { termo: string; categoria: string; situacao: Situacao };
+export const FILTROS_INICIAIS: FiltrosLista = { termo: '', categoria: '', situacao: '' };
 
 const TONS = {
   ativa: 'bg-acento/25 text-acento-escuro',
@@ -36,10 +42,17 @@ function Resumo({ numero, rotulo, ativo, aoTocar }: { numero: number; rotulo: st
   );
 }
 
-export function Lista({ nome, arquivo, urlFoto, abrir, atualizar, atualizando }: Props) {
-  const [termo, setTermo] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [situacao, setSituacao] = useState<Situacao>('');
+export function Lista({ nome, arquivo, urlFoto, abrir, atualizar, atualizando, filtros, mudarFiltros }: Props) {
+  const { termo, categoria, situacao } = filtros;
+  const setTermo = (termo: string) => mudarFiltros({ ...filtros, termo });
+  const setCategoria = (categoria: string) => mudarFiltros({ ...filtros, categoria });
+  const setSituacao = (situacao: Situacao) => mudarFiltros({ ...filtros, situacao });
+
+  // Ao voltar da ficha, a pílula escolhida aparece mesmo que a fila role de lado.
+  const pilulas = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    pilulas.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }, []);
 
   const todas = useMemo(() => arquivo.categorias.flatMap((c) => c.produtos.map((p) => ({ ...p, categoria: c.nome }))), [arquivo]);
   const contagem = useMemo(() => ({
@@ -84,7 +97,7 @@ export function Lista({ nome, arquivo, urlFoto, abrir, atualizar, atualizando }:
         </div>
       </div>
 
-      <ul aria-label="Filtrar por categoria" className="sem-barra -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
+      <ul ref={pilulas} aria-label="Filtrar por categoria" className="sem-barra -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
         <li><button type="button" onClick={() => setCategoria('')} aria-pressed={!categoria} className={pilula(!categoria)}>Todas</button></li>
         {arquivo.categorias.map((c) => (
           <li key={c.nome}>

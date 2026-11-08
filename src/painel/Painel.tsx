@@ -7,7 +7,7 @@ import { nomeGuardado } from './chaveLocal';
 import { Configurar, Desbloquear } from './Acesso';
 import { Ficha, type Pedido } from './Ficha';
 import { ErroPainel, gravar, lerDados, RAMO, type Dados } from './github';
-import { Lista } from './Lista';
+import { FILTROS_INICIAIS, Lista, type FiltrosLista } from './Lista';
 import { acharPeca, aplicarPeca, descreverMudanca, gerarCodigo, mesmaPeca, removerPeca, type Localizada } from './pecas';
 
 const AVISO_PUBLICACAO = RAMO === 'main' ? 'Aparece no site em 1 a 2 minutos.' : 'Modo de teste: salvo só na branch teste, o site não muda.';
@@ -25,6 +25,9 @@ export function Painel() {
   const [erroCarga, setErroCarga] = useState('');
   const [atualizando, setAtualizando] = useState(false);
   const [tela, setTela] = useState<Tela>({ tipo: 'lista' });
+  const [filtros, setFiltros] = useState<FiltrosLista>(FILTROS_INICIAIS);
+  // Onde a lista estava quando a ficha abriu, para voltar no mesmo ponto.
+  const rolagemDaLista = useRef(0);
   const [fotosRecentes, setFotosRecentes] = useState<Map<string, string>>(new Map());
   const [versaoFotos] = useState(() => Date.now());
   const alterado = useRef(false);
@@ -84,9 +87,14 @@ export function Painel() {
   const abrir = (codigo: string | null) => {
     history.pushState({ ficha: true }, '');
     alterado.current = false;
+    rolagemDaLista.current = scrollY;
     setTela({ tipo: 'ficha', codigo });
     scrollTo(0, 0);
   };
+
+  useEffect(() => {
+    if (tela.tipo === 'lista') scrollTo(0, rolagemDaLista.current);
+  }, [tela.tipo]);
 
   const fecharFicha = () => {
     alterado.current = false;
@@ -191,7 +199,7 @@ export function Painel() {
       ) : !dados ? (
         <p role="status" className="py-16 text-center text-[15px] text-suave">Abrindo o catálogo...</p>
       ) : tela.tipo === 'lista' ? (
-        <Lista nome={nome} arquivo={dados.arquivo} urlFoto={urlFoto} abrir={abrir} atualizar={() => void carregar()} atualizando={atualizando} />
+        <Lista nome={nome} arquivo={dados.arquivo} urlFoto={urlFoto} abrir={abrir} atualizar={() => void carregar()} atualizando={atualizando} filtros={filtros} mudarFiltros={setFiltros} />
       ) : (
         <Ficha
           key={tela.codigo ?? 'nova'}
