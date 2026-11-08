@@ -161,7 +161,7 @@
             "vermelho bordô"
           ],
           "combos": {},
-          "maisVendido": null,
+          "maisVendido": 999,
           "esgotado": false,
           "codigo": "NAT-10"
         },
