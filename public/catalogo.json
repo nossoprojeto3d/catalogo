@@ -426,14 +426,14 @@
         },
         {
           "nome": "Kit Verutas",
-          "codigo": "KID-16",
           "descricao": "Kitzinho pronto",
           "preco": "84,90",
           "foto": "",
           "cores": [],
           "combos": {},
-          "maisVendido": 999,
-          "esgotado": false
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "KID-16"
         },
         {
           "nome": "Milho Sensorial",
