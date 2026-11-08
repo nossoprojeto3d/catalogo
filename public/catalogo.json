@@ -2,7 +2,227 @@
   "categorias": [
     {
       "nome": "Natal",
-      "produtos": []
+      "produtos": [
+        {
+          "nome": "Árvore  Família Personalizada com Nomes",
+          "descricao": "✨ Personalização: Produzida com os nomes da sua família, formando uma linda árvore de Natal.\n\n📏 Tamanho: A altura e a largura dos nomes podem variar conforme a quantidade de nomes e o número de letras de cada um, mantendo a harmonia e as proporções da árvore.\n\n💰 Valor a partir de R$ 55,90: O preço final varia de acordo com a quantidade de nomes e o tamanho da peça.\n\n🎨 Cores: Personalizáveis conforme disponibilidade.",
+          "preco": "55,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-16"
+        },
+        {
+          "nome": "Árvore de Natal Decor",
+          "descricao": "",
+          "preco": "25,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-12"
+        },
+        {
+          "nome": "Árvore de Natal Felpudinha Média",
+          "descricao": "13 cm",
+          "preco": "54,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-06"
+        },
+        {
+          "nome": "Árvore de Natal Felpudinha Pequena",
+          "descricao": "8cm",
+          "preco": "15,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-05"
+        },
+        {
+          "nome": "Árvore de Natal Iluminada",
+          "descricao": "Acompanha vela artificial",
+          "preco": "15,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-11"
+        },
+        {
+          "nome": "Árvore de Natal Minimalista",
+          "descricao": "Consulte Cores Disponíveis",
+          "preco": "20,90",
+          "foto": "",
+          "cores": [
+            "Vermelho Bordo",
+            "Verde Militar",
+            "Dourado",
+            "Branco Perolado"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-07"
+        },
+        {
+          "nome": "Bandeja Oval",
+          "descricao": "18cm",
+          "preco": "26,00",
+          "foto": "",
+          "cores": [
+            "Verde Militar",
+            "Branco Perolado",
+            "Vermelho",
+            "Vermelho Bordô",
+            "Dourado",
+            "Marrom Café",
+            "Rosa",
+            "Azul Marinho",
+            "Preto",
+            "Areia"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-15"
+        },
+        {
+          "nome": "Bandeja Redonda - Gominhos",
+          "descricao": "17cm",
+          "preco": "29,90",
+          "foto": "",
+          "cores": [
+            "Branco Perolado",
+            "Vermelho",
+            "Vermelho Bordô",
+            "Verde Militar",
+            "Areia",
+            "Marrom Café",
+            "Dourado",
+            "Azul Marinho",
+            "Rosa"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-14"
+        },
+        {
+          "nome": "Casinha Iluminada",
+          "descricao": "Acompanha vela artificial",
+          "preco": "15,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-02"
+        },
+        {
+          "nome": "Kit Vila Iluminada",
+          "descricao": "acompanha vela artificial",
+          "preco": "59,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-01"
+        },
+        {
+          "nome": "Letreiro Feliz Natal Médio",
+          "descricao": "20cm",
+          "preco": "29,90",
+          "foto": "",
+          "cores": [
+            "verde militar",
+            "dourado",
+            "vermelho",
+            "vermelho bordô"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-10"
+        },
+        {
+          "nome": "Letreiro Feliz Natal Pequeno",
+          "descricao": "10 cm",
+          "preco": "14,90",
+          "foto": "",
+          "cores": [
+            "dourado",
+            "verde militar",
+            "vermelho bordô",
+            "vermelho"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-09"
+        },
+        {
+          "nome": "Ovelhinha - Crochê",
+          "descricao": "Coleção Presépio",
+          "preco": "18,00",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-04"
+        },
+        {
+          "nome": "Papai Noel Crochê",
+          "descricao": "",
+          "preco": "25,00",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-03"
+        },
+        {
+          "nome": "Presépio (Sagrada Família) Crochê",
+          "descricao": "3 peças - José, Maria e Jesus",
+          "preco": "57,00",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-08"
+        },
+        {
+          "nome": "Rena com Trenó",
+          "descricao": "",
+          "preco": "29,90",
+          "foto": "",
+          "cores": [
+            "Marrom café",
+            "Areia",
+            "Vermelho Bordô",
+            "Verde Militar",
+            "Vermelho",
+            "Branco Perolado"
+          ],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-13"
+        }
+      ]
     },
     {
       "nome": "Brindes",
