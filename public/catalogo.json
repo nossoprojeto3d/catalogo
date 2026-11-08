@@ -199,6 +199,39 @@
           "codigo": "NAT-03"
         },
         {
+          "nome": "Presentes Decorativos",
+          "descricao": "",
+          "preco": "8,00",
+          "versoes": [
+            {
+              "nome": "5 cm",
+              "preco": "8,00"
+            },
+            {
+              "nome": "8 cm",
+              "preco": "15,00"
+            },
+            {
+              "nome": "12 cm",
+              "preco": "20,00"
+            }
+          ],
+          "foto": "",
+          "cores": [
+            "Vermelho",
+            "Verde",
+            "Dourado",
+            "Branco",
+            "Verde MIlitar",
+            "Vermelho Bordo",
+            "Off White"
+          ],
+          "combos": {},
+          "maisVendido": 999,
+          "esgotado": false,
+          "codigo": "NAT-19"
+        },
+        {
           "nome": "Presépio (Sagrada Família) Crochê",
           "descricao": "3 peças - José, Maria e Jesus",
           "preco": "57,00",
