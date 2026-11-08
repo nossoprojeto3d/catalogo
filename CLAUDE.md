@@ -3,13 +3,13 @@
 Site publicado no GitHub Pages: https://nossoprojeto3d.github.io/catalogo/
 Todo push na `main` vai pro ar pelo GitHub Action `.github/workflows/publicar.yml` (testes, build e publicação).
 
-No ar: versão 4 (React + Vite + Tailwind v4), na branch `main`, publicada em 05/11/2026. O usuário está usando por alguns dias antes de fechar a versão.
-Desenvolvimento na branch `v4`; push nela não publica nada. O painel grava direto na `main`, então a `v4` fica para trás: antes de mexer, `git fetch` e `git merge --ff-only origin/main`. Publicar é levar a `v4` para a `main`, só com aprovação do usuário.
+No ar: versão 4 (React + Vite + Tailwind v4), publicada em 05/11/2026 e aprovada como oficial em 08/11/2026 (tag `v4.0.0`).
+Desenvolvimento direto na `main` (decisão do usuário em 08/11/2026; a branch `v4` foi apagada). O painel também grava na `main`: antes de mexer, `git pull --ff-only`. Push na `main` publica, então só com aprovação do usuário.
 
 ## Versões e backups
 
 - `backup-v3-20261105`: branch com a versão 3 como estava no ar. Não apagar sem o usuário pedir. Para voltar, reverter os commits na `main` sem `push --force`, combinando antes: ela lê a planilha, então não mostra o que foi alterado no painel.
-- `v3.0.0`: versão 3. `v2.0.0`: versão 2 (HTML único). Tags de versão são permanentes. A `v4.0.0` e o backup oficial ficam para depois dos dias de uso do usuário.
+- `v4.0.0`: versão 4. `v3.0.0`: versão 3. `v2.0.0`: versão 2 (HTML único). Tags de versão são permanentes.
 - `backup-oficial-AAAAMMDD`: último backup oficial. Só o mais recente fica, então não use essa tag como referência fixa.
 - Voltar para a v2 não é só reverter o código: o Action publica `dist/`, que a v2 não tem. Em Settings > Pages, a origem precisa continuar "GitHub Actions" para o site funcionar.
 
@@ -36,7 +36,7 @@ Desenvolvimento na branch `v4`; push nela não publica nada. O painel grava dire
 ## Como os dados chegam
 
 - Produtos ficam em `public/catalogo.json`, lido pelo site a cada visita e editado pelo painel. Categoria vazia não aparece no site. A planilha não é mais usada desde 05/11/2026.
-- Painel em `/catalogo/painel/` (`src/painel/`), aberto pelo link "Área da loja" no rodapé, página à parte, sem Analytics. Grava direto no GitHub, num commit só, com a chave do aparelho; o Action publica em 1 a 2 minutos. Só o site oficial grava na `main`; em qualquer outro endereço grava na `v4`, com aviso de modo de teste.
+- Painel em `/catalogo/painel/` (`src/painel/`), aberto pelo link "Área da loja" no rodapé, página à parte, sem Analytics. Grava direto no GitHub, num commit só, com a chave do aparelho; o Action publica em 1 a 2 minutos. Só o site oficial grava na `main`; em qualquer outro endereço grava na branch `teste` (não publica), com aviso de modo de teste.
 - Acesso: uma chave do GitHub por aparelho (Contents: Read and write, só neste repositório), guardada cifrada com a senha do painel (`chaveLocal.ts`). A chave nunca entra no código nem no chat. Não existe cadastro: nome e senha ficam só no navegador do aparelho. Só a conta `nossoprojeto3d` tem acesso de escrita ao projeto.
 - Se duas pessoas salvam peças diferentes, as duas alterações ficam. Se for a mesma peça, o painel avisa e não grava por cima.
 - Tela do painel (opção escolhida pelo usuário em 05/11/2026): saudação, resumo clicável (peças, esgotadas, sem foto, queridinhos), Nova peça, busca, pílulas de categoria e etiquetas na lista. A ficha é em blocos, com prévia ao vivo do card; no computador, duas colunas. Mudança de layout aqui também passa pelos 3 rascunhos.
@@ -86,4 +86,4 @@ Usado pelo `/conferir-site`, no celular e no desktop (`npm run build && npm run 
 9. WhatsApp: conferir o `href` (`wa.me/5562993152843?text=...`) sem clicar.
 10. Link compartilhado `#produto/<CODIGO>` abre o produto; o "voltar" do celular fecha a tela.
 11. Aviso de cookies: no celular, o botão flutuante do WhatsApp fica escondido até a resposta e volta depois dela.
-12. Painel: "Área da loja" no rodapé abre `/catalogo/painel/`. No site oficial, sem chave real, conferir só a tela de configuração: salvar de verdade grava na `main` e publica. Para testar o resto, usar a prévia local (grava na `v4`) ou simular a API do GitHub no navegador.
+12. Painel: "Área da loja" no rodapé abre `/catalogo/painel/`. No site oficial, sem chave real, conferir só a tela de configuração: salvar de verdade grava na `main` e publica. Para testar o resto, usar a prévia local (grava na branch `teste`) ou simular a API do GitHub no navegador.

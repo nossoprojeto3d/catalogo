@@ -10,7 +10,7 @@ import { ErroPainel, gravar, lerDados, RAMO, type Dados } from './github';
 import { Lista } from './Lista';
 import { acharPeca, aplicarPeca, descreverMudanca, gerarCodigo, mesmaPeca, removerPeca, type Localizada } from './pecas';
 
-const AVISO_PUBLICACAO = RAMO === 'main' ? 'Aparece no site em 1 a 2 minutos.' : 'Modo de teste: salvo só na v4, o site não muda.';
+const AVISO_PUBLICACAO = RAMO === 'main' ? 'Aparece no site em 1 a 2 minutos.' : 'Modo de teste: salvo só na branch teste, o site não muda.';
 const MSG_PECA_MUDOU = 'Outra pessoa alterou esta peça agora há pouco. Recarregue a lista para ver a versão nova.';
 
 type Fase = 'configurar' | 'senha' | 'pronto';
@@ -234,7 +234,7 @@ function Moldura({ sair, temAlteracao, children }: { sair?: () => void; temAlter
         </span>
         </div>
       </header>
-      {RAMO !== 'main' && <p className="bg-superficie-2 px-4 py-2 text-center text-[13px] font-medium">Modo de teste: salva só na v4. O site não muda.</p>}
+      {RAMO !== 'main' && <p className="bg-superficie-2 px-4 py-2 text-center text-[13px] font-medium">Modo de teste: salva só na branch teste. O site não muda.</p>}
       {children}
     </div>
   );
