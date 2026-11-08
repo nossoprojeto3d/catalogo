@@ -919,6 +919,17 @@
           "esgotado": false
         },
         {
+          "nome": "Nossa Senhora Aparecida",
+          "descricao": "8 cm",
+          "preco": "15,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "DEC-10"
+        },
+        {
           "nome": "Pai Nosso",
           "descricao": "30 cm",
           "preco": "89,90",
