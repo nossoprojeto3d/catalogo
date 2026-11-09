@@ -172,6 +172,17 @@
           "codigo": "NAT-23"
         },
         {
+          "nome": "Kit Natal Presépio",
+          "descricao": "Já incluso o desconto de 10% da promoção de natal",
+          "preco": "90,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-24"
+        },
+        {
           "nome": "Kit Vila Iluminada",
           "descricao": "acompanha vela artificial",
           "preco": "59,90",
