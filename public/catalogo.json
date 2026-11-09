@@ -1040,6 +1040,17 @@
           "codigo": "TIM-01"
         },
         {
+          "nome": "Mascote Tigrão Vila Nova",
+          "descricao": "",
+          "preco": "159,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "TIM-03"
+        },
+        {
           "nome": "Mascote Urubu Flamengo",
           "descricao": "",
           "preco": "159,00",
