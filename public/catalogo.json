@@ -172,6 +172,17 @@
           "codigo": "NAT-23"
         },
         {
+          "nome": "Kit Natal Completão",
+          "descricao": "",
+          "preco": "96,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-25"
+        },
+        {
           "nome": "Kit Natal Presépio",
           "descricao": "Já incluso o desconto de 10% da promoção de natal",
           "preco": "90,90",
