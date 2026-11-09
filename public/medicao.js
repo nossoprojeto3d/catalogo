@@ -26,7 +26,9 @@
   var HOSTS_PROJETOS = ["nossoprojeto3d.com.br"];
 
   var ativo = false;
-  var naoRastrear = navigator.doNotTrack === "1";
+  // Só mede no site oficial: testes no computador (localhost) e links temporários não entram nos números.
+  var siteOficial = /(^|\.)nossoprojeto3d\.com\.br$/.test(location.hostname);
+  var naoRastrear = navigator.doNotTrack === "1" || !siteOficial;
 
   /* ---------- consentimento ---------- */
   function lerEscolha() {
