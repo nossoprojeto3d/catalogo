@@ -1011,6 +1011,17 @@
           "combos": {},
           "maisVendido": null,
           "esgotado": false
+        },
+        {
+          "nome": "Plaquinha de Mesa Profissões",
+          "descricao": "Personalizada com seu nome e sua profissão.",
+          "preco": "49,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "MAN-02"
         }
       ]
     },
