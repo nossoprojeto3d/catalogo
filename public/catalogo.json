@@ -139,6 +139,17 @@
           "codigo": "NAT-20"
         },
         {
+          "nome": "Kit Natal 02",
+          "descricao": "Já incluso o desconto de 10% da promoção de natal",
+          "preco": "36,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "NAT-21"
+        },
+        {
           "nome": "Kit Vila Iluminada",
           "descricao": "acompanha vela artificial",
           "preco": "59,90",
