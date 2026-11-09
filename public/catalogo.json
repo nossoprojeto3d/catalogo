@@ -1013,6 +1013,22 @@
           "esgotado": false
         }
       ]
+    },
+    {
+      "nome": "Time",
+      "produtos": [
+        {
+          "nome": "Copo Flamengo",
+          "descricao": "",
+          "preco": "134,90",
+          "foto": "",
+          "cores": [],
+          "combos": {},
+          "maisVendido": null,
+          "esgotado": false,
+          "codigo": "TIM-01"
+        }
+      ]
     }
   ]
 }
