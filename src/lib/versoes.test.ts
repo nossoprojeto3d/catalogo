@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { naVersao, temVersoes, type Produto } from './catalogo';
 import { totalDoItem } from './preco';
 import { mensagemPedido } from './whatsapp';
-import { errosDaPeca, limparVersoes, menorPreco } from '../painel/pecas';
+import { errosDaPeca, errosPorCampo, limparVersoes, menorPreco } from '../painel/pecas';
 
 const letreiro: Produto = {
   nome: 'Letreiro Feliz Natal', codigo: 'NAT-10', descricao: '', preco: '14,90', foto: '',
@@ -33,5 +33,17 @@ describe('versões', () => {
     expect(errosDaPeca({ ...base, versoes: [{ nome: '', preco: '10' }] })).toContain('Escreva o nome de cada versão.');
     expect(errosDaPeca({ ...base, versoes: [{ nome: '10 cm', preco: '1' }, { nome: '10 CM', preco: '2' }] })).toContain('Duas versões estão com o mesmo nome.');
     expect(errosDaPeca(base)).toContain('Escreva o preço da peça.');
+  });
+
+  it('painel: aponta o campo de cada erro, com a posição da linha de versão na tela', () => {
+    const base = { nome: '', preco: '', categoria: '', esgotado: false };
+    const e = errosPorCampo({ ...base, versoes: [{ nome: '10 cm', preco: '5' }, { nome: '', preco: '' }, { nome: '', preco: '8' }, { nome: '10 cm', preco: '' }] });
+    expect(e.nome).toBe('Escreva o nome da peça.');
+    expect(e.categoria).toBe('Escolha a categoria.');
+    expect(e.preco).toBeUndefined();
+    expect(e.versaoNome).toEqual([0, 2, 3]);
+    expect(e.versaoPreco).toEqual([3]);
+    expect(errosPorCampo(base).preco).toBe('Escreva o preço da peça.');
+    expect(errosPorCampo({ ...base, esgotado: true, versoes: [{ nome: 'A', preco: '' }] }).versaoPreco).toEqual([]);
   });
 });

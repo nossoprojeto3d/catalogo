@@ -1,4 +1,4 @@
-import { ArrowLeft, Copy, DownloadSimple, ImageSquare, Plus, ShoppingBag, Trash, X } from '@phosphor-icons/react';
+import { ArrowLeft, Copy, DownloadSimple, ImageSquare, Plus, ShoppingBag, Trash, WarningCircle, X } from '@phosphor-icons/react';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { Botao } from '../components/Botoes';
@@ -9,11 +9,25 @@ import { paraNumero, textoPreco } from '../lib/preco';
 import { CAMPO, ROTULO } from './Acesso';
 import { carregarImagem, prepararFoto } from './foto';
 import { ErroPainel } from './github';
-import { errosDaPeca, limparVersoes, menorPreco, normalizarPreco, type Localizada } from './pecas';
+import { errosPorCampo, limparVersoes, menorPreco, normalizarPreco, type ErrosPorCampo, type Localizada } from './pecas';
 import { promptDaFoto } from './promptFoto';
 import { Miniatura } from './Miniatura';
 
 const OUTRA_CATEGORIA = '__nova__';
+const SEM_ERROS: ErrosPorCampo = { versoes: [], versaoNome: [], versaoPreco: [] };
+
+// Campo com problema: fundo rosado e borda vermelha mais grossa.
+const CAMPO_ERRO = CAMPO.replace('bg-superficie', 'bg-red-50').replace('ring-1 ring-texto/20', 'ring-2 ring-red-600');
+const campo = (erro: unknown) => (erro ? CAMPO_ERRO : CAMPO);
+
+function Aviso({ id, texto }: { id?: string; texto?: string }) {
+  if (!texto) return null;
+  return (
+    <p id={id} className="mt-1.5 flex items-start gap-1.5 text-[15px] font-semibold leading-snug text-red-700">
+      <WarningCircle size={20} weight="fill" className="mt-px shrink-0" /> {texto}
+    </p>
+  );
+}
 
 export type Pedido = {
   original: Localizada | null;
@@ -112,10 +126,15 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
   const [promptManual, setPromptManual] = useState(false);
   const [baixando, setBaixando] = useState(false);
   const [confirmarApagar, setConfirmarApagar] = useState(false);
+  // Depois da primeira tentativa de salvar, os campos com problema ficam marcados até serem corrigidos.
+  const [tentou, setTentou] = useState(false);
   const urlAberta = useRef<string | null>(null);
   useEffect(() => () => { if (urlAberta.current) URL.revokeObjectURL(urlAberta.current); }, []);
 
   const categoriaFinal = categoria === OUTRA_CATEGORIA ? novaCategoria.trim() : categoria;
+  const camposDaPeca = { nome, preco, categoria: categoriaFinal, esgotado: esgotada, versoes };
+  const ec = tentou ? errosPorCampo(camposDaPeca) : SEM_ERROS;
+  const idCategoria = categoria === OUTRA_CATEGORIA ? 'campo-nova-categoria' : 'campo-categoria';
   const ehBrinde = ABAS_BRINDES.includes(categoriaFinal);
 
   const versoesLimpas = limparVersoes(versoes);
@@ -220,10 +239,23 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
   };
 
   const enviar = async () => {
-    const problemas = errosDaPeca({ nome, preco, categoria: categoriaFinal, esgotado: esgotada, versoes });
-    setErros(problemas);
+    const problemas = errosPorCampo(camposDaPeca);
+    setTentou(true);
+    setErros([]);
     setConflito(false);
-    if (problemas.length) return;
+    // Na ordem da tela: Nome, Preço, Categoria e depois as versões.
+    const primeiraVersao = Math.min(...problemas.versaoNome, ...problemas.versaoPreco);
+    const alvo = problemas.nome ? 'campo-nome'
+      : problemas.preco ? 'campo-preco'
+      : problemas.categoria ? idCategoria
+      : Number.isFinite(primeiraVersao) ? `versao-${problemas.versaoNome.includes(primeiraVersao) ? 'nome' : 'preco'}-${primeiraVersao}`
+      : null;
+    if (alvo) {
+      const campo = document.getElementById(alvo);
+      campo?.focus({ preventScroll: true });
+      campo?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      return;
+    }
     setOcupado(true);
     try {
       const base64 = foto ? await prepararFoto(foto.img, foto.x, foto.y) : undefined;
@@ -310,26 +342,38 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
         <div className="space-y-3 md:space-y-4">
           <Bloco titulo="Dados">
             <div className="space-y-4">
-              <label className={ROTULO}>Nome
-                <input className={`${CAMPO} mt-1.5 font-normal`} value={nome} onChange={(e) => setNome(e.target.value)} />
-              </label>
-              {versoes.length === 0 && (
-                <label className={ROTULO}>Preço
-                  <input className={`${CAMPO} mt-1.5 font-normal`} inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} onBlur={() => setPreco(normalizarPreco(preco))} placeholder="0,00" />
+              <div>
+                <label className={ROTULO}>Nome
+                  <input id="campo-nome" className={`${campo(ec.nome)} mt-1.5 font-normal`} value={nome} onChange={(e) => setNome(e.target.value)} aria-invalid={!!ec.nome} aria-describedby={ec.nome ? 'erro-nome' : undefined} />
                 </label>
+                <Aviso id="erro-nome" texto={ec.nome} />
+              </div>
+              {versoes.length === 0 && (
+                <div>
+                  <label className={ROTULO}>Preço
+                    <input id="campo-preco" className={`${campo(ec.preco)} mt-1.5 font-normal`} inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} onBlur={() => setPreco(normalizarPreco(preco))} placeholder="0,00" aria-invalid={!!ec.preco} aria-describedby={ec.preco ? 'erro-preco' : undefined} />
+                  </label>
+                  <Aviso id="erro-preco" texto={ec.preco} />
+                </div>
               )}
+              <div>
               <label className={ROTULO}>Categoria
-                <select className={`${CAMPO} mt-1.5 font-normal`} value={categoria} onChange={(e) => setCategoria(e.target.value)}>
+                <select id="campo-categoria" className={`${campo(ec.categoria && categoria !== OUTRA_CATEGORIA)} mt-1.5 font-normal`} value={categoria} onChange={(e) => setCategoria(e.target.value)} aria-invalid={!!ec.categoria && categoria !== OUTRA_CATEGORIA} aria-describedby={ec.categoria && categoria !== OUTRA_CATEGORIA ? 'erro-categoria' : undefined}>
                   {/* Peça nova começa sem categoria, para ninguém salvar na primeira da lista sem querer. */}
                   <option value="" disabled hidden>Selecione uma categoria</option>
                   {arquivo.categorias.map((c) => <option key={c.nome} value={c.nome}>{c.nome}</option>)}
                   <option value={OUTRA_CATEGORIA}>Nova categoria...</option>
                 </select>
               </label>
+              {categoria !== OUTRA_CATEGORIA && <Aviso id="erro-categoria" texto={ec.categoria} />}
+              </div>
               {categoria === OUTRA_CATEGORIA && (
-                <label className={ROTULO}>Nome da nova categoria
-                  <input className={`${CAMPO} mt-1.5 font-normal`} value={novaCategoria} onChange={(e) => setNovaCategoria(e.target.value)} />
-                </label>
+                <div>
+                  <label className={ROTULO}>Nome da nova categoria
+                    <input id="campo-nova-categoria" className={`${campo(ec.categoria)} mt-1.5 font-normal`} value={novaCategoria} onChange={(e) => setNovaCategoria(e.target.value)} aria-invalid={!!ec.categoria} aria-describedby={ec.categoria ? 'erro-nova-categoria' : undefined} />
+                  </label>
+                  <Aviso id="erro-nova-categoria" texto={ec.categoria && 'Escreva o nome da nova categoria.'} />
+                </div>
               )}
               <label className={ROTULO}>Descrição
                 <textarea className={`${CAMPO} mt-1.5 h-24 py-3 font-normal`} value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Opcional" />
@@ -342,14 +386,19 @@ export function Ficha({ inicial, arquivo, urlFoto, salvar, apagar, voltar, recar
               <ul className="mb-2 space-y-2">
                 {versoes.map((v, i) => (
                   <li key={i} className="flex gap-2">
-                    <input className={`${CAMPO} min-w-0 flex-1`} aria-label={`Nome da versão ${i + 1}`} value={v.nome} onChange={(e) => mudarVersao(i, 'nome', e.target.value)} placeholder="Ex.: 20 cm" />
-                    <input className={`${CAMPO} w-28! shrink-0 px-3`} inputMode="decimal" aria-label={`Preço da versão ${i + 1}`} value={v.preco} onChange={(e) => mudarVersao(i, 'preco', e.target.value)} onBlur={() => mudarVersao(i, 'preco', normalizarPreco(v.preco))} placeholder="0,00" />
+                    <input id={`versao-nome-${i}`} className={`${campo(ec.versaoNome.includes(i))} min-w-0 flex-1`} aria-invalid={ec.versaoNome.includes(i)} aria-describedby={ec.versoes.length ? 'erro-versoes' : undefined} aria-label={`Nome da versão ${i + 1}`} value={v.nome} onChange={(e) => mudarVersao(i, 'nome', e.target.value)} placeholder="Ex.: 20 cm" />
+                    <input id={`versao-preco-${i}`} className={`${campo(ec.versaoPreco.includes(i))} w-28! shrink-0 px-3`} aria-invalid={ec.versaoPreco.includes(i)} aria-describedby={ec.versoes.length ? 'erro-versoes' : undefined} inputMode="decimal" aria-label={`Preço da versão ${i + 1}`} value={v.preco} onChange={(e) => mudarVersao(i, 'preco', e.target.value)} onBlur={() => mudarVersao(i, 'preco', normalizarPreco(v.preco))} placeholder="0,00" />
                     <button type="button" onClick={() => tirarVersao(i)} aria-label={`Tirar a versão ${v.nome || i + 1}`} className="grid size-12 shrink-0 place-items-center rounded-full text-suave ring-1 ring-texto/20">
                       <X size={16} />
                     </button>
                   </li>
                 ))}
               </ul>
+            )}
+            {ec.versoes.length > 0 && (
+              <div id="erro-versoes" className="mb-3 -mt-1">
+                {ec.versoes.map((t) => <Aviso key={t} texto={t} />)}
+              </div>
             )}
             <button type="button" onClick={adicionarVersao} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-superficie px-4 text-[15px] font-semibold ring-1 ring-texto/20">
               <Plus size={18} /> Adicionar versão

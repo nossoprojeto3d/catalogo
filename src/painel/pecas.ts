@@ -76,19 +76,34 @@ export function menorPreco(versoes: Versao[]): string {
   return precos.length ? Math.min(...precos).toFixed(2).replace('.', ',') : '';
 }
 
-// Devolve o que falta arrumar; vazio quer dizer que pode salvar.
-export function errosDaPeca({ nome, preco, categoria, esgotado, versoes = [] }: CamposDaPeca): string[] {
-  const erros: string[] = [];
-  if (!nome.trim()) erros.push('Escreva o nome da peça.');
-  if (!categoria.trim()) erros.push('Escolha a categoria.');
-  const limpas = limparVersoes(versoes);
-  if (limpas.length) {
-    if (limpas.some((v) => !v.nome)) erros.push('Escreva o nome de cada versão.');
-    if (!esgotado && limpas.some((v) => paraNumero(v.preco) <= 0)) erros.push('Escreva o preço de cada versão.');
-    const nomes = limpas.map((v) => normalizar(v.nome)).filter(Boolean);
-    if (new Set(nomes).size !== nomes.length) erros.push('Duas versões estão com o mesmo nome.');
-  } else if (!esgotado && paraNumero(normalizarPreco(preco)) <= 0) erros.push('Escreva o preço da peça.');
+// O que falta arrumar em cada campo, para a ficha marcar o campo certo.
+// versaoNome e versaoPreco são as posições das linhas de versão na tela.
+export type ErrosPorCampo = { nome?: string; categoria?: string; preco?: string; versoes: string[]; versaoNome: number[]; versaoPreco: number[] };
+
+export function errosPorCampo({ nome, preco, categoria, esgotado, versoes = [] }: CamposDaPeca): ErrosPorCampo {
+  const erros: ErrosPorCampo = { versoes: [], versaoNome: [], versaoPreco: [] };
+  if (!nome.trim()) erros.nome = 'Escreva o nome da peça.';
+  if (!categoria.trim()) erros.categoria = 'Escolha a categoria.';
+  // Mesma regra de limparVersoes, guardando a posição de cada linha.
+  const linhas = versoes
+    .map((v, i) => ({ i, nome: v.nome.trim(), preco: normalizarPreco(v.preco) }))
+    .filter((v) => v.nome || paraNumero(v.preco) > 0);
+  if (linhas.length) {
+    const semNome = linhas.filter((v) => !v.nome).map((v) => v.i);
+    if (semNome.length) erros.versoes.push('Escreva o nome de cada versão.');
+    if (!esgotado) erros.versaoPreco = linhas.filter((v) => paraNumero(v.preco) <= 0).map((v) => v.i);
+    if (erros.versaoPreco.length) erros.versoes.push('Escreva o preço de cada versão.');
+    const repetidas = linhas.filter((v) => v.nome && linhas.some((o) => o.i !== v.i && normalizar(o.nome) === normalizar(v.nome))).map((v) => v.i);
+    if (repetidas.length) erros.versoes.push('Duas versões estão com o mesmo nome.');
+    erros.versaoNome = [...new Set([...semNome, ...repetidas])].sort((a, b) => a - b);
+  } else if (!esgotado && paraNumero(normalizarPreco(preco)) <= 0) erros.preco = 'Escreva o preço da peça.';
   return erros;
+}
+
+// Devolve o que falta arrumar; vazio quer dizer que pode salvar.
+export function errosDaPeca(campos: CamposDaPeca): string[] {
+  const e = errosPorCampo(campos);
+  return [e.nome, e.categoria, ...e.versoes, e.preco].filter((x): x is string => !!x);
 }
 
 const juntar = (itens: string[]) => (itens.length > 1 ? `${itens.slice(0, -1).join(', ')} e ${itens[itens.length - 1]}` : itens[0]);
