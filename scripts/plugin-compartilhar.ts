@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { env } from 'node:process';
 import type { Plugin } from 'vite';
-import { normalizar, type ArquivoCatalogo } from '../src/lib/catalogo';
+import { categoriasDoArquivo, normalizar, queridinhos, type ArquivoCatalogo } from '../src/lib/catalogo';
 import { listarFotos } from './plugin-fotos';
 
 // O robô que monta a prévia do link (WhatsApp e outros) não roda o site nem
@@ -47,6 +47,19 @@ function nomesDasPecas() {
   return new Map(arquivo.categorias.flatMap((c) => c.produtos).filter((p) => p.codigo).map((p) => [normalizar(p.codigo), p.nome]));
 }
 
+// queridinhos.json: os queridinhos que têm foto, para a página principal (nossoprojeto3d.com.br)
+// sortear a cada visita. Sai a cada build, então acompanha o que for marcado no painel.
+export function listaDeQueridinhos(arquivo: ArquivoCatalogo, fotos: string[]) {
+  const porCodigo = new Map(fotos.map((f) => [normalizar(f.split('/').pop()!.replace(/\.[^.]+$/, '')), f]));
+  return queridinhos(categoriasDoArquivo(arquivo))
+    .map((p) => {
+      const arquivoFoto = p.codigo ? porCodigo.get(normalizar(p.codigo)) : undefined;
+      const foto = p.foto || (arquivoFoto ? `imagens/${arquivoFoto.split('/').map(encodeURIComponent).join('/')}` : '');
+      return { codigo: p.codigo, nome: p.nome.replace(/\s+/g, ' ').trim(), preco: p.preco, foto, link: `#produto/${encodeURIComponent(p.codigo || p.nome)}` };
+    })
+    .filter((p) => p.foto);
+}
+
 export function pluginCompartilhar(caminho: string): Plugin {
   return {
     name: 'np3d-compartilhar',
@@ -54,6 +67,8 @@ export function pluginCompartilhar(caminho: string): Plugin {
     generateBundle() {
       const site = env.URL_DO_SITE || URL_PADRAO;
       const nomes = nomesDasPecas();
+      const arquivo: ArquivoCatalogo = JSON.parse(readFileSync('public/catalogo.json', 'utf8'));
+      this.emitFile({ type: 'asset', fileName: 'queridinhos.json', source: JSON.stringify(listaDeQueridinhos(arquivo, listarFotos())) });
       for (const foto of listarFotos()) {
         const codigo = foto.split('/').pop()!.replace(/\.[^.]+$/, '');
         this.emitFile({

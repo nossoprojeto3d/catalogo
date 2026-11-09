@@ -239,3 +239,16 @@ describe('ordenação da lista', () => {
     expect(nomes('nome')).toBe('ABCD');
   });
 });
+
+describe('queridinhos.json da página principal', async () => {
+  const { listaDeQueridinhos } = await import('../../scripts/plugin-compartilhar');
+  it('leva só os queridinhos com foto, com link para a peça', () => {
+    const arquivo = { categorias: [{ nome: 'Natal', produtos: [
+      { nome: 'Kit  Natal', descricao: '', preco: '45,90', foto: '', cores: [], combos: {}, maisVendido: 1, esgotado: false, codigo: 'NAT-20' },
+      { nome: 'Sem foto', descricao: '', preco: '10,00', foto: '', cores: [], combos: {}, maisVendido: 2, esgotado: false, codigo: 'NAT-99' },
+      { nome: 'Comum', descricao: '', preco: '5,00', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: false, codigo: 'NAT-01' },
+    ] }] };
+    const lista = listaDeQueridinhos(arquivo as never, ['NAT-20.jpg', 'NAT-01.jpg']);
+    expect(lista).toEqual([{ codigo: 'NAT-20', nome: 'Kit Natal', preco: '45,90', foto: 'imagens/NAT-20.jpg', link: '#produto/NAT-20' }]);
+  });
+});
