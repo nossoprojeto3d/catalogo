@@ -11,6 +11,9 @@
      do catálogo envia o termo pesquisado).
 
    Como usar em uma página: <script src="medicao.js" defer></script>
+   O aviso de cookies é claro por padrão e escuro em páginas com data-theme="dark".
+   Cada projeto pode pôr a sua cor com as variáveis --np3d-aviso-acento e
+   --np3d-aviso-sobre-acento (e, se quiser, -fundo, -texto, -suave, -borda) no :root.
    Para medir algo específico, chame np3dTrack("nome_do_evento", { chave: "valor" }).
    Qualquer link com data-evento="nome" também vira evento ao clicar
    (parâmetros extras em data-produto, data-categoria etc.).
@@ -170,15 +173,22 @@
     css.textContent =
       "#np3d-cookies{position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:2147483000;" +
       "max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;" +
-      "background:#17130d;color:#f4efe3;border:1px solid #3a3226;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);" +
-      "font:12.5px/1.35 'Work Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}" +
-      "#np3d-cookies p{margin:0;flex:1 1 auto;color:#a69c87}" +
+      "background:var(--np3d-aviso-fundo,#fff);color:var(--np3d-aviso-texto,#1f1c14);border:1px solid var(--np3d-aviso-borda,#e8e2d0);" +
+      "border-radius:12px;box-shadow:0 10px 30px rgba(31,28,20,.18);" +
+      "font:12.5px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}" +
+      "#np3d-cookies p{margin:0;flex:1 1 auto;color:var(--np3d-aviso-suave,#5c574a)}" +
       "#np3d-cookies div{display:flex;gap:6px;flex:0 0 auto}" +
       "#np3d-cookies button{font:inherit;font-weight:600;cursor:pointer;border-radius:8px;padding:0 12px;min-height:34px;" +
-      "border:1px solid #4d4331;background:transparent;color:#f4efe3}" +
-      "#np3d-cookies button[data-acao=aceitar]{background:#c9a227;border-color:#c9a227;color:#120e09}" +
-      "#np3d-cookies button:hover{filter:brightness(1.1)}" +
-      "#np3d-cookies button:focus-visible{outline:3px solid #e7c873;outline-offset:2px}";
+      "border:1px solid var(--np3d-aviso-borda,#e8e2d0);background:transparent;color:var(--np3d-aviso-texto,#1f1c14)}" +
+      "#np3d-cookies button[data-acao=aceitar]{background:var(--np3d-aviso-acento,#c9a227);border-color:var(--np3d-aviso-acento,#c9a227);color:var(--np3d-aviso-sobre-acento,#151005)}" +
+      "#np3d-cookies button:hover{filter:brightness(1.06)}" +
+      "#np3d-cookies button:focus-visible{outline:3px solid var(--np3d-aviso-acento,#c9a227);outline-offset:2px}" +
+      // página escura (data-theme="dark", como na calculadora): aviso escuro
+      "[data-theme=dark] #np3d-cookies{background:var(--np3d-aviso-fundo,#17150f);color:var(--np3d-aviso-texto,#f4efe3);" +
+      "border-color:var(--np3d-aviso-borda,#3a3226);box-shadow:0 10px 30px rgba(0,0,0,.45)}" +
+      "[data-theme=dark] #np3d-cookies p{color:var(--np3d-aviso-suave,#a69c87)}" +
+      "[data-theme=dark] #np3d-cookies button{border-color:var(--np3d-aviso-borda,#3a3226);color:var(--np3d-aviso-texto,#f4efe3)}" +
+      "[data-theme=dark] #np3d-cookies button[data-acao=aceitar]{color:var(--np3d-aviso-sobre-acento,#151005)}";
     document.head.appendChild(css);
 
     var box = document.createElement("div");

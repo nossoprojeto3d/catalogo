@@ -146,3 +146,6 @@ html body:has([role='dialog']) #np3d-cookies { display: none; }
   /* O aviso ocupa a mesma altura do botão do WhatsApp: esconde o botão até a resposta. */
   body:has(#np3d-cookies) a[data-link='flutuante'] { visibility: hidden; }
 }
+
+/* Aviso de cookies do medicao.js com a cor do catálogo */
+:root { --np3d-aviso-acento: #c6f432; --np3d-aviso-sobre-acento: #23261c; --np3d-aviso-borda: #dfe2d5; }
