@@ -241,7 +241,7 @@ describe('ordenação da lista', () => {
 });
 
 describe('queridinhos.json da página principal', async () => {
-  const { listaDeQueridinhos } = await import('../../scripts/plugin-compartilhar');
+  const { listaDeQueridinhos, listaDeBrindes } = await import('../../scripts/plugin-compartilhar');
   it('leva só os queridinhos com foto, com link para a peça', () => {
     const arquivo = { categorias: [{ nome: 'Natal', produtos: [
       { nome: 'Kit  Natal', descricao: '', preco: '45,90', foto: '', cores: [], combos: {}, maisVendido: 1, esgotado: false, codigo: 'NAT-20' },
@@ -250,5 +250,16 @@ describe('queridinhos.json da página principal', async () => {
     ] }] };
     const lista = listaDeQueridinhos(arquivo as never, ['NAT-20.jpg', 'NAT-01.jpg']);
     expect(lista).toEqual([{ codigo: 'NAT-20', nome: 'Kit Natal', preco: '45,90', foto: 'imagens/NAT-20.jpg', link: '#produto/NAT-20' }]);
+  });
+  it('brindes.json leva as peças da categoria Brindes com foto', () => {
+    const arquivo = { categorias: [
+      { nome: 'Brindes', produtos: [
+        { nome: 'Bandeja', descricao: '', preco: '9,00', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: false, codigo: 'BRI-01' },
+        { nome: 'Esgotada', descricao: '', preco: '9,00', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: true, codigo: 'BRI-02' },
+      ] },
+      { nome: 'Kids', produtos: [{ nome: 'Outra', descricao: '', preco: '1,00', foto: '', cores: [], combos: {}, maisVendido: null, esgotado: false, codigo: 'KID-01' }] },
+    ] };
+    const lista = listaDeBrindes(arquivo as never, ['BRI-01.jpg', 'BRI-02.jpg', 'KID-01.jpg']);
+    expect(lista.map((p) => p.codigo)).toEqual(['BRI-01']);
   });
 });

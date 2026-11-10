@@ -49,9 +49,19 @@ function nomesDasPecas() {
 
 // queridinhos.json: os queridinhos que têm foto, para a página principal (nossoprojeto3d.com.br)
 // sortear a cada visita. Sai a cada build, então acompanha o que for marcado no painel.
+// brindes.json: as peças da categoria Brindes com foto, para a parte "Para empresas" da página principal.
 export function listaDeQueridinhos(arquivo: ArquivoCatalogo, fotos: string[]) {
+  return paraPagina(queridinhos(categoriasDoArquivo(arquivo)), fotos);
+}
+
+export function listaDeBrindes(arquivo: ArquivoCatalogo, fotos: string[]) {
+  const brindes = categoriasDoArquivo(arquivo).find((c) => normalizar(c.nome) === 'brindes');
+  return paraPagina((brindes?.produtos ?? []).filter((p) => !p.esgotado), fotos);
+}
+
+function paraPagina(produtos: ReturnType<typeof queridinhos>, fotos: string[]) {
   const porCodigo = new Map(fotos.map((f) => [normalizar(f.split('/').pop()!.replace(/\.[^.]+$/, '')), f]));
-  return queridinhos(categoriasDoArquivo(arquivo))
+  return produtos
     .map((p) => {
       const arquivoFoto = p.codigo ? porCodigo.get(normalizar(p.codigo)) : undefined;
       const foto = p.foto || (arquivoFoto ? `imagens/${arquivoFoto.split('/').map(encodeURIComponent).join('/')}` : '');
@@ -69,6 +79,7 @@ export function pluginCompartilhar(caminho: string): Plugin {
       const nomes = nomesDasPecas();
       const arquivo: ArquivoCatalogo = JSON.parse(readFileSync('public/catalogo.json', 'utf8'));
       this.emitFile({ type: 'asset', fileName: 'queridinhos.json', source: JSON.stringify(listaDeQueridinhos(arquivo, listarFotos())) });
+      this.emitFile({ type: 'asset', fileName: 'brindes.json', source: JSON.stringify(listaDeBrindes(arquivo, listarFotos())) });
       for (const foto of listarFotos()) {
         const codigo = foto.split('/').pop()!.replace(/\.[^.]+$/, '');
         this.emitFile({
